@@ -10,9 +10,10 @@ DON'T USE IT
 
 ```js
         {
-           module: "MMM-AMk2Display",
+           module: "MMM-Assistant2Display",
            config: {
-             debug:true
+             debug:true,
+             displayDelay: 30 * 1000
           }
         },
 ```
