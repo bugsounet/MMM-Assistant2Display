@@ -1,0 +1,112 @@
+#AMK2_DISPLAY {
+  position:absolute;
+  width:100%;
+  height:100%;
+  bottom:0;
+  display:block;
+}
+
+#AMK2_DISPLAY.hidden {
+   display:none;
+}
+
+#AMK2_DISPLAY_WINDOW {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+}
+
+#AMK2_DISPLAY.hidden #AMK2_DISPLAY_WINDOW {
+  visibility: hidden;
+  opacity: 0;
+  transition: visibility 0s 1s, opacity 1s linear;
+}
+
+#AMK2_DISPLAY_OUTPUT {
+    order: 1;
+    flex: 1 1 auto;
+    border: none;
+}
+
+/* transscription */
+#AMK2_DISPLAY_CONTENER {
+    order: 2;
+    flex: none;
+    height: 100px;
+    background-color: #f3f3f3; /* better than #181818 */
+    color: #000;
+}
+
+#AMK2_DISPLAY_CONTENER2 {
+    display: flex;
+    flex-direction: row;
+    height: 100%;
+}
+
+#AMK2_DISPLAY_LOGO {
+  width: 150px;
+  height:100px;
+  display:inline-block;
+  background-image:url('/modules/MMM-AssistantMk2/resources/AMk2_Small.png');
+  background-position : 2px -5px;
+  background-repeat: no-repeat;
+  background-size: 90%;
+ }
+
+#AMK2_DISPLAY_TRANSCRIPTION {
+    flex: 1 1 auto;
+}
+
+#AMK2_DISPLAY_TRANSCRIPTION p {
+  margin-top: 23px;
+  font-size: x-large;
+}
+
+#AMK2_DISPLAY_TRANSCRIPTION p.error {
+  color:#FF6633;
+  text-align:left;
+}
+
+#AMK2_DISPLAY_TRANSCRIPTION.hidden {
+  display: none
+}
+
+#AMK2_DISPLAY_HELP {
+    height: 100%;
+    font-size: small;
+}
+
+#AMK2_DISPLAY_HELP.hidden {
+  display: none
+}
+
+#AMK2_DISPLAY_HELPBOX {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+}
+
+#AMK2_DISPLAY_TRYSAY {
+    order: 0;
+    height: 30px;
+    align-items: center;
+    justify-content: center;
+    display: flex;
+    font-style: italic;
+    font-weight: bold;
+}
+
+#AMK2_DISPLAY_WORDBOX {
+    height: 100%;
+}
+
+#AMK2_DISPLAY_WORD {
+    font-size: x-small;
+    order: auto;
+    flex: 1;
+    display: flex;
+    height: 18px;
+    align-items: center;
+    min-width: 140px;
+    margin-right: 10px;
+}
