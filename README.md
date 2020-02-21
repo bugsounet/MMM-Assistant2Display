@@ -6,4 +6,12 @@ Dev repository module to display in IFRAME
 
 FROM MMM-AssistantMk2 addon
 
-DON'T USE IT
+DON'T USE IT.
+```js
+        {
+           module: "MMM-AMk2Display",
+           config: {
+             debug:true
+          }
+        },
+```
