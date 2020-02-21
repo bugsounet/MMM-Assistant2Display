@@ -1,10 +1,10 @@
-# MMM-AMk2Display
+# MMM-Assistant2Display
 
 Dev repository module to display in IFRAME
 * PHOTOS
 * WEB LINKS
 
-FROM MMM-AssistantMk2 addon
+FROM MMM-AssistantMk2
 
 DON'T USE IT
 
