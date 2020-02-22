@@ -1,4 +1,4 @@
-# MMM-AMk2Display
+# MMM-Assistant2Display
 
 Dev repository module to display in IFRAME
 * PHOTOS
