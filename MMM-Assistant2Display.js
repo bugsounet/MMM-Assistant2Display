@@ -35,6 +35,7 @@ Module.register("MMM-Assistant2Display",{
     scoutpan.id = "A2D_WINDOW"
     var scout = document.createElement("iframe")
     scout.id = "A2D_OUTPUT"
+
     scoutpan.appendChild(scout)
 
     var contener = document.createElement("div")
@@ -80,10 +81,19 @@ Module.register("MMM-Assistant2Display",{
     switch(notification) {
       case "DOM_OBJECTS_CREATED":
         this.prepare()
+        this.sendSocketNotification("INIT")
         break
       case "ASSISTANT2DISPLAY":
         log("[A2D] Received:", payload)
         this.scan(payload)
+        break
+    }
+  },
+
+  socketNotificationReceived: function (notification, payload) {
+    switch(notification) {
+      case "A2D_READY":
+        this.urlDisplay()
         break
     }
   },
@@ -95,26 +105,36 @@ Module.register("MMM-Assistant2Display",{
     if(response.urls && response.urls.length > 0) {
       this.prepareDisplay(response)
       this.showDisplay()
-      this.urlDisplay(response.urls)
+      this.urlsScan(response.urls)
+      //this.urlDisplay(response.urls)
     }
   },
 
+  urlsScan: function(urls) {
+    this.sendSocketNotification("URL_DETAIL", urls[this.pos])
+  },
+
   urlDisplay: function (url) {
+    var self = this
     var iframe = document.getElementById("A2D_OUTPUT")
     log("[A2D] Showing", url)
-    iframe.src = url[this.pos]
-    this.autoScrollDown()
-    
-    if (this.pos ==(url.length-1)){
-      setTimeout( () => {
-        this.hideDisplay()
-      }, this.config.displayDelay)
-    } else {
-      setTimeout( () => {
-        this.pos++
-        this.urlDisplay(url)
-      }, this.config.displayDelay)
-    }
+    iframe.src = "http://127.0.0.1:8080/A2D" //url[this.pos]
+    iframe.addEventListener("load", function () {
+      log("[A2D] URL Loaded")
+      self.autoScrollDown()
+   /* 
+      if (this.pos ==(url.length-1)){
+        setTimeout( () => {
+          self.hideDisplay()
+        }, self.config.displayDelay)
+      } else {
+        setTimeout( () => {
+          self.pos++
+           self.urlDisplay(url)
+        }, self.config.displayDelay)
+      }
+      */
+    })
   },
 
   showDisplay: function() {
@@ -146,7 +166,7 @@ Module.register("MMM-Assistant2Display",{
         word[item].textContent = value
         word[item].addEventListener("click", function() {
           log("[A2D] Clicked", value)
-          iframe.src = "http://127.0.0.1:8080/activatebytext/?query=" + value
+          iframe.src = "http://localhost:8080/activatebytext/?query=" + value
           self.hideDisplay(true)
         });
         wordbox.appendChild(word[item])
@@ -170,15 +190,36 @@ Module.register("MMM-Assistant2Display",{
     wordbox.innerHTML = ""
   },
 
-  autoScrollDown: function() {
+  scrollDownDetail: function() {
     var iframe = document.getElementById("A2D_OUTPUT")
-    iframe.addEventListener("load", function () {
-      log("[A2D] URL Loaded")
-      setTimeout(function ()
-      {
-        // do something to scroll down
+    var w = iframe.contentWindow
+    var d = w.document.getElementsByTagName('body')[0]
+    var my = d.scrollHeight
+    var cy = parseInt(iframe.dataset.yPos)
+    var ty = cy + 100 // this.config.scrollStep
+    if (ty > my) {
+      ty = my
+    } else {
+      ty = cy + 100 //this.config.scrollStep
+    }
+    w.scrollTo(0, ty)
+    iframe.dataset.yPos = ty
+    log("ty:", ty)
+    return ty
+  },
 
-      }, 3000);
-    })
+  autoScrollDown: function() {
+    log("[A2D] Scroll Down")
+    var iframe = document.getElementById("A2D_OUTPUT")
+    var w = iframe.contentWindow
+    var d = w.document.getElementsByTagName('body')[0]
+    var my = d.scrollHeight
+    var cy = this.scrollDownDetail()
+    log("my:", my)
+    if (cy < my) {
+      setTimeout(()=>{
+        this.autoScrollDown()
+      }, 1*1000) // this.config.scrollInterval)
+    }
   },
 });

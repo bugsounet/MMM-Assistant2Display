@@ -1,0 +1,25 @@
+{
+  "name": "MMM-Assistant2Display",
+  "version": "0.0.1-dev",
+  "description": "AMk2 Display",
+  "main": "MMM-Assistant2Display.js",
+  "keywords": [
+    "magic mirror",
+    "MMM-AssistantMk2"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/bugsounet/MMM-Assistant2Display"
+  },
+  "author": "bugsounet",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/bugsounet/MMM-Assistant2Display/issues"
+  },
+  "homepage": "https://github.com/bugsounet/MMM-Assistant2Display",
+  "dependencies": {
+    "cors-anywhere": "^0.4.1",
+    "frameguard": "^3.1.0",
+    "helmet": "^3.21.2"
+  }
+}
