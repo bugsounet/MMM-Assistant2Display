@@ -8,6 +8,9 @@ FROM MMM-AssistantMk2
 
 DON'T USE IT
 
+
+**SORRY, ... It's not Cleaned ;(**
+
 ```js
         {
            module: "MMM-Assistant2Display",
