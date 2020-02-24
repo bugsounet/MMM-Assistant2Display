@@ -4,7 +4,8 @@
 Module.register("MMM-Assistant2Display",{
   defaults: {
     debug:true,
-    displayDelay: 30 * 1000
+    displayDelay: 30 * 1000,
+    displaySpeed: 5
   },
 
   start: function () {
@@ -35,6 +36,7 @@ Module.register("MMM-Assistant2Display",{
     scoutpan.id = "A2D_WINDOW"
     var scout = document.createElement("iframe")
     scout.id = "A2D_OUTPUT"
+    scout.scrolling="no"
 
     scoutpan.appendChild(scout)
 
@@ -97,7 +99,7 @@ Module.register("MMM-Assistant2Display",{
         break
     }
   },
-  
+
   scan: function (response) {
     this.pos = 0
     var urlToDisplay = 0
@@ -121,19 +123,18 @@ Module.register("MMM-Assistant2Display",{
     iframe.src = "http://127.0.0.1:8080/A2D" //url[this.pos]
     iframe.addEventListener("load", function () {
       log("[A2D] URL Loaded")
-      self.autoScrollDown()
-   /* 
-      if (this.pos ==(url.length-1)){
+
+     // if (this.pos ==(url.length-1)){
         setTimeout( () => {
-          self.hideDisplay()
+          self.hideDisplay(true)
         }, self.config.displayDelay)
-      } else {
-        setTimeout( () => {
-          self.pos++
-           self.urlDisplay(url)
-        }, self.config.displayDelay)
-      }
-      */
+      //} else {
+       // setTimeout( () => {
+       //   self.pos++
+       //    self.urlDisplay(url)
+       // }, self.config.displayDelay)
+     // }
+
     })
   },
 
@@ -142,7 +143,7 @@ Module.register("MMM-Assistant2Display",{
     var winh = document.getElementById("A2D")
     winh.classList.remove("hidden")
   },
-  
+
   prepareDisplay: function (response) {
     console.log("[A2D] Prepare with", response)
     var self = this
@@ -152,7 +153,6 @@ Module.register("MMM-Assistant2Display",{
     t.className = "transcription"
     t.innerHTML = response.transcription.transcription
     tr.appendChild(t)
-      
     var wordbox = document.getElementById("A2D_WORDBOX")
     var trysay = document.getElementById("A2D_TRYSAY")
     trysay.textContent = ""
@@ -164,11 +164,13 @@ Module.register("MMM-Assistant2Display",{
         word[item] = document.createElement("div")
         word[item].id = "A2D_WORD"
         word[item].textContent = value
+        /* For later ...
         word[item].addEventListener("click", function() {
           log("[A2D] Clicked", value)
           iframe.src = "http://localhost:8080/activatebytext/?query=" + value
           self.hideDisplay(true)
         });
+        */
         wordbox.appendChild(word[item])
       }
     }
@@ -188,38 +190,5 @@ Module.register("MMM-Assistant2Display",{
     if (!send) iframe.src= ""
     trysay.textContent = ""
     wordbox.innerHTML = ""
-  },
-
-  scrollDownDetail: function() {
-    var iframe = document.getElementById("A2D_OUTPUT")
-    var w = iframe.contentWindow
-    var d = w.document.getElementsByTagName('body')[0]
-    var my = d.scrollHeight
-    var cy = parseInt(iframe.dataset.yPos)
-    var ty = cy + 100 // this.config.scrollStep
-    if (ty > my) {
-      ty = my
-    } else {
-      ty = cy + 100 //this.config.scrollStep
-    }
-    w.scrollTo(0, ty)
-    iframe.dataset.yPos = ty
-    log("ty:", ty)
-    return ty
-  },
-
-  autoScrollDown: function() {
-    log("[A2D] Scroll Down")
-    var iframe = document.getElementById("A2D_OUTPUT")
-    var w = iframe.contentWindow
-    var d = w.document.getElementsByTagName('body')[0]
-    var my = d.scrollHeight
-    var cy = this.scrollDownDetail()
-    log("my:", my)
-    if (cy < my) {
-      setTimeout(()=>{
-        this.autoScrollDown()
-      }, 1*1000) // this.config.scrollInterval)
-    }
   },
 });
