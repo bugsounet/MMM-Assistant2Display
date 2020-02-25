@@ -1,16 +1,26 @@
 /** Assistant 2 Display **/
 /** @bugsounet **/
 
+// todo:
+//    * timer management on new request
+//    * HelpWord display and click
+//    * photo management
+
+
 Module.register("MMM-Assistant2Display",{
   defaults: {
     debug:true,
     displayDelay: 30 * 1000,
-    displaySpeed: 5
+    displayHeight: 20000,
+    //displayHelpWord: false
+    scrollSpeed: 1,
+    scrollInitDelay: 1000
   },
 
   start: function () {
     self = this;
     this.pos = 0
+    this.urls= ""
   },
 
   getStyles: function() {
@@ -83,7 +93,7 @@ Module.register("MMM-Assistant2Display",{
     switch(notification) {
       case "DOM_OBJECTS_CREATED":
         this.prepare()
-        this.sendSocketNotification("INIT")
+        this.sendSocketNotification("INIT", this.config)
         break
       case "ASSISTANT2DISPLAY":
         log("[A2D] Received:", payload)
@@ -95,47 +105,47 @@ Module.register("MMM-Assistant2Display",{
   socketNotificationReceived: function (notification, payload) {
     switch(notification) {
       case "A2D_READY":
-        this.urlDisplay()
+        this.urlDisplay(payload)
         break
     }
   },
 
   scan: function (response) {
-    this.pos = 0
-    var urlToDisplay = 0
     log("[A2D] Scan",response)
     if(response.urls && response.urls.length > 0) {
+      this.pos = 0
+      this.urls= response.urls
       this.prepareDisplay(response)
-      this.showDisplay()
+
       this.urlsScan(response.urls)
-      //this.urlDisplay(response.urls)
     }
   },
 
-  urlsScan: function(urls) {
-    this.sendSocketNotification("URL_DETAIL", urls[this.pos])
+  urlsScan: function() {
+    this.sendSocketNotification("URL_DETAIL", this.urls[this.pos])
   },
 
-  urlDisplay: function (url) {
+  urlDisplay: function (uri) {
     var self = this
     var iframe = document.getElementById("A2D_OUTPUT")
-    log("[A2D] Showing", url)
-    iframe.src = "http://127.0.0.1:8080/A2D" //url[this.pos]
-    iframe.addEventListener("load", function () {
+    log("[A2D] Loading", uri)
+    this.showDisplay()
+    iframe.src = "modules/MMM-Assistant2Display/html/" + uri
+    iframe.addEventListener("load", function() {
       log("[A2D] URL Loaded")
 
-     // if (this.pos ==(url.length-1)){
+      if (self.pos ==(self.urls.length-1)){
         setTimeout( () => {
           self.hideDisplay(true)
         }, self.config.displayDelay)
-      //} else {
-       // setTimeout( () => {
-       //   self.pos++
-       //    self.urlDisplay(url)
-       // }, self.config.displayDelay)
-     // }
+      } else {
+        setTimeout( () => {
+          self.pos++
+          self.urlsScan()
+        }, self.config.displayDelay)
+      }
 
-    })
+    }, {once: true})
   },
 
   showDisplay: function() {
@@ -187,8 +197,9 @@ Module.register("MMM-Assistant2Display",{
     
     winh.classList.add("hidden")
     tr.innerHTML= ""
-    if (!send) iframe.src= ""
+    iframe.src= "about:blank"
     trysay.textContent = ""
     wordbox.innerHTML = ""
   },
+
 });

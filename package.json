@@ -18,12 +18,8 @@
   },
   "homepage": "https://github.com/bugsounet/MMM-Assistant2Display",
   "dependencies": {
-    "cors-anywhere": "^0.4.1",
-    "frameguard": "^3.1.0",
-    "helmet": "^3.21.2",
-    "pdfcrowd": "^4.11.0",
-    "pngjs": "^3.4.0",
-    "url-to-image": "^1.0.0",
-    "url-to-screenshot": "^3.0.0"
+    "fs": "0.0.1-security",
+    "path": "^0.12.7",
+    "postman-request": "^2.88.1-postman.18"
   }
 }
