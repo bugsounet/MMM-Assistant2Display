@@ -8,6 +8,7 @@ FROM MMM-AssistantMk2
 
 DON'T USE IT
 
+Needed : AMk2 v3.1.1-0dev with `responseConfig: { useA2D: true }`
 
 ```js
         {
