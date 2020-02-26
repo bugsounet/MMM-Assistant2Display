@@ -18,8 +18,12 @@
   },
   "homepage": "https://github.com/bugsounet/MMM-Assistant2Display",
   "dependencies": {
+    "axios": "^0.19.2",
+    "cheerio": "^1.0.0-rc.3",
     "fs": "0.0.1-security",
+    "http-proxy-middleware": "^1.0.0",
     "path": "^0.12.7",
-    "postman-request": "^2.88.1-postman.18"
+    "postman-request": "^2.88.1-postman.18",
+    "url-parse": "^1.4.7"
   }
 }
