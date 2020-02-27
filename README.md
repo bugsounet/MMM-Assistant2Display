@@ -14,6 +14,7 @@ Needed : AMk2 v3.1.1-0dev with `responseConfig: { useA2D: true }`
         {
            module: "MMM-Assistant2Display",
            config: {
+             ui: "Classic2", // ui of AMk2 (actually only Classic2 is done)
              debug:true, // debug mode
              verbose: false, // verbose of A2D Proxy
              displayDelay: 30 * 1000, // delay before closing iframe in ms
