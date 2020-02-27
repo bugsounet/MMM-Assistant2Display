@@ -28,7 +28,7 @@ class PROXY {
     if (debug == true) log = _log
     var verbose = (this.config.verbose) ? this.config.verbose : false
     if (verbose == true) logv= _log
-    this.server = null
+    this.proxy = null
     this.callback= callback
     this.script = `<script type="text/javascript">
 // A2D auto scrolling by bugsounet
@@ -123,17 +123,17 @@ if (window.addEventListener)
     })
     log("Initialized")
     app.set('port', this.config.proxyPort)
-    this.server = app.listen(app.get('port'), function () {
+    this.proxy = app.listen(app.get('port'), function () {
       log('Proxy Start listening ' + app.get('port'))
       self.callback("A2D_READY")
     })
   }
 
   stop () {
-    if (!this.server) return log("Not Running")
-    this.server.close()
+    if (!this.proxy) return log("Not Running")
+    this.proxy.close()
     log('Proxy Stop listening')
-    this.server = null
+    this.proxy = null
   }
 
 }
