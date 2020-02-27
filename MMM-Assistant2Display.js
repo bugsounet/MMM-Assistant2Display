@@ -6,6 +6,7 @@
 //    * multi ui config by reading AMk2 config
 //    * HelpWord display and click
 //    * photo management
+//    * ignore youtube links
 
 var A2D_ = function() {
   var context = "[A2D]";

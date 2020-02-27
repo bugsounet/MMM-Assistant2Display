@@ -12,6 +12,7 @@ class DisplayClass {
 
   scan(response) {
     A2D("Scan",response)
+    // todo: make exception for youtube links
     if(response.urls && response.urls.length > 0) {
       this.pos = 0
       this.urls= response.urls
