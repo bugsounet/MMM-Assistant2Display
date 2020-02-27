@@ -81,6 +81,7 @@ class Display extends DisplayClass {
         word[item].id = "A2D_WORD"
         word[item].textContent = value
         word[item].addEventListener("click", function() {
+          self.resetTimer()
           log("Clicked", value)
           self.hideDisplay()
           iframe.src = "http://localhost:8080/activatebytext/?query=" + value

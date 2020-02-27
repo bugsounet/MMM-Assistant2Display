@@ -31,9 +31,6 @@ Module.register("MMM-Assistant2Display",{
     self = this;
     this.config = Object.assign({}, this.default, this.config)
     if (this.config.debug) A2D = A2D_
-    this.pos = 0
-    this.urls= ""
-    this.timer = null
     this.displayResponse = new Display(this.config, (noti, payload=null) => { this.sendSocketNotification(noti, payload) })
   },
 
@@ -68,10 +65,7 @@ Module.register("MMM-Assistant2Display",{
         this.sendSocketNotification("INIT", this.config)
         break
       case "ASSISTANT_CONFIRMATION":
-        clearTimeout(this.timer)
-        this.pos = 0
-        this.urls= null
-        this.timer = null
+        this.displayResponse.resetTimer()
         this.displayResponse.hideDisplay()
         this.sendSocketNotification("PROXY_CLOSE")
         break

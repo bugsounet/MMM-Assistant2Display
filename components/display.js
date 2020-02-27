@@ -4,6 +4,9 @@ class DisplayClass {
   constructor (Config, callback) {
     this.config = Config
     this.sendSocketNotification = callback
+    this.pos = 0
+    this.urls= null
+    this.timer = null
     console.log("DisplayClass Loaded")
   }
 
@@ -57,5 +60,12 @@ class DisplayClass {
 
   hideDisplay() {
     // do nothing
+  }
+
+  resetTimer() {
+    clearTimeout(this.timer)
+    this.pos = 0
+    this.urls= null
+    this.timer = null
   }
 }
