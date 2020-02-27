@@ -1,6 +1,6 @@
 {
   "name": "MMM-Assistant2Display",
-  "version": "0.0.1-dev",
+  "version": "0.1.0-dev",
   "description": "AMk2 Display",
   "main": "MMM-Assistant2Display.js",
   "keywords": [
@@ -19,11 +19,9 @@
   "homepage": "https://github.com/bugsounet/MMM-Assistant2Display",
   "dependencies": {
     "axios": "^0.19.2",
+    "body-parser": "^1.19.0",
     "cheerio": "^1.0.0-rc.3",
-    "fs": "0.0.1-security",
-    "http-proxy-middleware": "^1.0.0",
-    "path": "^0.12.7",
-    "postman-request": "^2.88.1-postman.18",
+    "express": "^4.17.1",
     "url-parse": "^1.4.7"
   }
 }
