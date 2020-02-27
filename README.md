@@ -16,7 +16,6 @@ Needed : AMk2 v3.1.1-0dev with `responseConfig: { useA2D: true }`
              debug:true, // debug mode
              verbose: false, // verbose of A2D Proxy
              displayDelay: 30 * 1000, // delay before closing iframe in ms
-             //displayHelpWord: false // not yet implented
              scrollSpeed: 15, // scroll speed High number is low speed recommanded 15 
              scrollStart: 1000, // delay before scrolling in ms (after loaded url)
              proxyPort: 8081 // A2D proxy port
@@ -26,4 +25,4 @@ Needed : AMk2 v3.1.1-0dev with `responseConfig: { useA2D: true }`
 
 * Last Configuration update : 20/02/28
 * Note module position needed because only with iframe
-* Know bugs: exeption not done your youtube link
+* Know bugs: exeption not done for youtube links
