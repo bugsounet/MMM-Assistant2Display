@@ -46,11 +46,13 @@ module.exports = NodeHelper.create({
   },
 
   openProxy: function(url) {
+    if (this.proxyServer) this.proxyServer.stop()
     this.proxyServer = new proxy(this.config, (send,params)=>{ this.callback(send,params) })
     this.proxyServer.start(url)
   },
 
   closeProxy: function () {
+    if (!this.proxyServer) return
     this.proxyServer.stop()
     this.proxyServer= null
   }

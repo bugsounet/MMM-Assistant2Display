@@ -2,7 +2,8 @@
 /** @bugsounet **/
 
 // todo:
-//    * timer management on new request
+//    * timer management on new request -- done ?
+//    * multi ui config by reading AMk2 config
 //    * HelpWord display and click
 //    * photo management
 
@@ -18,10 +19,12 @@ var A2D = function() {
 Module.register("MMM-Assistant2Display",{
   defaults: {
     debug:true,
+    verbose: false,
     displayDelay: 30 * 1000,
-    displayHeight: 20000,
     //displayHelpWord: false
     scrollSpeed: 15,
+    scrollStart: 1000,
+    proxyPort: 8081
   },
 
   start: function () {
@@ -30,6 +33,7 @@ Module.register("MMM-Assistant2Display",{
     if (this.config.debug) A2D = A2D_
     this.pos = 0
     this.urls= ""
+    this.timer = null
   },
 
   getStyles: function() {
@@ -104,6 +108,14 @@ Module.register("MMM-Assistant2Display",{
         this.prepare()
         this.sendSocketNotification("INIT", this.config)
         break
+      case "ASSISTANT_CONFIRMATION":
+        clearTimeout(this.timer)
+        this.pos = 0
+        this.urls= ""
+        this.timer = null
+        this.hideDisplay()
+        this.sendSocketNotification("PROXY_CLOSE")
+        break
       case "ASSISTANT2DISPLAY":
         log("Received:", payload)
         this.scan(payload)
@@ -138,23 +150,18 @@ Module.register("MMM-Assistant2Display",{
     var iframe = document.getElementById("A2D_OUTPUT")
     A2D("Loading", this.urls[this.pos])
     this.showDisplay()
-    iframe.src = "http://127.0.0.1:8081/"+ this.urls[this.pos]
+    iframe.src = "http://127.0.0.1:" + this.config.proxyPort + "/"+ this.urls[this.pos]
     iframe.addEventListener("load", function() {
       A2D("URL Loaded")
-
-      if (self.pos ==(self.urls.length-1)){
-        setTimeout( () => {
-          self.hideDisplay(true)
-          self.sendSocketNotification("PROXY_CLOSE")
-        }, self.config.displayDelay)
-      } else {
-        setTimeout( () => {
-          self.sendSocketNotification("PROXY_CLOSE")
+      self.timer = setTimeout( () => {
+        self.sendSocketNotification("PROXY_CLOSE")
+        if (self.pos >= (self.urls.length-1)){
+          self.hideDisplay()
+        } else {
           self.pos++
           self.urlsScan()
-        }, self.config.displayDelay)
-      }
-
+        }
+      }, self.config.displayDelay)
     }, {once: true})
   },
 
@@ -167,6 +174,8 @@ Module.register("MMM-Assistant2Display",{
   prepareDisplay: function (response) {
     A2D("Prepare with", response)
     var self = this
+    var winh = document.getElementById("A2D")
+    var iframe = document.getElementById("A2D_OUTPUT")
     var tr = document.getElementById("A2D_TRANSCRIPTION")
     tr.innerHTML = ""
     var t = document.createElement("p")
@@ -184,27 +193,24 @@ Module.register("MMM-Assistant2Display",{
         word[item] = document.createElement("div")
         word[item].id = "A2D_WORD"
         word[item].textContent = value
-        /* For later ...
         word[item].addEventListener("click", function() {
-          log("[A2D] Clicked", value)
+          log("Clicked", value)
+          self.hideDisplay()
           iframe.src = "http://localhost:8080/activatebytext/?query=" + value
-          self.hideDisplay(true)
         });
-        */
         wordbox.appendChild(word[item])
       }
     }
     A2D("Prepare ok")
   },
 
-  hideDisplay: function (send) {
+  hideDisplay: function () {
     A2D("Hide Iframe")
     var winh = document.getElementById("A2D")
     var tr = document.getElementById("A2D_TRANSCRIPTION")
     var iframe = document.getElementById("A2D_OUTPUT")
     var trysay = document.getElementById("A2D_TRYSAY")
     var wordbox = document.getElementById("A2D_WORDBOX")
-    
     winh.classList.add("hidden")
     tr.innerHTML= ""
     iframe.src= "about:blank"

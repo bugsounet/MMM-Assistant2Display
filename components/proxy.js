@@ -7,6 +7,7 @@ const axios = require("axios")
 const cheerio = require("cheerio")
 const urlParser = require("url-parse")
 var app = express()
+
 var _log = function() {
     var context = "[A2D:PROXY]"
     return Function.prototype.bind.call(console.log, console, context)
@@ -16,47 +17,48 @@ var log = function() {
   //do nothing
 }
 
+var logv = function() {
+  //do nothing
+}
+
 class PROXY {
   constructor(config, callback = ()=>{}) {
     this.config = config
     var debug = (this.config.debug) ? this.config.debug : false
     if (debug == true) log = _log
-    this.server= null
+    var verbose = (this.config.verbose) ? this.config.verbose : false
+    if (verbose == true) logv= _log
+    this.server = null
     this.callback= callback
-    this.htmlToAdd = `<script type="text/javascript">
-var posY = 0
+    this.script = `<script type="text/javascript">
+// A2D auto scrolling by bugsounet
 
-function loadCallback(){
-  var d = document.getElementsByTagName('body')[0]
-  var my = d.scrollHeight
+function scrollDown(posY){
+  var body = document.getElementsByTagName('body')[0]
+  var scrollHeight = body.scrollHeight
 
   window.setTimeout(function(){
-    if (posY < my) {
-      Scroll(0, posY);
-      posY = posY + 1
-      loadCallback();
+    if (posY == 0) console.log("[A2D:PROXY] Begin Scrolling")
+    if (posY < scrollHeight) {
+      window.scrollTo(0, posY);
+      posY++
+      scrollDown(posY);
     }
-    else console.log("END")
+    else console.log("[A2D:PROXY] End Scrolling")
   }, ${this.config.scrollSpeed});
-  //
 }
- 
-// Scroll X
-function Scroll(x, y){
-    window.scrollTo(x, y);
-}
-if (window.addEventListener)
-  window.addEventListener("load", loadCallback, false)
-else if (window.attachEvent)
-  window.attachEvent("onload", loadCallback)
-else
-  window.onload=loadCallback
 
-</script>`
+if (window.addEventListener)
+  window.addEventListener("load", () => {
+    setTimeout("scrollDown(0)", ${this.config.scrollStart})
+  }, false)
+
+</script>
+`
   }
+
   start (url) {
-    if (this.server) return log("Already Started")
-    else log("Initialize for request: " + url)
+    log("Initialize for request: " + url)
     var self = this
     var targetDocumentURL = url
     var targetBaseURL = new urlParser(targetDocumentURL).origin
@@ -70,9 +72,8 @@ else
       } else {
         requested = targetBaseURL + requested
       }
-      log("REQUESTED:", requested)
+      logv("REQUESTED:", requested)
       if (requested == targetDocumentURL) {
-        // main html page
         response.header("Access-Control-Allow-Origin", "*")
         response.header("Access-Control-Allow-Methods", "GET")
         response.header("Access-Control-Allow-Headers", request.header('access-control-request-headers'))
@@ -88,7 +89,7 @@ else
               $("head").append(`<base href="${targetBaseURL}">`)
             }
             var addScript = $("head")
-            addScript.append(self.htmlToAdd)
+            addScript.append(self.script)
             response.send($.html())
           })
           .catch(function (error) {
@@ -100,7 +101,7 @@ else
         axios.get(requested)
           .then((result)=>{
             var contentType = result.headers["content-type"]
-            log("TYPE", requested, contentType)
+            logv("TYPE", requested, contentType)
             if (contentType) {
               response.setHeader('content-type', contentType)
             } else {
@@ -114,14 +115,14 @@ else
             } else if (error.request) {
               log("Error Request: " + error.request);
             } else {
-              log('Error' + error.message);
+              log('Error: ' + error.message);
             }
             response.send(error.message)
           })    
       }
     })
     log("Initialized")
-    app.set('port', 8081)
+    app.set('port', this.config.proxyPort)
     this.server = app.listen(app.get('port'), function () {
       log('Proxy Start listening ' + app.get('port'))
       self.callback("A2D_READY")
@@ -135,9 +136,6 @@ else
     this.server = null
   }
 
-  callbackErr (err) {
-
-  }
 }
 
 module.exports = PROXY
