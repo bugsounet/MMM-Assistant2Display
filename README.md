@@ -1,12 +1,10 @@
 # MMM-Assistant2Display
 
 Dev repository module to display in IFRAME
-* PHOTOS
-* WEB LINKS with auto-scrolling
+* PHOTOS (not set yet)
+* WEB LINKS with auto-scrolling (Done)
 
 FROM MMM-AssistantMk2
-
-DON'T USE IT
 
 Needed : AMk2 v3.1.1-0dev with `responseConfig: { useA2D: true }`
 
@@ -14,11 +12,10 @@ Needed : AMk2 v3.1.1-0dev with `responseConfig: { useA2D: true }`
         {
            module: "MMM-Assistant2Display",
            config: {
-             ui: "Classic2", // ui of AMk2 (actually only Classic2 is done)
+             ui: "Classic2", // ui of AMk2 (available: Classic/Classic2/Fullscreen)
              debug:true, // debug mode
              verbose: false, // verbose of A2D Proxy
              displayDelay: 30 * 1000, // delay before closing iframe in ms
-             //displayHelpWord: false // not yet implented
              scrollSpeed: 15, // scroll speed High number is low speed recommanded 15 
              scrollStart: 1000, // delay before scrolling in ms (after loaded url)
              proxyPort: 8081 // A2D proxy port
@@ -26,5 +23,6 @@ Needed : AMk2 v3.1.1-0dev with `responseConfig: { useA2D: true }`
         },
 ```
 
-* Last Configuration update : 20/02/27
+* Last Configuration update : 20/02/28
 * Note module position needed because only with iframe
+* Know bugs: exeption not done for youtube links
