@@ -65,13 +65,14 @@ Module.register("MMM-Assistant2Display",{
         this.displayResponse.prepare()
         this.sendSocketNotification("INIT", this.config)
         break
+      case "ASSISTANT_HOOK":
+        A2D("Hooked")
       case "ASSISTANT_CONFIRMATION":
         this.displayResponse.resetTimer()
         this.displayResponse.hideDisplay()
         this.sendSocketNotification("PROXY_CLOSE")
         break
       case "ASSISTANT2DISPLAY":
-        A2D("Received:", payload)
         this.displayResponse.scan(payload)
         break
     }

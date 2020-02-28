@@ -11,7 +11,7 @@ class DisplayClass {
   }
 
   scan(response) {
-    A2D("Scan",response)
+    A2D("Response Scan",response)
     // todo: make exception for youtube links
     if(response.urls && response.urls.length > 0) {
       this.pos = 0
@@ -27,6 +27,7 @@ class DisplayClass {
 
   urlDisplay() {
     var self = this
+    if (!this.urls) return
     var iframe = document.getElementById("A2D_OUTPUT")
     A2D("Loading", this.urls[this.pos])
     this.showDisplay()
