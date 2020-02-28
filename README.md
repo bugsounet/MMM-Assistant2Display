@@ -24,5 +24,4 @@ Needed : AMk2 v3.1.1-0dev with `responseConfig: { useA2D: true }`
 ```
 
 * Last Configuration update : 20/02/28
-* Note module position needed because only with iframe
-* Know bugs: exeption not done for youtube links
+* Note: module position not needed because only with iframe
