@@ -2,9 +2,6 @@
 /** @bugsounet **/
 
 // todo:
-//    * timer management on new request -- done ?
-//    * multi ui config by reading AMk2 config
-//    * HelpWord display and click
 //    * photo management
 //    * ignore youtube links
 
@@ -19,7 +16,7 @@ var A2D = function() {
 
 Module.register("MMM-Assistant2Display",{
   defaults: {
-    ui: "Classic2",
+    ui : "AMk2",
     debug:true,
     verbose: false,
     displayDelay: 30 * 1000,
@@ -35,20 +32,32 @@ Module.register("MMM-Assistant2Display",{
     this.displayResponse = new Display(this.config, (noti, payload=null) => { this.sendSocketNotification(noti, payload) })
   },
 
+  uiAutoChoice: function() {
+    if (this.config.ui == "AMk2") {
+      for (let [item, value] of Object.entries(config.modules)) {
+        if (value.module == "MMM-AssistantMk2") {
+          if (value.config.ui && ((value.config.ui === "Classic2") || (value.config.ui === "Classic"))) {
+            this.config.ui = value.config.ui
+          } else this.config.ui = "Fullscreen"
+        }
+      }
+    }
+    console.log("[A2D] Auto choice UI", this.config.ui)
+  },
+
+  getScripts: function() {
+    this.uiAutoChoice()
+    var ui = this.config.ui + "/" + this.config.ui + '.js'
+    return [
+       "/modules/MMM-Assistant2Display/components/display.js",
+       "/modules/MMM-Assistant2Display/ui/" + ui
+    ]
+  },
+
   getStyles: function() {
     return [
       "/modules/MMM-Assistant2Display/ui/" + this.config.ui + "/" + this.config.ui + ".css"
     ];
-  },
-
-  getScripts: function() {
-    if (this.config.ui) {
-      var ui = this.config.ui + "/" + this.config.ui + '.js'
-      return [
-       "/modules/MMM-Assistant2Display/components/display.js",
-       "/modules/MMM-Assistant2Display/ui/" + ui
-      ]
-    }
   },
 
   suspend: function() {
