@@ -25,7 +25,7 @@ module.exports = NodeHelper.create({
       case "INIT":
         this.initialize(payload)
         break
-      case "URL_DETAIL":
+      case "PROXY_OPEN":
         this.openProxy(payload)
         break
       case "PROXY_CLOSE":
@@ -39,6 +39,7 @@ module.exports = NodeHelper.create({
     log(this.config)
     var debug = (this.config.debug) ? this.config.debug : false
     if (debug == true) log = _log
+    log("Initialized: Assistant2Display Version",  require('./package.json').version)
   },
 
   callback: function(send,params) {

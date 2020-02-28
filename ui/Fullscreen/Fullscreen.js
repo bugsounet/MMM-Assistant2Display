@@ -24,15 +24,6 @@ class Display extends DisplayClass {
     return dom
   }
 
-  prepareDisplay(response) {
-    A2D("Prepare with", response)
-    var self = this
-    var winh = document.getElementById("A2D")
-    var iframe = document.getElementById("A2D_OUTPUT")
-    A2D("Prepare ok")
-    super.prepareDisplay(response)
-  }
-
   hideDisplay() {
     A2D("Hide Iframe")
     var winh = document.getElementById("A2D")

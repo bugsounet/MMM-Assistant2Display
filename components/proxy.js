@@ -97,15 +97,12 @@ if (window.addEventListener)
             response.send(error.message)
           })
       } else {
-        // other resources
         axios.get(requested)
           .then((result)=>{
             var contentType = result.headers["content-type"]
             logv("TYPE", requested, contentType)
             if (contentType) {
               response.setHeader('content-type', contentType)
-            } else {
-             //
             }
             response.send(result.data)
           })
@@ -121,7 +118,6 @@ if (window.addEventListener)
           })    
       }
     })
-    log("Initialized")
     app.set('port', this.config.proxyPort)
     this.proxy = app.listen(app.get('port'), function () {
       log('Proxy Start listening ' + app.get('port'))

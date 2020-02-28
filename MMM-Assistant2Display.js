@@ -82,7 +82,7 @@ Module.register("MMM-Assistant2Display",{
         this.sendSocketNotification("PROXY_CLOSE")
         break
       case "ASSISTANT2DISPLAY":
-        this.displayResponse.scan(payload)
+        this.displayResponse.start(payload)
         break
     }
   },
