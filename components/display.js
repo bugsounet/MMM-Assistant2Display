@@ -16,6 +16,11 @@ class DisplayClass {
     if(response.photos && response.photos.length > 0) {
       A2D("Photos Links detected !")
       A2D("Not yet coded !")
+      this.pos = 0
+      this.urls= response.photos
+      this.response = response
+      this.prepareDisplay(this.response)
+      this.photoDisplay()
     } else if(response.urls && response.urls.length > 0) {
       this.pos = 0
       this.urls= response.urls
@@ -42,6 +47,27 @@ class DisplayClass {
       this.prepareDisplay(this.response)
       this.sendSocketNotification("PROXY_OPEN", this.urls[this.pos])
     }
+  }
+
+  photoDisplay() {
+    var self = this
+    if (!this.urls) return
+    var iframe = document.getElementById("A2D_OUTPUT")
+    A2D("Loading photo #", this.pos)
+    this.showDisplay()
+    iframe.src = this.urls[this.pos]
+    iframe.addEventListener("load", function() {
+      A2D("URL Loaded")
+      self.timer = setTimeout( () => {
+        self.sendSocketNotification("PROXY_CLOSE")
+        if (self.pos >= (self.urls.length-1)){
+          self.hideDisplay()
+        } else {
+          self.pos++
+          self.photoDisplay()
+        }
+      }, self.config.displayDelay)
+    }, {once: true})
   }
 
   urlDisplay() {
