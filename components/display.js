@@ -13,7 +13,10 @@ class DisplayClass {
 
   start(response) {
     A2D("Response Scan")
-    if(response.urls && response.urls.length > 0) {
+    if(response.photos && response.photos.length > 0) {
+      A2D("Photos Links detected !")
+      A2D("Not yet coded !")
+    } else if(response.urls && response.urls.length > 0) {
       this.pos = 0
       this.urls= response.urls
       this.response = response
