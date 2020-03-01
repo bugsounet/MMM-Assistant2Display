@@ -22,23 +22,21 @@ Module.register("MMM-Assistant2Display",{
   },
 
   start: function () {
-    self = this;
+    self = this
+    this.useA2D = false
+    this.scanAMk2()
     this.config = Object.assign({}, this.default, this.config)
+    this.helperConfig= {
+      debug: this.config.debug,
+      verbose: this.config.verbose,
+      scrollSpeed: this.config.scrollSpeed,
+      scrollStart: this.config.scrollStart,
+      proxyPort: this.config.proxyPort,
+      useA2D: this.useA2D
+    }
+
     if (this.config.debug) A2D = A2D_
     this.displayResponse = new Display(this.config, (noti, payload=null) => { this.sendSocketNotification(noti, payload) })
-  },
-
-  uiAutoChoice: function() {
-    if (this.config.ui == "AMk2") {
-      for (let [item, value] of Object.entries(config.modules)) {
-        if (value.module == "MMM-AssistantMk2") {
-          if (value.config.ui && ((value.config.ui === "Classic2") || (value.config.ui === "Classic"))) {
-            this.config.ui = value.config.ui
-          } else this.config.ui = "Fullscreen"
-        }
-      }
-    }
-    console.log("[AMK2:ADDONS:A2D] Auto choice UI", this.config.ui)
   },
 
   getScripts: function() {
@@ -67,18 +65,19 @@ Module.register("MMM-Assistant2Display",{
   notificationReceived: function (notification, payload) {
     switch(notification) {
       case "DOM_OBJECTS_CREATED":
-        this.displayResponse.prepare()
-        this.sendSocketNotification("INIT", this.config)
+        if (this.useA2D) this.displayResponse.prepare()
+        this.sendSocketNotification("INIT", this.helperConfig)
         break
       case "ASSISTANT_HOOK":
-        A2D("Hooked")
       case "ASSISTANT_CONFIRMATION":
-        this.displayResponse.resetTimer()
-        this.displayResponse.hideDisplay()
-        this.sendSocketNotification("PROXY_CLOSE")
+        if (this.useA2D) {
+          this.displayResponse.resetTimer()
+          this.displayResponse.hideDisplay()
+          this.sendSocketNotification("PROXY_CLOSE")
+        }
         break
       case "ASSISTANT2DISPLAY":
-        this.displayResponse.start(payload)
+        if (this.useA2D) this.displayResponse.start(payload)
         break
     }
   },
@@ -89,5 +88,26 @@ Module.register("MMM-Assistant2Display",{
         this.displayResponse.urlDisplay()
         break
     }
+  },
+
+  scanAMk2: function() {
+    for (let [item, value] of Object.entries(config.modules)) {
+      if (value.module == "MMM-AssistantMk2") {
+        this.useA2D = value.config.addons ? value.config.addons : false
+      }
+    }
+  },
+
+  uiAutoChoice: function() {
+    if (this.config.ui == "AMk2") {
+      for (let [item, value] of Object.entries(config.modules)) {
+        if (value.module == "MMM-AssistantMk2") {
+          if (value.config.ui && ((value.config.ui === "Classic2") || (value.config.ui === "Classic"))) {
+            this.config.ui = value.config.ui
+          } else this.config.ui = "Fullscreen"
+        }
+      }
+    }
+    console.log("[AMK2:ADDONS:A2D] Auto choice UI", this.config.ui)
   },
 });

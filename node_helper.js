@@ -16,7 +16,6 @@ module.exports = NodeHelper.create({
 
   start: function () {
     this.config = {}
-    this.html = ""
     this.proxyServer = null
   },
 
@@ -39,7 +38,8 @@ module.exports = NodeHelper.create({
     log(this.config)
     var debug = (this.config.debug) ? this.config.debug : false
     if (debug == true) log = _log
-    log("Initialized: Assistant2Display Version",  require('./package.json').version)
+    if (this.config.useA2D) log("Initialized: Assistant2Display Version",  require('./package.json').version)
+    else log("Disabled.")
   },
 
   callback: function(send,params) {
@@ -57,5 +57,4 @@ module.exports = NodeHelper.create({
     this.proxyServer.stop()
     this.proxyServer= null
   }
-
 });

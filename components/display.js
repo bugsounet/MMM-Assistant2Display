@@ -27,7 +27,6 @@ class DisplayClass {
   }
 
   urlsScan() {
-    if (!this.urls) return
     var re_ytl = new RegExp("youtube\.com\/watch\\?v\=([0-9a-zA-Z\-\_]+)", "ig")
     var re_ytp = new RegExp("youtube\.com\/playlist\\?list\=([a-zA-Z0-9\-\_]+)", "ig")
     var self = this
@@ -38,7 +37,7 @@ class DisplayClass {
       A2D("Bypass YT Link:", this.urls[this.pos])
       this.pos++
       if (self.pos >= (self.urls.length-1)){
-        return A2D("No Link to Display")
+        return A2D("No New Link to Display")
       }
     } else {
       this.prepareDisplay(this.response)
@@ -47,8 +46,8 @@ class DisplayClass {
   }
 
   photoDisplay() {
-    var self = this
     if (!this.urls) return
+    var self = this
     var photo = document.getElementById("A2D_PHOTO")
     A2D("Loading photo #" + (this.pos+1) + "/" + self.urls.length)
     this.showDisplay(false,true)

@@ -21,7 +21,6 @@ class Display extends DisplayClass {
     scout.classList.add("hidden")
     scoutpan.appendChild(scoutphoto)
     scoutpan.appendChild(scout)
-    
 
     var contener = document.createElement("div")
     contener.id = "A2D_CONTENER"
@@ -68,5 +67,4 @@ class Display extends DisplayClass {
     photo.src= ""
     super.hideDisplay()
   }
-  
 }

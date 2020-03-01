@@ -24,36 +24,36 @@ class Display extends DisplayClass {
 
     var contener = document.createElement("div")
     contener.id = "A2D_CONTENER"
-    
+
     var contener2 = document.createElement("div")
     contener2.id = "A2D_CONTENER2"   
 
     var logo = document.createElement("div")
     logo.id = "A2D_LOGO"
-    
+
     contener2.appendChild(logo)
     var transcription = document.createElement("div")
     transcription.id = "A2D_TRANSCRIPTION"
     contener2.appendChild(transcription)
- 
+
     var help = document.createElement("div")
     help.id = "A2D_HELP"
-   
+
     var helpbox = document.createElement("div")
     helpbox.id = "A2D_HELPBOX"
     help.appendChild(helpbox)
-    
+
     var trysay = document.createElement("div")
     trysay.id = "A2D_TRYSAY"
     helpbox.appendChild(trysay)
-    
+
     var wordbox = document.createElement("div")
     wordbox.id = "A2D_WORDBOX"
     helpbox.appendChild(wordbox)
-    
+
     contener2.appendChild(help)
     contener.appendChild(contener2)
-        
+
     scoutpan.appendChild(contener)
     dom.appendChild(scoutpan)
 

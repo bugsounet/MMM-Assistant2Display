@@ -5,7 +5,6 @@ class Display extends DisplayClass {
     console.log("Extend Display with Fullscreen ui Loaded")
   }
 
-
   prepare() {
     var dom = document.createElement("div")
     dom.id = "A2D"
