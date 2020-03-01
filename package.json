@@ -3,6 +3,10 @@
   "version": "1.0.0",
   "description": "AMk2 Display",
   "main": "MMM-Assistant2Display.js",
+  "scripts": {
+    "preinstall": "installer/preinstall.sh",
+    "postinstall": "installer/postinstall.sh"
+  },
   "keywords": [
     "magic mirror",
     "MMM-AssistantMk2"
