@@ -32,7 +32,7 @@ this is the default configuration defined, if you don't define any value
        scrollSpeed: 15,
        scrollStart: 1000,
        proxyPort: 8081,
-       debug:true,
+       debug: false,
        verbose: false,
      }
   },
