@@ -4,7 +4,7 @@ const proxy = require("./components/proxy.js")
 var NodeHelper = require("node_helper")
 
 var _log = function() {
-  var context = "[A2D]"
+  var context = "[AMK2:ADDONS:A2D]"
   return Function.prototype.bind.call(console.log, console, context)
 }()
 

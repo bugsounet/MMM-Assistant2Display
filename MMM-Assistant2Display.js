@@ -1,12 +1,8 @@
 /** Assistant 2 Display **/
 /** @bugsounet **/
 
-// todo:
-//    * photo management
-//    * ignore youtube links
-
 var A2D_ = function() {
-  var context = "[A2D]";
+  var context = "[AMK2:ADDONS:A2D]";
   return Function.prototype.bind.call(console.log, console, context);
 }()
 
@@ -17,7 +13,7 @@ var A2D = function() {
 Module.register("MMM-Assistant2Display",{
   defaults: {
     ui : "AMk2",
-    debug:true,
+    debug:false,
     verbose: false,
     displayDelay: 30 * 1000,
     scrollSpeed: 15,
@@ -42,7 +38,7 @@ Module.register("MMM-Assistant2Display",{
         }
       }
     }
-    console.log("[A2D] Auto choice UI", this.config.ui)
+    console.log("[AMK2:ADDONS:A2D] Auto choice UI", this.config.ui)
   },
 
   getScripts: function() {
@@ -94,5 +90,4 @@ Module.register("MMM-Assistant2Display",{
         break
     }
   },
-
 });
