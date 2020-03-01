@@ -1,8 +1,10 @@
-# MMM-Assistant2Display (addons MMM-AssistantMk2)
+# MMM-Assistant2Display
 
-This module allows to display the links and photos found by your assistant
+This module is an addons for MMM-AssistantMk2.
 
-Needed : AMk2 v3.1.1-0 with `responseConfig: { useA2D: true }`
+It allows to display the links and photos found by your assistant.
+
+Needed: AMk2 v3.1.1-0 with `config: { addons: true }`
 
 ## Configuration
 To display the module insert it in the config.js file. Here is an example:
@@ -19,7 +21,7 @@ To display the module insert it in the config.js file. Here is an example:
 ```
 
 ### Personalized configuration
-this is the default configuration defined if you don't define any value
+this is the default configuration defined, if you don't define any value
 
 ```js
   {
@@ -38,7 +40,7 @@ this is the default configuration defined if you don't define any value
 
 | Option  | Description | Type | Default |
 | ------- | --- | --- | --- |
-| ui | ui type: Classic/Classic2/Fullscreen or AMk2 for automatic choice from AMk2 config) | Boolean | AMk2 |
+| ui | ui type: Classic/Classic2/Fullscreen or AMk2 for automatic choice from AMk2 config | Boolean | AMk2 |
 | displayDelay | delay before closing iframe in ms | Integer | 30 * 1000 |
 | scrollSpeed | scroll speed High number is low speed recommanded 15 | Integer | 15 |
 | scrollStart | delay before scrolling in ms (after url loaded ) | Integer | 1000 |
