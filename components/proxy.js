@@ -30,6 +30,7 @@ class PROXY {
     if (verbose == true) logv= _log
     this.proxy = null
     this.callback= callback
+    this.header= false
     this.script = `<script type="text/javascript">
 // A2D auto scrolling by bugsounet
 
@@ -116,7 +117,7 @@ if (window.addEventListener)
             }
             response.send(error.message)
           })    
-      }
+        }
     })
     app.set('port', this.config.proxyPort)
     this.proxy = app.listen(app.get('port'), function () {

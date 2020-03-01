@@ -14,12 +14,9 @@ class DisplayClass {
   start(response) {
     A2D("Response Scan")
     if(response.photos && response.photos.length > 0) {
-      A2D("Photos Links detected !")
-      A2D("Not yet coded !")
       this.pos = 0
       this.urls= response.photos
-      this.response = response
-      this.prepareDisplay(this.response)
+      this.prepareDisplay(response)
       this.photoDisplay()
     } else if(response.urls && response.urls.length > 0) {
       this.pos = 0
@@ -52,14 +49,13 @@ class DisplayClass {
   photoDisplay() {
     var self = this
     if (!this.urls) return
-    var iframe = document.getElementById("A2D_OUTPUT")
-    A2D("Loading photo #", this.pos)
-    this.showDisplay()
-    iframe.src = this.urls[this.pos]
-    iframe.addEventListener("load", function() {
-      A2D("URL Loaded")
+    var photo = document.getElementById("A2D_PHOTO")
+    A2D("Loading photo #" + (this.pos+1) + "/" + self.urls.length)
+    this.showDisplay(false,true)
+    photo.src = this.urls[this.pos]
+    photo.addEventListener("load", function() {
+      A2D("Photo Loaded")
       self.timer = setTimeout( () => {
-        self.sendSocketNotification("PROXY_CLOSE")
         if (self.pos >= (self.urls.length-1)){
           self.hideDisplay()
         } else {
@@ -75,7 +71,7 @@ class DisplayClass {
     if (!this.urls) return
     var iframe = document.getElementById("A2D_OUTPUT")
     A2D("Loading", this.urls[this.pos])
-    this.showDisplay()
+    this.showDisplay(true,false)
     iframe.src = "http://127.0.0.1:" + this.config.proxyPort + "/"+ this.urls[this.pos]
     iframe.addEventListener("load", function() {
       A2D("URL Loaded")
@@ -91,9 +87,13 @@ class DisplayClass {
     }, {once: true})
   }
 
-  showDisplay() {
+  showDisplay(urls,photos) {
     A2D("Show Iframe")
+    var iframe = document.getElementById("A2D_OUTPUT")
+    var photo = document.getElementById("A2D_PHOTO")
     var winh = document.getElementById("A2D")
+    if (urls) iframe.classList.remove("hidden")
+    if (photos) photo.classList.remove("hidden")
     winh.classList.remove("hidden")
   }
 
