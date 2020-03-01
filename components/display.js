@@ -8,7 +8,7 @@ class DisplayClass {
     this.urls= null
     this.timer = null
     this.response = null
-    console.log("DisplayClass Loaded")
+    console.log("[AMK2:ADDONS:A2D] DisplayClass Loaded")
   }
 
   start(response) {

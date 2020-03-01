@@ -2,7 +2,7 @@ class Display extends DisplayClass {
   constructor (Config, callback) {
     super(Config, callback)
     this.sendSocketNotification = callback
-    console.log("Extend Display with Fullscreen ui Loaded")
+    console.log("[AMK2:ADDONS:A2D] Extend Display with Fullscreen ui Loaded")
   }
 
   prepare() {
