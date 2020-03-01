@@ -4,7 +4,16 @@ This module is an addons for MMM-AssistantMk2.
 
 It allows to display the links and photos found by your assistant.
 
-Needed: AMk2 v3.1.1-0 with `config: { addons: true }`
+Needed: AMk2 v3.1.1-0 with `config: { addons: true }
+
+## Installation
+
+```sh
+cd ~/MagicMirror/modules
+git clone https://github.com/bugsounet/MMM-Assistant2Display.git
+cd MMM-Assistant2Display
+npm install
+```
 
 ## Configuration
 To display the module insert it in the config.js file. Here is an example:
