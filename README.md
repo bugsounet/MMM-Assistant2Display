@@ -1,27 +1,51 @@
-# MMM-Assistant2Display
+# MMM-Assistant2Display (addons MMM-AssistantMk2)
 
-Dev repository module to display in IFRAME
-* PHOTOS (not set yet)
-* WEB LINKS with auto-scrolling (Done)
+This module allows to display the links and photos found by your assistant
 
-FROM MMM-AssistantMk2
+Needed : AMk2 v3.1.1-0 with `responseConfig: { useA2D: true }`
 
-Needed : AMk2 v3.1.1-0dev with `responseConfig: { useA2D: true }`
+## Configuration
+To display the module insert it in the config.js file. Here is an example:
+
+### Minimal configuration
 
 ```js
-        {
-           module: "MMM-Assistant2Display",
-           config: {
-             ui: "AMk2", // ui of AMk2 (available: Classic/Classic2/Fullscreen or AMk2 for automatic choice from AMk2 config)
-             debug:true, // debug mode
-             verbose: false, // verbose of A2D Proxy
-             displayDelay: 30 * 1000, // delay before closing iframe in ms
-             scrollSpeed: 15, // scroll speed High number is low speed recommanded 15 
-             scrollStart: 1000, // delay before scrolling in ms (after loaded url)
-             proxyPort: 8081 // A2D proxy port
-          }
-        },
+  {
+     module: "MMM-Assistant2Display",
+     config: {
+       ui: "AMk2",
+     }
+   },
 ```
 
-* Last Configuration update : 20/02/28
+### Personalized configuration
+this is the default configuration defined if you don't define any value
+
+```js
+  {
+     module: "MMM-Assistant2Display",
+     config: {
+       ui: "AMk2", 
+       displayDelay: 30 * 1000,
+       scrollSpeed: 15,
+       scrollStart: 1000,
+       proxyPort: 8081,
+       debug:true,
+       verbose: false,
+     }
+  },
+```
+
+| Option  | Description | Type | Default |
+| ------- | --- | --- | --- |
+| ui | ui type: Classic/Classic2/Fullscreen or AMk2 for automatic choice from AMk2 config) | Boolean | AMk2 |
+| displayDelay | delay before closing iframe in ms | Integer | 30 * 1000 |
+| scrollSpeed | scroll speed High number is low speed recommanded 15 | Integer | 15 |
+| scrollStart | delay before scrolling in ms (after url loaded ) | Integer | 1000 |
+| proxyPort | A2D Proxy port | Integer | 8081 |
+| debug | debug mode | Boolean | false |
+| verbose | verbose mode of A2D Proxy (debug needed) | Boolean | false |
+
+
+* Last Configuration update : 20/03/01
 * Note: module position not needed because only with iframe
