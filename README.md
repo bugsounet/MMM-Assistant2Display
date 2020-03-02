@@ -58,5 +58,4 @@ this is the default configuration defined, if you don't define any value
 | verbose | verbose mode of A2D Proxy (debug needed) | Boolean | false |
 
 
-* Last Configuration update : 20/03/01
 * Note: module position not needed because only with iframe
