@@ -4,7 +4,11 @@ This module is an addons for MMM-AssistantMk2.
 
 It allows to display the links and photos found by your assistant.
 
-Needed: AMk2 v3.1.1-0 with `config: { addons: true }`
+Needed: AMk2 v3.1.1-0 with special configuration
+
+Turn on `addons: true` in your AMk2 config.js file
+
+`config: { addons: true }`
 
 ## Installation
 
