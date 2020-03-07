@@ -18,7 +18,8 @@ Module.register("MMM-Assistant2Display",{
     displayDelay: 30 * 1000,
     scrollSpeed: 15,
     scrollStart: 1000,
-    proxyPort: 8081
+    proxyPort: 8081,
+    sandbox: null
   },
 
   start: function () {
@@ -100,12 +101,21 @@ Module.register("MMM-Assistant2Display",{
 
   uiAutoChoice: function() {
     if (this.config.ui == "AMk2") {
+      var modify = false
       for (let [item, value] of Object.entries(config.modules)) {
         if (value.module == "MMM-AssistantMk2") {
           if (value.config.ui && ((value.config.ui === "Classic2") || (value.config.ui === "Classic"))) {
             this.config.ui = value.config.ui
-          } else this.config.ui = "Fullscreen"
+            modify = true
+          } else {
+            this.config.ui = "Fullscreen"
+            modify = true
+          }
         }
+      }
+      if (!modify) {
+        console.log("[AMK2:ADDONS:A2D][ERROR] AMk2 not found!")
+        this.config.ui = "Fullscreen"
       }
     }
     console.log("[AMK2:ADDONS:A2D] Auto choice UI", this.config.ui)
