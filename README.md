@@ -47,6 +47,7 @@ this is the default configuration defined, if you don't define any value
        proxyPort: 8081,
        debug: false,
        verbose: false,
+       sandbox: null
      }
   },
 ```
@@ -60,6 +61,7 @@ this is the default configuration defined, if you don't define any value
 | proxyPort | A2D Proxy port | Integer | 8081 |
 | debug | debug mode | Boolean | false |
 | verbose | verbose mode of A2D Proxy (debug needed) | Boolean | false |
+| sandbox | This attribute allows you to apply restrictions on the content that can appear in the iframe. Set `null` to desactivate | string | null |
 
 
 * Note: module position not needed because only with iframe

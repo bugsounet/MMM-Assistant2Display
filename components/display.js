@@ -29,14 +29,13 @@ class DisplayClass {
   urlsScan() {
     var re_ytl = new RegExp("youtube\.com\/watch\\?v\=([0-9a-zA-Z\-\_]+)", "ig")
     var re_ytp = new RegExp("youtube\.com\/playlist\\?list\=([a-zA-Z0-9\-\_]+)", "ig")
-    var self = this
     var ytlink = re_ytl.exec(this.urls[this.pos])
     var ytpl = re_ytp.exec(this.urls[this.pos])
 
     if (ytlink || ytpl) {
       A2D("Bypass YT Link:", this.urls[this.pos])
       this.pos++
-      if (self.pos >= (self.urls.length-1)){
+      if (this.pos >= (this.urls.length-1)){
         return A2D("No New Link to Display")
       }
     } else {
@@ -72,6 +71,8 @@ class DisplayClass {
     A2D("Loading", this.urls[this.pos])
     this.showDisplay(true,false)
     iframe.src = "http://127.0.0.1:" + this.config.proxyPort + "/"+ this.urls[this.pos]
+    if (this.config.sandbox) iframe.sandbox = this.config.sandbox
+
     iframe.addEventListener("load", function() {
       A2D("URL Loaded")
       self.timer = setTimeout( () => {
