@@ -19,11 +19,13 @@ Module.register("MMM-Assistant2Display",{
     scrollSpeed: 15,
     scrollStart: 1000,
     proxyPort: 8081,
-    sandbox: null
+    sandbox: null,
+    useLinks: true,
+    usePhotos: true,
+    useYoutube: true
   },
 
   start: function () {
-    self = this
     this.useA2D = false
     this.scanAMk2()
     this.config = Object.assign({}, this.default, this.config)
@@ -69,6 +71,17 @@ Module.register("MMM-Assistant2Display",{
         if (this.useA2D) this.displayResponse.prepare()
         this.sendSocketNotification("INIT", this.helperConfig)
         break
+      case "ASSISTANT_LISTEN":
+      case "ASSISTANT_THINK":
+        if (this.useA2D) {
+          this.displayResponse.controlPlayer("setVolume", 5)
+        }
+        break
+      case "ASSISTANT_STANDBY":
+        if (this.useA2D) {
+          this.displayResponse.controlPlayer("setVolume", 100)
+        }
+        break
       case "ASSISTANT_HOOK":
       case "ASSISTANT_CONFIRMATION":
         if (this.useA2D) {
@@ -79,6 +92,13 @@ Module.register("MMM-Assistant2Display",{
         break
       case "ASSISTANT2DISPLAY":
         if (this.useA2D) this.displayResponse.start(payload)
+        break
+      case "A2D_STOP":
+        if (this.useA2D) {
+          this.displayResponse.controlPlayer("pauseVideo")
+          this.displayResponse.resetTimer()
+          this.displayResponse.hideDisplay()
+        }
         break
     }
   },

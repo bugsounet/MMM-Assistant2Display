@@ -48,3 +48,12 @@
 #A2D_PHOTO.hidden {
    display:none;
 }
+
+#A2D_YOUTUBE {
+    width: 100%;
+    height: 100%;
+}
+
+#A2D_YOUTUBE.hidden {
+  display:none;
+}

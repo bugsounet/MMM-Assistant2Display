@@ -19,6 +19,18 @@ class Display extends DisplayClass {
     scout.id = "A2D_OUTPUT"
     scout.scrolling="no"
     scout.classList.add("hidden")
+    var scoutyt = document.createElement("div")
+    scoutyt.id = "A2D_YOUTUBE"
+    scoutyt.classList.add("hidden")
+    var api = document.createElement("script")
+    api.src = "https://www.youtube.com/iframe_api"
+    var writeScript = document.getElementsByTagName("script")[0]
+    writeScript.parentNode.insertBefore(api, writeScript)
+    window.onYouTubeIframeAPIReady = () => {
+      A2D("YOUTUBE API is ready.")
+      this.initYTPlayer(this.makeYTOptions())
+    }
+    scoutpan.appendChild(scoutyt)
     scoutpan.appendChild(scoutphoto)
     scoutpan.appendChild(scout)
 
@@ -55,11 +67,13 @@ class Display extends DisplayClass {
 
   hideDisplay() {
     A2D("Hide Iframe")
+    var YT = document.getElementById("A2D_YOUTUBE")
     var winh = document.getElementById("A2D")
     var tr = document.getElementById("A2D_TRANSCRIPTION")
     var iframe = document.getElementById("A2D_OUTPUT")
     var photo = document.getElementById("A2D_PHOTO")
-    winh.classList.add("hidden")
+    if (this.videoPlaying) YT.classList.remove("hidden")
+    else winh.classList.add("hidden")
     tr.innerHTML= ""
     iframe.classList.add("hidden")
     iframe.src= "about:blank"
