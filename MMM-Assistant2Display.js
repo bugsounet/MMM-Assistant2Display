@@ -47,7 +47,8 @@ Module.register("MMM-Assistant2Display",{
     var ui = this.config.ui + "/" + this.config.ui + '.js'
     return [
        "/modules/MMM-Assistant2Display/components/display.js",
-       "/modules/MMM-Assistant2Display/ui/" + ui
+       "/modules/MMM-Assistant2Display/ui/" + ui,
+       "/modules/MMM-Assistant2Display/components/youtube.js"
     ]
   },
 
@@ -74,12 +75,12 @@ Module.register("MMM-Assistant2Display",{
       case "ASSISTANT_LISTEN":
       case "ASSISTANT_THINK":
         if (this.useA2D) {
-          this.displayResponse.controlPlayer("setVolume", 5)
+          this.displayResponse.player.controlPlayer("setVolume", 5)
         }
         break
       case "ASSISTANT_STANDBY":
         if (this.useA2D) {
-          this.displayResponse.controlPlayer("setVolume", 100)
+          this.displayResponse.player.controlPlayer("setVolume", 100)
         }
         break
       case "ASSISTANT_HOOK":
@@ -95,7 +96,7 @@ Module.register("MMM-Assistant2Display",{
         break
       case "A2D_STOP":
         if (this.useA2D) {
-          this.displayResponse.controlPlayer("pauseVideo")
+          this.displayResponse.player.controlPlayer("pauseVideo")
           this.displayResponse.resetTimer()
           this.displayResponse.hideDisplay()
         }

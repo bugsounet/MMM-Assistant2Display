@@ -27,8 +27,8 @@ class Display extends DisplayClass {
     var writeScript = document.getElementsByTagName("script")[0]
     writeScript.parentNode.insertBefore(api, writeScript)
     window.onYouTubeIframeAPIReady = () => {
-      A2D("YOUTUBE API is ready.")
-      this.initYTPlayer(this.makeYTOptions())
+      this.player = new YOUTUBE(this.config, "A2D_YOUTUBE", (show) => { this.showYT(show) })
+      this.player.init()
     }
     scoutpan.appendChild(scoutyt)
     scoutpan.appendChild(scoutphoto)
@@ -117,7 +117,7 @@ class Display extends DisplayClass {
     var photo = document.getElementById("A2D_PHOTO")
     var trysay = document.getElementById("A2D_TRYSAY")
     var wordbox = document.getElementById("A2D_WORDBOX")
-    if (this.videoPlaying) YT.classList.remove("hidden")
+    if (this.player.status()) YT.classList.remove("hidden")
     else winh.classList.add("hidden")
     tr.innerHTML= ""
     iframe.classList.add("hidden")
