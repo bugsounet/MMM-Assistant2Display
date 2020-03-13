@@ -20,26 +20,46 @@ Module.register("MMM-Assistant2Display",{
     scrollStart: 1000,
     proxyPort: 8081,
     sandbox: null,
-    useLinks: true,
+    useLinks: false,
     usePhotos: true,
-    useYoutube: true
+    useYoutube: true,
+    useVolume: true,
+    volumePreset: "ALSA"
   },
 
   start: function () {
     this.useA2D = false
     this.scanAMk2()
     this.config = Object.assign({}, this.default, this.config)
+    this.volumeScript= {
+      "OSX": `osascript -e 'set volume output volume #VOLUME#'`,
+      "ALSA": `amixer sset -M 'PCM' #VOLUME#%`,
+      "HIFIBERRY-DAC": `amixer sset -M 'Digital' #VOLUME#%`,
+      "PULSE": `amixer set Master #VOLUME#% -q`,
+      "RESPEAKER_SPEAKER": `amixer -M sset Speaker #VOLUME#%`,
+      "RESPEAKER_PLAYBACK": `amixer -M sset Playback #VOLUME#%`
+    }
+    
     this.helperConfig= {
       debug: this.config.debug,
       verbose: this.config.verbose,
       scrollSpeed: this.config.scrollSpeed,
       scrollStart: this.config.scrollStart,
       proxyPort: this.config.proxyPort,
+      volumeScript: this.volumeScript[this.config.volumePreset],
       useA2D: this.useA2D
     }
 
     if (this.config.debug) A2D = A2D_
-    this.displayResponse = new Display(this.config, (noti, payload=null) => { this.sendSocketNotification(noti, payload) })
+    var callbacks= {
+      "sendSocketNotification": (noti, params) => {
+        this.sendSocketNotification(noti, params)
+      },
+      "sendNotification": (noti, params)=> {
+        this.sendNotification(noti, params)
+      }
+    }
+    this.displayResponse = new Display(this.config, callbacks)
   },
 
   getScripts: function() {
@@ -76,10 +96,12 @@ Module.register("MMM-Assistant2Display",{
       case "ASSISTANT_THINK":
         if (this.useA2D) {
           this.displayResponse.player.controlPlayer("setVolume", 5)
+          this.displayResponse.hideDisplay(true)
         }
         break
       case "ASSISTANT_STANDBY":
         if (this.useA2D) {
+          this.displayResponse.showYT(true)
           this.displayResponse.player.controlPlayer("setVolume", 100)
         }
         break
@@ -87,7 +109,6 @@ Module.register("MMM-Assistant2Display",{
       case "ASSISTANT_CONFIRMATION":
         if (this.useA2D) {
           this.displayResponse.resetTimer()
-          this.displayResponse.hideDisplay()
           this.sendSocketNotification("PROXY_CLOSE")
         }
         break
@@ -101,6 +122,11 @@ Module.register("MMM-Assistant2Display",{
           this.displayResponse.hideDisplay()
         }
         break
+      case "VOLUME_SET":
+        if (this.useA2D && this.config.useVolume) {
+          this.sendSocketNotification("SET_VOLUME", payload)
+        }
+        break          
     }
   },
 

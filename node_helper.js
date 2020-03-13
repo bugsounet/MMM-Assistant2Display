@@ -1,6 +1,7 @@
 /** node helper **/
 
 const proxy = require("./components/proxy.js")
+var exec = require('child_process').exec
 var NodeHelper = require("node_helper")
 
 var _log = function() {
@@ -30,6 +31,9 @@ module.exports = NodeHelper.create({
       case "PROXY_CLOSE":
         this.closeProxy()
         break
+      case "SET_VOLUME":
+        this.setVolume(payload)
+        break
     }
   },
 
@@ -56,5 +60,16 @@ module.exports = NodeHelper.create({
     if (!this.proxyServer) return
     this.proxyServer.stop()
     this.proxyServer= null
+  },
+
+  setVolume: function(volume) {
+    var script = this.config.volumeScript.replace("#VOLUME#", volume)
+    exec (script, (err, stdout, stderr)=>{
+      if (err) {
+        console.log("[AMK2:ADDONS:A2D] Set Volume Error:", err)
+      } else {
+        log("Set Volume To:", volume)
+      }
+    })
   }
 });

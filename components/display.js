@@ -1,9 +1,10 @@
 /* Common A2D Class */
 
 class DisplayClass {
-  constructor (Config, callback) {
+  constructor (Config, callbacks) {
     this.config = Config
-    this.sendSocketNotification = callback
+    this.sendSocketNotification = callbacks.sendSocketNotification
+    this.sendNotification= callbacks.sendNotification
     this.pos = 0
     this.urls= null
     this.timer = null
@@ -14,7 +15,7 @@ class DisplayClass {
 
   start(response) {
     A2D("Response Scan")
-    if(response.photos && response.photos.length > 0) {
+    if(this.config.usePhotos && response.photos && response.photos.length > 0) {
       this.pos = 0
       this.urls= response.photos
       this.prepareDisplay(response)
@@ -36,10 +37,9 @@ class DisplayClass {
     
     if (ytLink || ytPlayList) {
       A2D("YT Link:", this.urls[this.pos], ytPlayList )
-      if (ytLink) this.player.loadVideo( {id: ytLink[1], type : "id"})
-      if (ytPlayList) this.player.loadVideo( {id: ytPlayList[1], type : "playlist"})
-      
-    } else {
+      if (ytLink && this.config.useYoutube) this.player.loadVideo( {id: ytLink[1], type : "id"})
+      if (ytPlayList&& this.config.useYoutube) this.player.loadVideo( {id: ytPlayList[1], type : "playlist"})
+    } else if(this.config.useLinks) {
       this.sendSocketNotification("PROXY_OPEN", this.urls[this.pos])
     }
   }

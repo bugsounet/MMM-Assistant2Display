@@ -1,7 +1,6 @@
 class Display extends DisplayClass {
   constructor (Config, callback) {
     super(Config, callback)
-    this.callback = callback
     console.log("[AMK2:ADDONS:A2D] Extend Display with Classic ui Loaded")
   }
 
@@ -27,7 +26,7 @@ class Display extends DisplayClass {
     var writeScript = document.getElementsByTagName("script")[0]
     writeScript.parentNode.insertBefore(api, writeScript)
     window.onYouTubeIframeAPIReady = () => {
-      this.player = new YOUTUBE(this.config, "A2D_YOUTUBE", (show) => { this.showYT(show) })
+      this.player = new YOUTUBE("A2D_YOUTUBE", (show) => { this.showYT(show) })
       this.player.init()
     }
     scoutpan.appendChild(scoutyt)
@@ -65,14 +64,14 @@ class Display extends DisplayClass {
     super.prepareDisplay(response)
   }
 
-  hideDisplay() {
+  hideDisplay(force) {
     A2D("Hide Iframe")
     var YT = document.getElementById("A2D_YOUTUBE")
     var winh = document.getElementById("A2D")
     var tr = document.getElementById("A2D_TRANSCRIPTION")
     var iframe = document.getElementById("A2D_OUTPUT")
     var photo = document.getElementById("A2D_PHOTO")
-    if (this.player.status()) YT.classList.remove("hidden")
+    if (!force && this.player.status()) YT.classList.remove("hidden")
     else winh.classList.add("hidden")
     tr.innerHTML= ""
     iframe.classList.add("hidden")

@@ -1,7 +1,7 @@
 /** Youtube Library **/
 
 class YOUTUBE {
-  constructor(config, id, callback) {
+  constructor(id, callback) {
     this.cb = callback
     this.config = config
     this.idDom = id
