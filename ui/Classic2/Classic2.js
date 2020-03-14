@@ -26,7 +26,11 @@ class Display extends DisplayClass {
     var writeScript = document.getElementsByTagName("script")[0]
     writeScript.parentNode.insertBefore(api, writeScript)
     window.onYouTubeIframeAPIReady = () => {
-      this.player = new YOUTUBE("A2D_YOUTUBE", (show) => { this.showYT(show) })
+      this.player = new YOUTUBE(
+        "A2D_YOUTUBE",
+        (show) => { this.showYT(show) },
+        (title) => { this.titleYT(title) }
+      )
       this.player.init()
     }
     scoutpan.appendChild(scoutyt)
@@ -73,21 +77,22 @@ class Display extends DisplayClass {
     return dom
   }
 
-  prepareDisplay(response) {
-    A2D("Prepare with", response)
+  prepareDisplay(response,title) {
+    A2D("Prepare with", response ? response : title)
     var self = this
     var iframe = document.getElementById("A2D_OUTPUT")
     var tr = document.getElementById("A2D_TRANSCRIPTION")
     tr.innerHTML = ""
     var t = document.createElement("p")
     t.className = "transcription"
-    t.innerHTML = response.transcription.transcription
+    if (title) t.innerHTML = title
+    else t.innerHTML = response.transcription.transcription
     tr.appendChild(t)
     var wordbox = document.getElementById("A2D_WORDBOX")
     var trysay = document.getElementById("A2D_TRYSAY")
     trysay.textContent = ""
     wordbox.innerHTML = ""
-    if(response.trysay) {
+    if(response && response.trysay) {
       trysay.textContent = response.trysay
       var word = []
       for (let [item, value] of Object.entries(response.help)) {
@@ -104,7 +109,7 @@ class Display extends DisplayClass {
       }
     }
     A2D("Prepare ok")
-    super.prepareDisplay(response)
+    super.prepareDisplay(response,title)
   }
 
   hideDisplay(force) {
@@ -126,5 +131,10 @@ class Display extends DisplayClass {
     trysay.textContent = ""
     wordbox.innerHTML = ""
     super.hideDisplay()
+  }
+
+  titleYT(title) {
+    this.prepareDisplay(null, title)
+    super.titleYT(title)
   }
 }

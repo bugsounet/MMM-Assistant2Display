@@ -26,7 +26,11 @@ class Display extends DisplayClass {
     var writeScript = document.getElementsByTagName("script")[0]
     writeScript.parentNode.insertBefore(api, writeScript)
     window.onYouTubeIframeAPIReady = () => {
-      this.player = new YOUTUBE("A2D_YOUTUBE", (show) => { this.showYT(show) })
+      this.player = new YOUTUBE(
+        "A2D_YOUTUBE",
+        (show) => { this.showYT(show) },
+        (title) => { this.titleYT(title) }
+      )
       this.player.init()
     }
     scoutpan.appendChild(scoutyt)
@@ -51,14 +55,15 @@ class Display extends DisplayClass {
     return dom
   }
 
-  prepareDisplay(response) {
-    A2D("Prepare with", response)
+  prepareDisplay(response, title) {
+    A2D("Prepare with", response ? response : title)
     var self = this
     var tr = document.getElementById("A2D_TRANSCRIPTION")
     tr.innerHTML = ""
     var t = document.createElement("p")
     t.className = "transcription"
-    t.innerHTML = response.transcription.transcription
+    if (title) t.innerHTML = title
+    else t.innerHTML = response.transcription.transcription
     tr.appendChild(t)
     A2D("Prepare ok")
     super.prepareDisplay(response)
@@ -79,5 +84,10 @@ class Display extends DisplayClass {
     photo.classList.add("hidden")
     photo.src= ""
     super.hideDisplay()
+  }
+
+  titleYT(title) {
+    this.prepareDisplay(null, title)
+    super.titleYT(title)
   }
 }

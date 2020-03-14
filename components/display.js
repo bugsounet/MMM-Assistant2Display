@@ -36,7 +36,6 @@ class DisplayClass {
     var ytPlayList = ytP.exec(this.urls[this.pos])
     
     if (ytLink || ytPlayList) {
-      A2D("YT Link:", this.urls[this.pos], ytPlayList )
       if (ytLink && this.config.useYoutube) this.player.loadVideo( {id: ytLink[1], type : "id"})
       if (ytPlayList&& this.config.useYoutube) this.player.loadVideo( {id: ytPlayList[1], type : "playlist"})
     } else if(this.config.useLinks) {
@@ -114,7 +113,7 @@ class DisplayClass {
     // reserved for extends
   }
 
-  hideDisplay() {
+  hideDisplay(force) {
     // reserved for extends
   }
 
@@ -130,5 +129,9 @@ class DisplayClass {
         YT.classList.add("hidden")
       }
     }
+  }
+
+  titleYT(title) {
+    // reserved for extends
   }
 }

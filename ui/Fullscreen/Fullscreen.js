@@ -26,7 +26,11 @@ class Display extends DisplayClass {
     var writeScript = document.getElementsByTagName("script")[0]
     writeScript.parentNode.insertBefore(api, writeScript)
     window.onYouTubeIframeAPIReady = () => {
-      this.player = new YOUTUBE("A2D_YOUTUBE", (show) => { this.showYT(show) })
+      this.player = new YOUTUBE(
+        "A2D_YOUTUBE",
+        (show) => { this.showYT(show) },
+        (title) => { this.titleYT(title) }
+      )
       this.player.init()
     }
     scoutpan.appendChild(scoutyt)

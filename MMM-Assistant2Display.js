@@ -20,7 +20,7 @@ Module.register("MMM-Assistant2Display",{
     scrollStart: 1000,
     proxyPort: 8081,
     sandbox: null,
-    useLinks: false,
+    useLinks: true,
     usePhotos: true,
     useYoutube: true,
     useVolume: true,
@@ -101,7 +101,7 @@ Module.register("MMM-Assistant2Display",{
         break
       case "ASSISTANT_STANDBY":
         if (this.useA2D) {
-          this.displayResponse.showYT(true)
+          this.displayResponse.showYT(this.displayResponse.player.status())
           this.displayResponse.player.controlPlayer("setVolume", 100)
         }
         break
@@ -117,7 +117,7 @@ Module.register("MMM-Assistant2Display",{
         break
       case "A2D_STOP":
         if (this.useA2D) {
-          this.displayResponse.player.controlPlayer("pauseVideo")
+          this.displayResponse.player.controlPlayer("stopVideo")
           this.displayResponse.resetTimer()
           this.displayResponse.hideDisplay()
         }
