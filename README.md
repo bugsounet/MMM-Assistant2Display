@@ -2,13 +2,20 @@
 
 This module is an addons for MMM-AssistantMk2.
 
-It allows to display the links and photos found by your assistant.
+It allows to display the links, photos and YouTube video found by your assistant.
+
+You can control MagicMirror sound volume
 
 Needed: AMk2 v3.1.1-3 with special configuration
 
 Turn on `addons: true` in your AMk2 config.js file
 
 `config: { addons: true }`
+
+## Screenshoot
+
+ ![](https://raw.githubusercontent.com/bugsounet/MMM-Assistant2Display/dev/screenshoot2.jpeg)
+ ![](https://raw.githubusercontent.com/bugsounet/MMM-Assistant2Display/dev/screenshoot1.jpg)
 
 ## Installation
 
@@ -73,4 +80,7 @@ this is the default configuration defined, if you don't define any value
 | useVolume | allow volume control | Boolean | true |
 | volumePreset | preset configuration type. available : ALSA, PULSE, HIFIBERRY-DAC,RESPEAKER_SPEAKER, RESPEAKER_PLAYBACK, OSX  | String | ALSA |
 
-* Note: module position not needed because only with iframe
+* Note:
+  * module position not needed because only with iframe
+  * if you want to stop link/photo or youtube video displaying: just say `stop`
+  * if you want to control sound volume of your mirror: just say `volume 5` (mini volume is 0, maximum is 10)
