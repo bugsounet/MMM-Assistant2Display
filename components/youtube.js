@@ -1,8 +1,23 @@
 /** Youtube Library **/
+/** bugsounet **/
 
+/** Contructor(id,status,title):
+ * @id: dom ID
+ * @status: return --> true -> playing video or false -> in standby
+ * @title: return title of the youtube video
+****
+ * function:
+ * init(): intialize player
+ * load(object):
+    * { type: "id", id: <YT video id> } -> YT single video
+    * { type: "playlist", id: <YT video id> } -> YT playlist video
+ * controlPlayer(command,param):
+    * command and param to send from YT iframe API
+****
+**/
 class YOUTUBE {
-  constructor(id, callback, title) {
-    this.cb = callback
+  constructor(id, status, title) {
+    this.status = status
     this.title = title
     this.idDom = id
     this.YTPlayer = null
@@ -20,7 +35,7 @@ class YOUTUBE {
       iv_load_policy:3,
       modestbranding: 1
     }
-    this.videoPlaying= false
+
     this.state = {
       "-1": "Video unstarted",
       "0": "Video ended",
@@ -29,6 +44,7 @@ class YOUTUBE {
       "3": "Video buffering",
       "5": "Video cued"
     }
+
     this.error = {
       "2": "Invalid Parameter",
       "5": "HTML5 Player Error",
@@ -36,7 +52,9 @@ class YOUTUBE {
       "101": "Not Allowed By Owner",
       "150": "Not Allowed By Owner"
     }
+
     this.errorYT = false
+    this.videoPlaying = false
     console.log("[AMK2:ADDONS:A2D] YOUTUBE Class Loaded")
   }
 
@@ -68,7 +86,7 @@ class YOUTUBE {
         case 0:
         case 2:
           this.videoPlaying= false
-          this.cb(this.videoPlaying)
+          this.status(this.videoPlaying)
           break
         case 1:
           var title = this.YTPlayer.l.videoData.title
@@ -76,7 +94,7 @@ class YOUTUBE {
           this.title(title)
         case 3:
           this.videoPlaying= true
-          this.cb(this.videoPlaying)
+          this.status(this.videoPlaying)
           break
         case 5:
           if (this.list) {
@@ -92,7 +110,7 @@ class YOUTUBE {
     return options
   }
 
-  loadVideo(payload) {
+  load(payload) {
     var option = {}
     var method = ""
     if (!payload) return false
@@ -130,9 +148,5 @@ class YOUTUBE {
       if (ret && ret.constructor.name == "Y") ret = null
       return ret
     }
-  }
-
-  status() {
-    return this.videoPlaying
   }
 }

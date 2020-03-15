@@ -101,7 +101,7 @@ Module.register("MMM-Assistant2Display",{
         break
       case "ASSISTANT_STANDBY":
         if (this.useA2D) {
-          this.displayResponse.showYT(this.displayResponse.player.status())
+          this.displayResponse.showYT()
           this.displayResponse.player.controlPlayer("setVolume", 100)
         }
         break

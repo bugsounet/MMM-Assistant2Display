@@ -28,8 +28,14 @@ class Display extends DisplayClass {
     window.onYouTubeIframeAPIReady = () => {
       this.player = new YOUTUBE(
         "A2D_YOUTUBE",
-        (show) => { this.showYT(show) },
-        (title) => { this.titleYT(title) }
+        (show) => {
+          this.videoDisplayed = show
+          this.showYT()
+        },
+        (title) => {
+          this.videoTitle = title
+          this.titleYT(title)
+        }
       )
       this.player.init()
     }
@@ -55,15 +61,14 @@ class Display extends DisplayClass {
     return dom
   }
 
-  prepareDisplay(response, title) {
+  prepareDisplay(response) {
     A2D("Prepare with", response ? response : title)
     var self = this
     var tr = document.getElementById("A2D_TRANSCRIPTION")
     tr.innerHTML = ""
     var t = document.createElement("p")
     t.className = "transcription"
-    if (title) t.innerHTML = title
-    else t.innerHTML = response.transcription.transcription
+    t.innerHTML = response.transcription.transcription
     tr.appendChild(t)
     A2D("Prepare ok")
     super.prepareDisplay(response)
@@ -76,18 +81,16 @@ class Display extends DisplayClass {
     var tr = document.getElementById("A2D_TRANSCRIPTION")
     var iframe = document.getElementById("A2D_OUTPUT")
     var photo = document.getElementById("A2D_PHOTO")
-    if (!force && this.player.status()) YT.classList.remove("hidden")
+    if (!force && this.videoDisplayed) {
+      this.titleYT(this.videoTitle)
+      YT.classList.remove("hidden")
+    }
     else winh.classList.add("hidden")
-    tr.innerHTML= ""
+    if (!this.videoDisplayed) tr.innerHTML= ""
     iframe.classList.add("hidden")
     iframe.src= "about:blank"
     photo.classList.add("hidden")
     photo.src= ""
     super.hideDisplay()
-  }
-
-  titleYT(title) {
-    this.prepareDisplay(null, title)
-    super.titleYT(title)
   }
 }

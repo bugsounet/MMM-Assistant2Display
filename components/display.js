@@ -10,6 +10,9 @@ class DisplayClass {
     this.timer = null
     this.response = null
     this.player = null
+    this.videoDisplayed = false
+    this.otherDisplayed = false
+    this.videoTitle = ""
     console.log("[AMK2:ADDONS:A2D] DisplayClass Loaded")
   }
 
@@ -36,8 +39,8 @@ class DisplayClass {
     var ytPlayList = ytP.exec(this.urls[this.pos])
     
     if (ytLink || ytPlayList) {
-      if (ytLink && this.config.useYoutube) this.player.loadVideo( {id: ytLink[1], type : "id"})
-      if (ytPlayList&& this.config.useYoutube) this.player.loadVideo( {id: ytPlayList[1], type : "playlist"})
+      if (ytLink && this.config.useYoutube) this.player.load( {id: ytLink[1], type : "id"})
+      if (ytPlayList&& this.config.useYoutube) this.player.load( {id: ytPlayList[1], type : "playlist"})
     } else if(this.config.useLinks) {
       this.sendSocketNotification("PROXY_OPEN", this.urls[this.pos])
     }
@@ -48,12 +51,14 @@ class DisplayClass {
     var self = this
     var photo = document.getElementById("A2D_PHOTO")
     A2D("Loading photo #" + (this.pos+1) + "/" + self.urls.length)
+    this.otherDisplayed = true
     this.showDisplay(false,true)
     photo.src = this.urls[this.pos]
     photo.addEventListener("load", function() {
       A2D("Photo Loaded")
       self.timer = setTimeout( () => {
         if (self.pos >= (self.urls.length-1)){
+          self.resetTimer()
           self.hideDisplay()
         } else {
           self.pos++
@@ -68,6 +73,7 @@ class DisplayClass {
     if (!this.urls) return
     var iframe = document.getElementById("A2D_OUTPUT")
     A2D("Loading", this.urls[this.pos])
+    this.otherDisplayed = true
     this.showDisplay(true,false)
     iframe.src = "http://127.0.0.1:" + this.config.proxyPort + "/"+ this.urls[this.pos]
     if (this.config.sandbox) iframe.sandbox = this.config.sandbox
@@ -76,7 +82,8 @@ class DisplayClass {
       A2D("URL Loaded")
       self.timer = setTimeout( () => {
         self.sendSocketNotification("PROXY_CLOSE")
-        if (self.pos >= (self.urls.length-1)){
+        if (self.pos >= (self.urls.length-1)) {
+          self.resetTimer()
           self.hideDisplay()
         } else {
           self.pos++
@@ -94,7 +101,7 @@ class DisplayClass {
     var winh = document.getElementById("A2D")
     if (urls) iframe.classList.remove("hidden")
     if (photos) photo.classList.remove("hidden")
-    if (this.player.status()) YT.classList.add("hidden")
+    if (this.videoDisplayed) YT.classList.add("hidden")
     winh.classList.remove("hidden")
   }
 
@@ -103,6 +110,7 @@ class DisplayClass {
     this.pos = 0
     this.urls= null
     this.timer = null
+    this.otherDisplayed = false
   }
 
   prepare() {
@@ -117,11 +125,11 @@ class DisplayClass {
     // reserved for extends
   }
 
-  showYT(show) {
-    if (!this.timer) {
+  showYT() {
+    if (!this.otherDisplayed) {
       var YT = document.getElementById("A2D_YOUTUBE")
       var winh = document.getElementById("A2D")
-      if (show) {
+      if (this.videoDisplayed) {
         winh.classList.remove("hidden")
         YT.classList.remove("hidden")
       } else {
@@ -132,6 +140,7 @@ class DisplayClass {
   }
 
   titleYT(title) {
-    // reserved for extends
+    var tr = document.getElementById("A2D_TRANSCRIPTION").getElementsByTagName("p")
+    tr[0].innerHTML= title
   }
 }

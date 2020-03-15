@@ -28,8 +28,14 @@ class Display extends DisplayClass {
     window.onYouTubeIframeAPIReady = () => {
       this.player = new YOUTUBE(
         "A2D_YOUTUBE",
-        (show) => { this.showYT(show) },
-        (title) => { this.titleYT(title) }
+        (show) => {
+          this.videoDisplayed = show
+          this.showYT()
+        },
+        (title) => {
+          this.videoTitle = title
+          this.titleYT(title)
+        }
       )
       this.player.init()
     }
@@ -77,7 +83,7 @@ class Display extends DisplayClass {
     return dom
   }
 
-  prepareDisplay(response,title) {
+  prepareDisplay(response) {
     A2D("Prepare with", response ? response : title)
     var self = this
     var iframe = document.getElementById("A2D_OUTPUT")
@@ -85,8 +91,7 @@ class Display extends DisplayClass {
     tr.innerHTML = ""
     var t = document.createElement("p")
     t.className = "transcription"
-    if (title) t.innerHTML = title
-    else t.innerHTML = response.transcription.transcription
+    t.innerHTML = response.transcription.transcription
     tr.appendChild(t)
     var wordbox = document.getElementById("A2D_WORDBOX")
     var trysay = document.getElementById("A2D_TRYSAY")
@@ -102,6 +107,7 @@ class Display extends DisplayClass {
         word[item].addEventListener("click", function() {
           self.resetTimer()
           log("Clicked", value)
+          self.resetTimer()
           self.hideDisplay()
           iframe.src = "http://localhost:8080/activatebytext/?query=" + value
         });
@@ -109,7 +115,7 @@ class Display extends DisplayClass {
       }
     }
     A2D("Prepare ok")
-    super.prepareDisplay(response,title)
+    super.prepareDisplay(response)
   }
 
   hideDisplay(force) {
@@ -121,20 +127,20 @@ class Display extends DisplayClass {
     var photo = document.getElementById("A2D_PHOTO")
     var trysay = document.getElementById("A2D_TRYSAY")
     var wordbox = document.getElementById("A2D_WORDBOX")
-    if (!force && this.player.status()) YT.classList.remove("hidden")
+    if (!force && this.videoDisplayed) {
+      this.titleYT(this.videoTitle)
+      YT.classList.remove("hidden")
+    }
     else winh.classList.add("hidden")
-    tr.innerHTML= ""
+    if (!this.videoDisplayed) {
+      tr.innerHTML= ""
+      trysay.textContent = ""
+      wordbox.innerHTML = ""
+    }
     iframe.classList.add("hidden")
     iframe.src= "about:blank"
     photo.classList.add("hidden")
     photo.src= ""
-    trysay.textContent = ""
-    wordbox.innerHTML = ""
-    super.hideDisplay()
-  }
-
-  titleYT(title) {
-    this.prepareDisplay(null, title)
-    super.titleYT(title)
+    super.hideDisplay(force)
   }
 }
