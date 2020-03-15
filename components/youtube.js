@@ -11,7 +11,7 @@
  * load(object):
     * { type: "id", id: <YT video id> } -> YT single video
     * { type: "playlist", id: <YT video id> } -> YT playlist video
- * controlPlayer(command,param):
+ * command(command,param):
     * command and param to send from YT iframe API
 ****
 **/
@@ -98,11 +98,11 @@ class YOUTUBE {
           break
         case 5:
           if (this.list) {
-            var list = this.controlPlayer("getPlaylist")
+            var list = this.command("getPlaylist")
             if (!Array.isArray(list)) return false
             A2D("YT Playlist count:", list.length)
           }
-          if(!this.errorYT && this.YTStarted) this.controlPlayer("playVideo")
+          if(!this.errorYT && this.YTStarted) this.command("playVideo")
           break
       }
       A2D("YT Status:", this.state[ev.data])
@@ -117,12 +117,11 @@ class YOUTUBE {
     if (typeof payload.id == "undefined") return false
     else var id = payload.id
     this.list = false
-    A2D("YTLOAD", payload)
     if (payload.type == "id") {
       option = {
-        videoId: id,
+        videoId: id
       }
-      method = "VideoById"
+      method = "cueVideoById"
     }
     else if (payload.type == "playlist") {
       option = {
@@ -130,21 +129,21 @@ class YOUTUBE {
         listType: "playlist",
         index: 0
       }
-      method = "Playlist"
+      method = "cuePlaylist"
+      this.list = true
     } else return false
 
-    var fn = "cue" + method
     this.YTStarted = true
     this.errorYT = false
-    this.controlPlayer(fn, option)
+    this.command(method, option)
   }
 
-  controlPlayer(command, param=null) {
-    A2D("YT Control:", command, param ? param : "")
-    if (!this.YTPlayer || !command) return false
-    if (typeof this.YTPlayer[command] == "function") {
-      var ret = this.YTPlayer[command](param)
-      if (command == "stopVideo") this.YTStarted = false
+  command(cmd, param=null) {
+    A2D("YT Control:", cmd, param ? param : "")
+    if (!this.YTPlayer || !cmd) return false
+    if (typeof this.YTPlayer[cmd] == "function") {
+      var ret = this.YTPlayer[cmd](param)
+      if (cmd == "stopVideo") this.YTStarted = false
       if (ret && ret.constructor.name == "Y") ret = null
       return ret
     }

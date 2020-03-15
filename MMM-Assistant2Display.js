@@ -95,14 +95,14 @@ Module.register("MMM-Assistant2Display",{
       case "ASSISTANT_LISTEN":
       case "ASSISTANT_THINK":
         if (this.useA2D) {
-          this.displayResponse.player.controlPlayer("setVolume", 5)
+          this.displayResponse.player.command("setVolume", 5)
           this.displayResponse.hideDisplay(true)
         }
         break
       case "ASSISTANT_STANDBY":
         if (this.useA2D) {
           this.displayResponse.showYT()
-          this.displayResponse.player.controlPlayer("setVolume", 100)
+          this.displayResponse.player.command("setVolume", 100)
         }
         break
       case "ASSISTANT_HOOK":
@@ -117,7 +117,7 @@ Module.register("MMM-Assistant2Display",{
         break
       case "A2D_STOP":
         if (this.useA2D) {
-          this.displayResponse.player.controlPlayer("stopVideo")
+          this.displayResponse.player.command("stopVideo")
           this.displayResponse.resetTimer()
           this.displayResponse.hideDisplay()
         }
