@@ -80,7 +80,7 @@ this is the default configuration defined, if you don't define any value
 | useVolume | allow volume control | Boolean | true |
 | volumePreset | preset configuration type. available : ALSA, PULSE, HIFIBERRY-DAC,RESPEAKER_SPEAKER, RESPEAKER_PLAYBACK, OSX  | String | ALSA |
 
-* Note:
+* Notes:
   * module position not needed because only with iframe
   * if you want to stop link/photo or youtube video displaying: just say `stop`
   * if you want to control sound volume of your mirror: just say `volume 5` (mini volume is 0, maximum is 10)
