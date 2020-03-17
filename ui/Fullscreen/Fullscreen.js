@@ -28,12 +28,12 @@ class Display extends DisplayClass {
     window.onYouTubeIframeAPIReady = () => {
       this.player = new YOUTUBE(
         "A2D_YOUTUBE",
-        (show) => {
-          this.videoDisplayed = show
+        (status) => {
+          this.A2D.youtube.displayed = status
           this.showYT()
         },
         (title) => {
-          // no used
+          this.A2D.youtube.title = title
         }
       )
       this.player.init()
@@ -54,7 +54,7 @@ class Display extends DisplayClass {
     var winh = document.getElementById("A2D")
     var iframe = document.getElementById("A2D_OUTPUT")
     var photo = document.getElementById("A2D_PHOTO")
-    if (!force && this.videoDisplayed) YT.classList.remove("hidden")
+    if (!force && this.A2D.youtube.displayed) YT.classList.remove("hidden")
     else winh.classList.add("hidden")
     iframe.classList.add("hidden")
     iframe.src= "about:blank"

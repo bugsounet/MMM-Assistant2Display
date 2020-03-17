@@ -17,9 +17,10 @@
 **/
 class YOUTUBE {
   constructor(id, status, title) {
+    this.idDom = id
     this.status = status
     this.title = title
-    this.idDom = id
+
     this.YTPlayer = null
     this.YTStarted = false
     this.list = false
@@ -45,7 +46,7 @@ class YOUTUBE {
       "5": "Video cued"
     }
 
-    this.error = {
+    this.err = {
       "2": "Invalid Parameter",
       "5": "HTML5 Player Error",
       "100": "Video Not Found (removed or privated)",
@@ -54,7 +55,6 @@ class YOUTUBE {
     }
 
     this.errorYT = false
-    this.videoPlaying = false
     console.log("[AMK2:ADDONS:A2D] YOUTUBE Class Loaded")
   }
 
@@ -72,12 +72,12 @@ class YOUTUBE {
     options.events.onError = (ev) => {
       this.errorYT = true
       if (ev.data == "2") ev.target.stopVideo()
-      A2D(`Player Error ${ev.data}:`, this.error[ev.data] ? this.error[ev.data] : "Unknown Error")
+      console.log(`[AMK2:ADDONS:A2D] Player Error ${ev.data}:`, this.err[ev.data] ? this.err[ev.data] : "Unknown Error")
     }
 
     options.events.onPlaybackQualityChange = (ev) => {
       var playbackQuality = ev.data
-      A2D("YT Quality actual: " + playbackQuality)
+      A2D("YT Quality: " + playbackQuality)
     }
 
     options.events.onStateChange = (ev) => {
@@ -85,16 +85,17 @@ class YOUTUBE {
         case -1:
         case 0:
         case 2:
-          this.videoPlaying= false
-          this.status(this.videoPlaying)
+          this.status(false)
           break
         case 1:
-          var title = this.YTPlayer.l.videoData.title
+          A2D("!!! YT DEBUG !!!", this.YTPlayer)
+          // to make better title is now not available ... retry with new method
+          var title = this.YTPlayer.l.videoData ? this.YTPlayer.l.videoData.title : (
+            this.YTPlayer.playerInfo.videoData ? this.YTPlayer.playerInfo.videoData.title : "unknow")
           A2D("YT Playing Title:" , title)
           this.title(title)
         case 3:
-          this.videoPlaying= true
-          this.status(this.videoPlaying)
+          this.status(true)
           break
         case 5:
           if (this.list) {
@@ -139,7 +140,7 @@ class YOUTUBE {
   }
 
   command(cmd, param=null) {
-    A2D("YT Control:", cmd, param ? param : "")
+    A2D("YT Command:", cmd, param ? param : "")
     if (!this.YTPlayer || !cmd) return false
     if (typeof this.YTPlayer[cmd] == "function") {
       var ret = this.YTPlayer[cmd](param)

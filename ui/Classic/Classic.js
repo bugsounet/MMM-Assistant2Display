@@ -1,7 +1,7 @@
 class Display extends DisplayClass {
   constructor (Config, callback) {
     super(Config, callback)
-    console.log("[AMK2:ADDONS:A2D] Extend Display with Classic ui Loaded")
+    console.log("[AMK2:ADDONS:A2D] Extends Display with Classic ui Loaded")
   }
 
   prepare() {
@@ -29,12 +29,12 @@ class Display extends DisplayClass {
       this.player = new YOUTUBE(
         "A2D_YOUTUBE",
         (show) => {
-          this.videoDisplayed = show
+          this.A2D.youtube.displayed = show
           this.showYT()
         },
         (title) => {
-          this.videoTitle = title
-          this.titleYT(title)
+          this.A2D.youtube.title = title
+          this.titleYT()
         }
       )
       this.player.init()
@@ -61,17 +61,16 @@ class Display extends DisplayClass {
     return dom
   }
 
-  prepareDisplay(response) {
-    A2D("Prepare with", response ? response : title)
-    var self = this
+  prepareDisplay() {
+    A2D("Prepare Display with:", this.A2D.AMk2)
     var tr = document.getElementById("A2D_TRANSCRIPTION")
     tr.innerHTML = ""
     var t = document.createElement("p")
     t.className = "transcription"
-    t.innerHTML = response.transcription.transcription
+    t.innerHTML = this.A2D.AMk2.transcription
     tr.appendChild(t)
     A2D("Prepare ok")
-    super.prepareDisplay(response)
+    super.prepareDisplay()
   }
 
   hideDisplay(force) {
@@ -81,12 +80,12 @@ class Display extends DisplayClass {
     var tr = document.getElementById("A2D_TRANSCRIPTION")
     var iframe = document.getElementById("A2D_OUTPUT")
     var photo = document.getElementById("A2D_PHOTO")
-    if (!force && this.videoDisplayed) {
-      this.titleYT(this.videoTitle)
+    if (!force && this.A2D.youtube.displayed) {
+      this.titleYT()
       YT.classList.remove("hidden")
     }
     else winh.classList.add("hidden")
-    if (!this.videoDisplayed) tr.innerHTML= ""
+    if (!this.A2D.youtube.displayed) tr.innerHTML= ""
     iframe.classList.add("hidden")
     iframe.src= "about:blank"
     photo.classList.add("hidden")

@@ -133,7 +133,7 @@ Module.register("MMM-Assistant2Display",{
   socketNotificationReceived: function (notification, payload) {
     switch(notification) {
       case "A2D_READY":
-        this.displayResponse.urlDisplay()
+        this.displayResponse.linksDisplay()
         break
     }
   },

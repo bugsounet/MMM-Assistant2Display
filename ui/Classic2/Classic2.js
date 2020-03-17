@@ -1,7 +1,7 @@
 class Display extends DisplayClass {
   constructor (Config, callback) {
     super(Config, callback)
-    console.log("[AMK2:ADDONS:A2D] Extend Display with Classic2 ui Loaded")
+    console.log("[AMK2:ADDONS:A2D] Extends Display with Classic2 ui Loaded")
   }
 
   prepare() {
@@ -29,12 +29,12 @@ class Display extends DisplayClass {
       this.player = new YOUTUBE(
         "A2D_YOUTUBE",
         (show) => {
-          this.videoDisplayed = show
+          this.A2D.youtube.displayed = show
           this.showYT()
         },
         (title) => {
-          this.videoTitle = title
-          this.titleYT(title)
+          this.A2D.youtube.title = title
+          this.titleYT()
         }
       )
       this.player.init()
@@ -83,39 +83,38 @@ class Display extends DisplayClass {
     return dom
   }
 
-  prepareDisplay(response) {
-    A2D("Prepare with", response ? response : title)
+  prepareDisplay() {
+    A2D("Prepare Display with:", this.A2D.AMk2)
     var self = this
     var iframe = document.getElementById("A2D_OUTPUT")
     var tr = document.getElementById("A2D_TRANSCRIPTION")
     tr.innerHTML = ""
     var t = document.createElement("p")
     t.className = "transcription"
-    t.innerHTML = response.transcription.transcription
+    t.innerHTML = this.A2D.AMk2.transcription
     tr.appendChild(t)
     var wordbox = document.getElementById("A2D_WORDBOX")
     var trysay = document.getElementById("A2D_TRYSAY")
     trysay.textContent = ""
     wordbox.innerHTML = ""
-    if(response && response.trysay) {
-      trysay.textContent = response.trysay
+    if(this.A2D.AMk2.trysay) {
+      trysay.textContent = this.A2D.AMk2.trysay
       var word = []
-      for (let [item, value] of Object.entries(response.help)) {
+      for (let [item, value] of Object.entries(this.A2D.AMk2.help)) {
         word[item] = document.createElement("div")
         word[item].id = "A2D_WORD"
         word[item].textContent = value
         word[item].addEventListener("click", function() {
-          self.resetTimer()
           log("Clicked", value)
           self.resetTimer()
           self.hideDisplay()
           iframe.src = "http://localhost:8080/activatebytext/?query=" + value
-        });
+        })
         wordbox.appendChild(word[item])
       }
     }
     A2D("Prepare ok")
-    super.prepareDisplay(response)
+    super.prepareDisplay()
   }
 
   hideDisplay(force) {
@@ -127,12 +126,12 @@ class Display extends DisplayClass {
     var photo = document.getElementById("A2D_PHOTO")
     var trysay = document.getElementById("A2D_TRYSAY")
     var wordbox = document.getElementById("A2D_WORDBOX")
-    if (!force && this.videoDisplayed) {
-      this.titleYT(this.videoTitle)
+    if (!force && this.A2D.youtube.displayed) {
+      this.titleYT()
       YT.classList.remove("hidden")
     }
     else winh.classList.add("hidden")
-    if (!this.videoDisplayed) {
+    if (!this.A2D.youtube.displayed) {
       tr.innerHTML= ""
       trysay.textContent = ""
       wordbox.innerHTML = ""
