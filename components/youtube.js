@@ -3,8 +3,9 @@
 
 /** Contructor(id,status,title):
  * @id: dom ID
- * @status: return --> true -> playing video or false -> in standby
+ * @status: return --> true -> playing video/buffering or false -> in standby (unstarted/ended/paused)
  * @title: return title of the youtube video
+ * @ended : return true when video finish (ended, paused or error)
 ****
  * function:
  * init(): intialize player
@@ -16,10 +17,11 @@
 ****
 **/
 class YOUTUBE {
-  constructor(id, status, title) {
+  constructor(id, status, title, ended) {
     this.idDom = id
     this.status = status
     this.title = title
+    this.ended = ended
 
     this.YTPlayer = null
     this.YTStarted = false
@@ -73,6 +75,7 @@ class YOUTUBE {
       this.errorYT = true
       if (ev.data == "2") ev.target.stopVideo()
       console.log(`[AMK2:ADDONS:A2D] Player Error ${ev.data}:`, this.err[ev.data] ? this.err[ev.data] : "Unknown Error")
+      this.ended(true)
     }
 
     options.events.onPlaybackQualityChange = (ev) => {
@@ -82,13 +85,14 @@ class YOUTUBE {
 
     options.events.onStateChange = (ev) => {
       switch(ev.data) {
-        case -1:
         case 0:
         case 2:
+          this.ended(true)
+        case -1:
           this.status(false)
           break
         case 1:
-          A2D("!!! YT DEBUG !!!", this.YTPlayer)
+          A2D("!!! TEMP YT DEBUG !!!", this.YTPlayer)
           // to make better title is now not available ... retry with new method
           var title = this.YTPlayer.l.videoData ? this.YTPlayer.l.videoData.title : (
             this.YTPlayer.playerInfo.videoData ? this.YTPlayer.playerInfo.videoData.title : "unknow")

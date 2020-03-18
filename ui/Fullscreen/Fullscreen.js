@@ -34,6 +34,9 @@ class Display extends DisplayClass {
         },
         (title) => {
           this.A2D.youtube.title = title
+        },
+        (ended) => {
+          this.sendAlive(false)
         }
       )
       this.player.init()
@@ -55,7 +58,10 @@ class Display extends DisplayClass {
     var iframe = document.getElementById("A2D_OUTPUT")
     var photo = document.getElementById("A2D_PHOTO")
     if (!force && this.A2D.youtube.displayed) YT.classList.remove("hidden")
-    else winh.classList.add("hidden")
+    else {
+      winh.classList.add("hidden")
+      this.sendAlive(false)
+    }
     iframe.classList.add("hidden")
     iframe.src= "about:blank"
     photo.classList.add("hidden")

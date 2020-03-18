@@ -35,6 +35,9 @@ class Display extends DisplayClass {
         (title) => {
           this.A2D.youtube.title = title
           this.titleYT()
+        },
+        (ended) => {
+          this.sendAlive(false)
         }
       )
       this.player.init()
@@ -132,6 +135,7 @@ class Display extends DisplayClass {
     }
     else winh.classList.add("hidden")
     if (!this.A2D.youtube.displayed) {
+      this.sendAlive(false)
       tr.innerHTML= ""
       trysay.textContent = ""
       wordbox.innerHTML = ""
