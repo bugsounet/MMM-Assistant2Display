@@ -58,12 +58,11 @@ class DisplayClass {
       }
     }
     this.A2D = this.objAssign({}, this.A2D, tmp)
-
+    this.prepareDisplay()
+    this.sendAlive(true)
     if(this.config.usePhotos && this.A2D.photos.length > 0) {
-      this.prepareDisplay()
       this.photoDisplay()
     } else if (this.A2D.links.length > 0) {
-      this.prepareDisplay()
       this.urlsScan()
     }
     A2D("Response Structure:", this.A2D)
@@ -82,8 +81,7 @@ class DisplayClass {
         type: ytPlayList ? "playlist" : "id"
       },
       this.A2D.youtube = this.objAssign({}, this.A2D.youtube, tmp)
-      this.sendAlive(true)
-      if (this.config.useYoutube) this.player.load( {id: this.A2D.youtube.id, type : this.A2D.youtube.type})
+      if (this.config.useYoutube) this.player.load({id: this.A2D.youtube.id, type : this.A2D.youtube.type})
     } else if(this.config.useLinks) {
       this.sendSocketNotification("PROXY_OPEN", this.A2D.links.urls[this.A2D.links.position])
     }
@@ -93,7 +91,6 @@ class DisplayClass {
     var photo = document.getElementById("A2D_PHOTO")
     A2D("Loading photo #" + (this.A2D.photos.position+1) + "/" + (this.A2D.photos.length))
     this.A2D.photos.displayed = true
-    this.sendAlive(true)
     this.showDisplay()
     photo.src = this.A2D.photos.urls[this.A2D.photos.position]
     photo.addEventListener("load", () => {
@@ -124,7 +121,6 @@ class DisplayClass {
     var iframe = document.getElementById("A2D_OUTPUT")
     A2D("Loading", this.A2D.links.urls[this.A2D.links.position])
     this.A2D.links.displayed = true
-    this.sendAlive(true)
     this.showDisplay()
     iframe.src = "http://127.0.0.1:" + this.config.proxyPort + "/"+ this.A2D.links.urls[this.A2D.links.position]
     if (this.config.sandbox) iframe.sandbox = this.config.sandbox
