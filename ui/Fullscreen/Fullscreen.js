@@ -1,7 +1,6 @@
 class Display extends DisplayClass {
-  constructor (Config, callback) {
-    super(Config, callback)
-    this.sendSocketNotification = callback
+  constructor (Config, callbacks) {
+    super(Config, callbacks)
     console.log("[AMK2:ADDONS:A2D] Extend Display with Fullscreen ui Loaded")
   }
 
@@ -19,6 +18,30 @@ class Display extends DisplayClass {
     scout.id = "A2D_OUTPUT"
     scout.scrolling="no"
     scout.classList.add("hidden")
+    var scoutyt = document.createElement("div")
+    scoutyt.id = "A2D_YOUTUBE"
+    scoutyt.classList.add("hidden")
+    var api = document.createElement("script")
+    api.src = "https://www.youtube.com/iframe_api"
+    var writeScript = document.getElementsByTagName("script")[0]
+    writeScript.parentNode.insertBefore(api, writeScript)
+    window.onYouTubeIframeAPIReady = () => {
+      this.player = new YOUTUBE(
+        "A2D_YOUTUBE",
+        (status) => {
+          this.A2D.youtube.displayed = status
+          this.showYT()
+        },
+        (title) => {
+          this.A2D.youtube.title = title
+        },
+        (ended) => {
+          this.sendAlive(false)
+        }
+      )
+      this.player.init()
+    }
+    scoutpan.appendChild(scoutyt)
     scoutpan.appendChild(scoutphoto)
     scoutpan.appendChild(scout)
     dom.appendChild(scoutpan)
@@ -28,12 +51,17 @@ class Display extends DisplayClass {
     return dom
   }
 
-  hideDisplay() {
+  hideDisplay(force) {
     A2D("Hide Iframe")
+    var YT = document.getElementById("A2D_YOUTUBE")
     var winh = document.getElementById("A2D")
     var iframe = document.getElementById("A2D_OUTPUT")
     var photo = document.getElementById("A2D_PHOTO")
-    winh.classList.add("hidden")
+    if (!force && this.A2D.youtube.displayed) YT.classList.remove("hidden")
+    else {
+      winh.classList.add("hidden")
+      this.sendAlive(false)
+    }
     iframe.classList.add("hidden")
     iframe.src= "about:blank"
     photo.classList.add("hidden")
