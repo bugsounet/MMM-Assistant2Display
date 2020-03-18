@@ -92,12 +92,16 @@ class YOUTUBE {
           this.status(false)
           break
         case 1:
-          A2D("!!! TEMP YT DEBUG !!!", this.YTPlayer)
-          // to make better title is now not available ... retry with new method
-          var title = this.YTPlayer.l.videoData ? this.YTPlayer.l.videoData.title : (
-            this.YTPlayer.playerInfo.videoData ? this.YTPlayer.playerInfo.videoData.title : "unknow")
-          A2D("YT Playing Title:" , title)
-          this.title(title)
+          // to make better: if title is not available ... retry with new method (API Change...)
+          //A2D("!!! TEMP YT DEBUG !!!", this.YTPlayer)
+          try {
+            var title = this.YTPlayer.l.videoData ? this.YTPlayer.l.videoData.title : (
+              this.YTPlayer.playerInfo.videoData ? this.YTPlayer.playerInfo.videoData.title : "unknow")
+            A2D("YT Playing Title:" , title)
+            this.title(title)
+          } catch (e) {
+            A2D("YT Playing Title: API Error")
+          }
         case 3:
           this.status(true)
           break
