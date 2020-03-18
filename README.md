@@ -17,6 +17,14 @@ Turn on `addons: true` in your AMk2 config.js file
  ![](https://raw.githubusercontent.com/bugsounet/MMM-Assistant2Display/dev/screenshoot2.jpeg)
  ![](https://raw.githubusercontent.com/bugsounet/MMM-Assistant2Display/dev/screenshoot1.jpg)
 
+## Update history
+ * 19/03/2020 (V1.1.0)
+   * **ADD**: YouTube support with all AMk2 ui
+   * **ADD**: Title display in Classic / Classic2 ui (beta)
+   * **ADD**: vocal sound control
+   * **ADD**: screen addon control (screen addon v1.0.4 needed)
+   * **ADD**: feature activation sub modules choice 
+
 ## Installation
 
 ```sh
@@ -84,3 +92,4 @@ this is the default configuration defined, if you don't define any value
   * module position not needed because only with iframe
   * if you want to stop link/photo or youtube video displaying: just say `stop`
   * if you want to control sound volume of your mirror: just say `volume 5` (mini volume is 0, maximum is 10)
+  * this module control AMk2 screen addon when you use this module (It don't turn off screen !)
