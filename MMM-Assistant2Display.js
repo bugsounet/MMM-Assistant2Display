@@ -120,6 +120,7 @@ Module.register("MMM-Assistant2Display",{
           this.displayResponse.player.command("stopVideo")
           this.displayResponse.resetTimer()
           this.displayResponse.hideDisplay()
+          this.displayResponse.sendAlive(false)
         }
         break
       case "VOLUME_SET":
