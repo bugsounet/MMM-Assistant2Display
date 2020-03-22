@@ -18,6 +18,9 @@ Turn on `addons: true` in your AMk2 config.js file
  ![](https://raw.githubusercontent.com/bugsounet/MMM-Assistant2Display/dev/screenshoot1.jpg)
 
 ## Update history
+ * 22/03/2020 (V1.1.1)
+   * **FIX**: Always screen up when YT display and assistant query
+   * **FIX**: Always screen up when on next playlist YT
  * 19/03/2020 (V1.1.0)
    * **ADD**: YouTube support with all AMk2 ui
    * **ADD**: Title display in Classic / Classic2 ui (beta)
