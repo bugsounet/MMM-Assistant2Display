@@ -60,7 +60,7 @@ class Display extends DisplayClass {
     if (!force && this.A2D.youtube.displayed) YT.classList.remove("hidden")
     else {
       winh.classList.add("hidden")
-      this.sendAlive(false)
+      if (!this.A2D.youtube.displayed) this.sendAlive(false)
     }
     iframe.classList.add("hidden")
     iframe.src= "about:blank"

@@ -179,6 +179,7 @@ class DisplayClass {
     var YT = document.getElementById("A2D_YOUTUBE")
     var winh = document.getElementById("A2D")
     if (this.A2D.youtube.displayed) {
+      this.sendAlive(true) // for YT playlist
       winh.classList.remove("hidden")
       YT.classList.remove("hidden")
     } else {
