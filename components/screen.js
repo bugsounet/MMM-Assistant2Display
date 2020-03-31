@@ -54,7 +54,7 @@ class SCREEN {
     if (this.locked || this.running || (!this.config.turnOffDisplay && !this.config.ecoMode)) return
     log("Starts.")
 
-    if (this.config.turnOffDisplay) tthis.setPowerDisplay(true)
+    if (this.config.turnOffDisplay) this.setPowerDisplay(true)
     if (this.config.ecoMode) this.sendSocketNotification("SCREEN_SHOWING")
     clearInterval(this.interval)
     this.interval = null
