@@ -47,7 +47,7 @@ Installer_info "Checking OS..."
 Installer_checkOS
 if  [ "$platform" == "osx" ]; then
   Installer_error "OS Detected: $OSTYPE ($os_name $os_version $arch)"
-  Installer_error "You need to read documents/install.md for Manual Install"
+  Installer_error "You need to read wiki for manual installation"
   exit 0
 else
   Installer_success "OS Detected: $OSTYPE ($os_name $os_version $arch)"

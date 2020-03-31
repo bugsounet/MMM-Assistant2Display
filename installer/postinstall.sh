@@ -23,6 +23,16 @@ cd "$Installer_dir"
 source utils.sh
 
 # module name
-Installer_module="Assistant2Display addons"
+Installer_module="Assistant2Display"
+
+Installer_yesno "Do you want to install snowboy detector" && (
+  cd ~/MagicMirror/modules/MMM-Assistant2Display/installer/
+  ./snowboy.sh
+)
+
+Installer_yesno "Do you want to install PIR Sensor" && (
+  cd ~/MagicMirror/modules/MMM-Assistant2Display/installer/
+  ./pir.sh
+)
 
 Installer_exit "$Installer_module is now installed !"
