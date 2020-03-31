@@ -5,6 +5,7 @@ class DisplayClass {
     this.config = Config
     this.sendSocketNotification = callbacks.sendSocketNotification
     this.sendNotification= callbacks.sendNotification
+    this.sendTunnel = callbacks.tunnel
     this.timer = null
     this.player = null
     this.A2D = {
@@ -33,7 +34,7 @@ class DisplayClass {
         length: 0
       }
     }
-    console.log("[AMK2:ADDONS:A2D] DisplayClass Loaded")
+    console.log("[A2D] DisplayClass Loaded")
   }
 
   start(response) {
@@ -66,6 +67,7 @@ class DisplayClass {
       this.urlsScan()
     }
     A2D("Response Structure:", this.A2D)
+    this.sendTunnel(this.A2D)
   }
 
   urlsScan() {
@@ -236,10 +238,11 @@ class DisplayClass {
     }
     this.A2D = this.objAssign({}, this.A2D, tmp)
     A2D("Reset Struct", this.A2D)
+    this.sendTunnel(this.A2D)
   }
 
   sendAlive(status) {
     A2D("SendAlive:", status)
-    this.sendNotification("USER_PRESENCE", status)
+    this.sendSocketNotification("SCREEN_LOCK", status)
   }
 }

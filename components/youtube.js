@@ -57,7 +57,7 @@ class YOUTUBE {
     }
 
     this.errorYT = false
-    console.log("[AMK2:ADDONS:A2D] YOUTUBE Class Loaded")
+    console.log("[A2D] YOUTUBE Class Loaded")
   }
 
   init() {

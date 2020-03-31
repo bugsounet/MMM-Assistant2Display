@@ -1,7 +1,7 @@
 class Display extends DisplayClass {
   constructor (Config, callbacks) {
     super(Config, callbacks)
-    console.log("[AMK2:ADDONS:A2D] Extend Display with Fullscreen ui Loaded")
+    console.log("[A2D] Extend Display with Fullscreen ui Loaded")
   }
 
   prepare() {

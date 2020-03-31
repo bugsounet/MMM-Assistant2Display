@@ -1,6 +1,6 @@
 {
   "name": "MMM-Assistant2Display",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "description": "AMk2 Display",
   "main": "MMM-Assistant2Display.js",
   "scripts": {
@@ -9,7 +9,8 @@
   },
   "keywords": [
     "magic mirror",
-    "MMM-AssistantMk2"
+    "MMM-AssistantMk2",
+    "YouTube"
   ],
   "repository": {
     "type": "git",
@@ -26,6 +27,7 @@
     "body-parser": "^1.19.0",
     "cheerio": "^1.0.0-rc.3",
     "express": "^4.17.1",
+    "ping": "^0.2.2",
     "url-parse": "^1.4.7"
   }
 }

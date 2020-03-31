@@ -1,0 +1,18 @@
+#SCREEN,
+#INTERNET {
+  font-size: large;
+  display: flex;
+}
+
+
+#SCREEN.hidden,
+#INTERNET.hidden {
+  display: none;
+}
+
+#SCREEN_TEXT,
+#INTERNET_TEXT {
+  margin-right: 10px;
+}
+
+
