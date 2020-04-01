@@ -39,7 +39,7 @@ class Display extends DisplayClass {
           this.sendAlive(false)
         }
       )
-      this.player.init()
+      if (this.config.useYoutube) this.player.init()
     }
     scoutpan.appendChild(scoutyt)
     scoutpan.appendChild(scoutphoto)
@@ -53,6 +53,10 @@ class Display extends DisplayClass {
 
   hideDisplay(force) {
     A2D("Hide Iframe")
+        A2D("force", force)
+        A2D("youtube.displayed",this.A2D.youtube.displayed)
+        A2D("links.displayed", this.A2D.links.displayed)
+        A2D("photos.displayed", this.A2D.photos.displayed)
     var YT = document.getElementById("A2D_YOUTUBE")
     var winh = document.getElementById("A2D")
     var iframe = document.getElementById("A2D_OUTPUT")

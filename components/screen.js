@@ -90,7 +90,7 @@ class SCREEN {
   }
 
   wakeup() {
-    this.reset(true, this.config.detectorSleeping)
+    this.reset(null, this.config.detectorSleeping)
   }
 
   reset(unlock, wakeup) {

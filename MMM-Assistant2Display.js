@@ -57,6 +57,7 @@ Module.register("MMM-Assistant2Display",{
     },
     internet: {
       useInternet: false,
+      displayPing: false,
       delay: 2* 60 * 1000,
       scan: "google.fr",
       command: "pm2 restart 0",
@@ -119,7 +120,7 @@ Module.register("MMM-Assistant2Display",{
 
     var screen = document.createElement("div")
     screen.id = "SCREEN"
-    if (!this.config.screen.useScreen || !this.config.screen.displayCounter) dom.className = "hidden"
+    if (!this.config.screen.useScreen || !this.config.screen.displayCounter) screen.className = "hidden"
     var screenText = document.createElement("div")
     screenText.id = "SCREEN_TEXT"
     screenText.textContent = this.config.screen.text
@@ -132,6 +133,7 @@ Module.register("MMM-Assistant2Display",{
 
     var internet = document.createElement("div")
     internet.id = "INTERNET"
+    if (!this.config.internet.useInternet || !this.config.internet.displayPing) internet.className = "hidden"
     var internetText = document.createElement("div")
     internetText.id = "INTERNET_TEXT"
     internetText.textContent = "Ping: "
@@ -184,14 +186,14 @@ Module.register("MMM-Assistant2Display",{
       case "ASSISTANT_LISTEN":
       case "ASSISTANT_THINK":
         if (this.useA2D) {
-          this.displayResponse.player.command("setVolume", 5)
+          if (this.config.useYoutube && this.displayResponse.player) this.displayResponse.player.command("setVolume", 5)
           this.displayResponse.hideDisplay(true)
         }
         break
       case "ASSISTANT_STANDBY":
         if (this.useA2D) {
           this.displayResponse.showYT()
-          this.displayResponse.player.command("setVolume", 100)
+          if (this.config.useYoutube && this.displayResponse.player) this.displayResponse.player.command("setVolume", 100)
         }
         break
       case "ASSISTANT_HOOK":
@@ -206,7 +208,7 @@ Module.register("MMM-Assistant2Display",{
         break
       case "A2D_STOP":
         if (this.useA2D) {
-          this.displayResponse.player.command("stopVideo")
+          if (this.config.useYoutube && this.displayResponse.player) this.displayResponse.player.command("stopVideo")
           this.displayResponse.resetTimer()
           this.displayResponse.hideDisplay()
           this.displayResponse.sendAlive(false)
@@ -224,7 +226,7 @@ Module.register("MMM-Assistant2Display",{
         }
         break
       case "WAKEUP":
-        if (this.use.A2D && this.config.screen.useScreen) {
+        if (this.useA2D && this.config.screen.useScreen) {
           this.sendSocketNotification("SCREEN_WAKEUP")
           break
         }
@@ -250,12 +252,22 @@ Module.register("MMM-Assistant2Display",{
         this.sendNotification("ASSISTANT_ACTIVATE", { file:"default", type: "MIC" })
         break
       case "INTERNET_DOWN":
-        this.sendNotification("SHOW_ALERT", { type: "alert" , message: "Internet is DOWN ! Retry: " + param.payload, title: "Internet Scan", timer: 10000})
-        this.sendSocketNotification("SCREEN_RESET")
+        this.sendNotification("SHOW_ALERT", {
+          type: "alert" ,
+          message: "Internet is DOWN ! Retry: " + param.payload,
+          title: "Internet Scan",
+          timer: 10000
+        })
+        this.sendSocketNotification("SCREEN_WAKEUP")
         break
       case "INTERNET_RESTART":
-        this.sendNotification("SHOW_ALERT", { type: "alert" , message: "Internet is now available! Restarting Magic Mirror...", title: "Internet Scan", timer: 10000})
-        this.sendSocketNotification("SCREEN_RESET")
+        this.sendNotification("SHOW_ALERT", {
+          type: "alert" ,
+          message: "Internet is now available! Restarting Magic Mirror...",
+          title: "Internet Scan",
+          timer: 10000
+        })
+        this.sendSocketNotification("SCREEN_WAKEUP")
         break
       case "INTERNET_PING":
         var ping = document.getElementById("INTERNET_PING")

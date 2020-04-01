@@ -60,8 +60,8 @@ class DisplayClass {
     }
     this.A2D = this.objAssign({}, this.A2D, tmp)
     this.prepareDisplay()
-    this.sendAlive(true)
     if(this.config.usePhotos && this.A2D.photos.length > 0) {
+      this.sendAlive(true)
       this.photoDisplay()
     } else if (this.A2D.links.length > 0) {
       this.urlsScan()
@@ -83,8 +83,12 @@ class DisplayClass {
         type: ytPlayList ? "playlist" : "id"
       },
       this.A2D.youtube = this.objAssign({}, this.A2D.youtube, tmp)
-      if (this.config.useYoutube) this.player.load({id: this.A2D.youtube.id, type : this.A2D.youtube.type})
+      if (this.config.useYoutube) {
+        this.sendAlive(true)
+        this.player.load({id: this.A2D.youtube.id, type : this.A2D.youtube.type})
+      }
     } else if(this.config.useLinks) {
+      this.sendAlive(true)
       this.sendSocketNotification("PROXY_OPEN", this.A2D.links.urls[this.A2D.links.position])
     }
   }
@@ -185,6 +189,7 @@ class DisplayClass {
       winh.classList.remove("hidden")
       YT.classList.remove("hidden")
     } else {
+      //if (!this.config.useYoutube) this.sendAlive(false)
       winh.classList.add("hidden")
       YT.classList.add("hidden")
     }
@@ -242,7 +247,21 @@ class DisplayClass {
   }
 
   sendAlive(status) {
+    if (status) this.lock()
+    else this.unlock()
     A2D("SendAlive:", status)
     this.sendSocketNotification("SCREEN_LOCK", status)
+  }
+
+  lock() {
+    MM.getModules().exceptWithClass("MMM-AssistantMk2").enumerate((module)=> {
+      module.hide(15, {lockString: "A2D_LOCKED"})
+    })
+  }
+
+  unlock () {
+    MM.getModules().exceptWithClass("MMM-AssistantMk2").enumerate((module)=> {
+      module.show(15, {lockString: "A2D_LOCKED"})
+    })
   }
 }
