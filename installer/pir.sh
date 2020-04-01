@@ -40,7 +40,7 @@ if [ "$EUID" -eq 0 ]; then
 fi
 
 Installer_info "Installing dependencies..."
-cd ~/MagicMirror/modules/MMM-AssistantMk2/
+cd ~/MagicMirror/modules/MMM-Assistant2Display/
 npm install onoff electron-rebuild
 ./node_modules/.bin/electron-rebuild
 sudo usermod -a -G gpio pi || echo "Error command: sudo usermod -a -G gpio pi"
