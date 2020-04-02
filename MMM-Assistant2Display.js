@@ -48,8 +48,9 @@ Module.register("MMM-Assistant2Display",{
     snowboy: {
       useSnowboy: false,
       audioGain: 2.0,
-      applyFrontend: true,
-      applyModel: "smart_mirror",
+      Frontend: true,
+      Model: "jarvis",
+      Sensitivity: null
     },
     governor: {
       useGovernor: false,
@@ -63,6 +64,8 @@ Module.register("MMM-Assistant2Display",{
       command: "pm2 restart 0",
       showAlert: true
     },
+    useMMMHotword: false,
+    useMMMSnowboy: false,
   },
 
   start: function () {
@@ -181,7 +184,7 @@ Module.register("MMM-Assistant2Display",{
         this.sendSocketNotification("INIT", this.helperConfig)
         break
       case "ASSISTANT_READY":
-        if (this.useA2D && this.config.briefToday.useBriefToday) this.briefToday()
+        if (this.useA2D) this.onReady()
         break
       case "ASSISTANT_LISTEN":
       case "ASSISTANT_THINK":
@@ -215,10 +218,10 @@ Module.register("MMM-Assistant2Display",{
         }
         break
       case "A2D_AMK2_BUSY":
-        if (this.useA2D) this.before()
+        if (this.useA2D) this.onBefore()
         break
       case "A2D_AMK2_READY":
-        if (this.useA2D) this.after()
+        if (this.useA2D) this.onAfter()
         break
       case "VOLUME_SET":
         if (this.useA2D && this.config.volume.useVolume) {
@@ -249,7 +252,7 @@ Module.register("MMM-Assistant2Display",{
         counter.textContent = payload
         break
       case "SNOWBOY_DETECTED":
-        this.sendNotification("ASSISTANT_ACTIVATE", { file:"default", type: "MIC" })
+        this.sendNotification("ASSISTANT_ACTIVATE", { profile:"default", type: "MIC" })
         break
       case "INTERNET_DOWN":
         this.sendNotification("SHOW_ALERT", {
@@ -272,6 +275,14 @@ Module.register("MMM-Assistant2Display",{
       case "INTERNET_PING":
         var ping = document.getElementById("INTERNET_PING")
         ping.textContent = payload
+        break
+      case "SNOWBOY_STOP":
+        if (this.config.useMMMSnowboy) this.sendNotification("SNOWBOY_STOP")
+        if (this.config.snowboy.useSnowboy) this.sendSocketNotification("SNOWBOY_STOP")
+        break
+      case "SNOWBOY_START":
+        if (this.config.useMMMSnowboy) this.sendNotification("SNOWBOY_START")
+        if (this.config.snowboy.useSnowboy) this.sendSocketNotification("SNOWBOY_START")
         break
     }
   },
@@ -335,17 +346,24 @@ Module.register("MMM-Assistant2Display",{
 
   /** briefToday **/
   briefToday: function() {
-    this.sendNotification("ASSISTANT_ACTIVATE", { type: "TEXT", key: this.config.briefToday.welcome, chime: false })
+    this.sendNotification("ASSISTANT_ACTIVATE", { profile: "default", type: "TEXT", key: this.config.briefToday.welcome, chime: false })
   },
 
-  before: function () {
-    this.sendSocketNotification("SCREEN_STOP")
-    this.sendSocketNotification("SNOWBOY_STOP")
+  onBefore: function () {
+    if (this.config.screen.useScreen) this.sendSocketNotification("SCREEN_STOP")
+    if (this.config.useMMMSnowboy) this.sendNotification("SNOWBOY_STOP")
+    if (this.config.snowboy.useSnowboy) this.sendSocketNotification("SNOWBOY_STOP")
   },
 
-  after: function () {
-    this.sendSocketNotification("SCREEN_RESET")
-    this.sendSocketNotification("SNOWBOY_START")
+  onAfter: function () {
+    if (this.config.screen.useScreen) this.sendSocketNotification("SCREEN_RESET")
+    if (this.config.useMMMSnowboy) this.sendNotification("SNOWBOY_START")
+    if (this.config.snowboy.useSnowboy) this.sendSocketNotification("SNOWBOY_START")
+  },
+
+  onReady: function() {
+    if (this.config.useMMMSnowboy) this.sendNotification("SNOWBOY_START")
+    if (this.config.briefToday.useBriefToday) this.briefToday()
   },
 
   screenShowing: function () {

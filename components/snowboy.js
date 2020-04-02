@@ -1,4 +1,4 @@
-/** Snowboy addon For AMk2 **/
+/** Snowboy addon For A2D **/
 /** bugsounet **/
 
 const path = require("path")
@@ -64,6 +64,7 @@ class SNOWBOY {
     this.config = config
     this.sendSocketNotification = callback.sendSocketNotification
     this.models = []
+    this.model = []
     this.mic = null
     this.detector = null
     var debug = (this.config.debug) ? this.config.debug : false
@@ -71,50 +72,64 @@ class SNOWBOY {
     this.debug = debug
     this.default = {
       audioGain: 2.0,
-      applyFrontend: false,
-      applyModel: "smart_mirror",
-      applySensitivity: null,
-      models: []
+      Frontend: false,
+      Model: "smart_mirror",
+      Sensitivity: null
     }
     this.config = Object.assign(this.default, this.config)
   }
 
   init () {
-    var models = new Models();
+    this.models = new Models();
     var modelPath = path.resolve(__dirname, "../models")
 
-    if (this.config.models.length == 0) {
-      log("Checking models")
-      if (this.config.applyModel) {
-        for (let [item, value] of Object.entries(snowboyDict)) {
-          if (this.config.applyModel == item) {
-            log("Model selected:", item)
-            if (this.config.applySensitivity) {
-               if ((isNaN(this.config.applySensitivity)) || (Math.ceil(this.config.applySensitivity) > 1)) {
-                 log("Wrong Sensitivity value.")
-               } else {
-                if (item == ("jarvis" || "neo_ya")) {
-                  value.sensitivity = this.config.applySensitivity + "," + this.config.applySensitivity
-                }
-                else value.sensitivity = this.config.applySensitivity
-                log("Sensitivity set:", this.config.applySensitivity)
+    log("Checking models")
+    if (this.config.Model) {
+      for (let [item, value] of Object.entries(snowboyDict)) {
+        if (this.config.Model == item) {
+          log("Model selected:", item)
+          if (this.config.Sensitivity) {
+             if ((isNaN(this.config.Sensitivity)) || (Math.ceil(this.config.Sensitivity) > 1)) {
+               log("Wrong Sensitivity value.")
+             } else {
+              if (item == ("jarvis" || "neo_ya")) {
+                value.sensitivity = this.config.Sensitivity + "," + this.config.Sensitivity
               }
+              else value.sensitivity = this.config.Sensitivity
+              log("Sensitivity set:", this.config.Sensitivity)
             }
-            this.config.models.push(value)
           }
+          this.model.push(value)
         }
       }
     }
-    if (this.config.models.length == 0) return console.log("[A2D:SNOWBOY][ERROR] No model to load")
-    this.config.models.forEach((model)=>{
-      model.file = path.resolve(modelPath, model.file)
-      models.add(model)
-    })
+    if (this.model.length == 0) return console.log("[A2D:SNOWBOY][ERROR] model not found:", this.config.Model)
+    this.model[0].file = path.resolve(modelPath, this.config.Model + ".umdl")
+    this.models.add(this.model[0])
+
+    log("Initialized...")
+    this.start()
+  }
+
+  start () {
+    if (this.mic) return
+    this.mic = null
+    var defaultOption = {
+      sampleRate: 16000,
+      channels: 1,
+      threshold: 0.5,
+      thresholdStart: null,
+      thresholdEnd: null,
+      silence: '1.0',
+      verbose: this.debug
+    }
+    var Options = Object.assign({}, defaultOption, this.micConfig)
+
     this.detector = new Detector({
       resource: path.resolve(__dirname, "../snowboy/resources/common.res"),
-      models: models,
+      models: this.models,
       audioGain: this.config.audioGain,
-      applyFrontend: this.config.applyFrontend
+      applyFrontend: this.config.Frontend
     })
 
     this.detector
@@ -129,25 +144,8 @@ class SNOWBOY {
         this.sendSocketNotification("SNOWBOY_DETECTED")
         return
       })
-    log("Initialized...")
-    this.start()
-  }
 
-  start () {
-    if (this.mic) return
-    this.mic = null
-    var defaultOption = {
-      device: null,
-      recorder: "arecord",
-      audioType: "wav",
-      threshold: 0,
-      sampleRate: 16000,
-      endOnSilence: false,
-      debug: this.debug
-    }
-    var Options = Object.assign({}, defaultOption, this.micConfig)
     this.mic = new Recorder(Options, this.detector, (err)=>{this.callbackErr(err)})
-    log("Starts listening.")
     this.mic.start()
   }
 
@@ -155,7 +153,7 @@ class SNOWBOY {
     if (!this.mic) return
     this.mic.stop()
     this.mic = null
-    log("Stops listening.")
+    this.detector = null
   }
 
   callbackErr (err) {

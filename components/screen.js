@@ -24,6 +24,7 @@ class SCREEN {
     this.interval = null
     this.running = false
     this.locked = false
+    this.powerDisplay = false
     this.default = {
       delay: 5 * 60 * 1000,
       turnOffDisplay: true,
@@ -54,8 +55,14 @@ class SCREEN {
     if (this.locked || this.running || (!this.config.turnOffDisplay && !this.config.ecoMode)) return
     log("Starts.")
 
-    if (this.config.turnOffDisplay) this.setPowerDisplay(true)
-    if (this.config.ecoMode) this.sendSocketNotification("SCREEN_SHOWING")
+    if (this.config.turnOffDisplay) {
+      if (this.config.dev) this.setPowerDisplay(true)
+      else this.wantedPowerDisplay(true)
+    }
+    if (this.config.ecoMode) {
+      this.sendSocketNotification("SCREEN_SHOWING")
+      this.powerDisplay = true
+    }
     clearInterval(this.interval)
     this.interval = null
     this.counter = this.config.delay
@@ -68,11 +75,14 @@ class SCREEN {
       if (this.counter <= 0) {
         clearInterval(this.interval)
         this.running = false
-        if (this.config.ecoMode) this.sendSocketNotification("SCREEN_HIDING")
+        if (this.config.ecoMode) {
+          this.sendSocketNotification("SCREEN_HIDING")
+          this.powerDisplay = false
+        }
         if (this.config.turnOffDisplay) this.wantedPowerDisplay(false)
         this.interval = null
         log("Stops by counter.")
-        if (this.config.detectorSleeping) this.snowboy("STOP")
+        if (this.config.detectorSleeping) this.sendSocketNotification("SNOWBOY_STOP")
       }
     }, 1000)
   }
@@ -81,7 +91,10 @@ class SCREEN {
     if (lock == true) this.locked = true
 
     if (this.config.turnOffDisplay) this.wantedPowerDisplay(true)
-    if (this.config.ecoMode) this.sendSocketNotification("SCREEN_SHOWING")
+    if (this.config.ecoMode) {
+      this.sendSocketNotification("SCREEN_SHOWING")
+      this.powerDisplay = true
+    }
     if (!this.running) return
     clearInterval(this.interval)
     this.interval = null
@@ -93,15 +106,15 @@ class SCREEN {
     this.reset(null, this.config.detectorSleeping)
   }
 
-  reset(unlock, wakeup) {
+  reset(unlock, detectorSleeping) {
     if (unlock == true) this.locked = false
 
     if (this.locked) return log("[Restart] Screen is Locked !")
     clearInterval(this.interval)
     this.interval = null
     this.running = false
+    if (detectorSleeping && !this.powerDisplay) this.sendSocketNotification("SNOWBOY_START")
     this.start()
-    if (wakeup) this.snowboy("START")
   }
 
   wantedPowerDisplay (wanted) {
@@ -143,6 +156,7 @@ class SCREEN {
       else exec("/usr/bin/vcgencmd display_power 0")
     }
     log((this.config.rpi4 ? "RPI 4 " : "") + "Display " + (set ? "ON." : "OFF."))
+    this.powerDisplay = set
   }
 }
 

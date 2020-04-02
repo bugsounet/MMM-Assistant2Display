@@ -189,7 +189,6 @@ class DisplayClass {
       winh.classList.remove("hidden")
       YT.classList.remove("hidden")
     } else {
-      //if (!this.config.useYoutube) this.sendAlive(false)
       winh.classList.add("hidden")
       YT.classList.add("hidden")
     }
