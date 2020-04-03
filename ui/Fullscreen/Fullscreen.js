@@ -62,10 +62,8 @@ class Display extends DisplayClass {
     var iframe = document.getElementById("A2D_OUTPUT")
     var photo = document.getElementById("A2D_PHOTO")
     if (!force && this.A2D.youtube.displayed) YT.classList.remove("hidden")
-    else {
-      winh.classList.add("hidden")
-      if (!this.A2D.youtube.displayed) this.sendAlive(false)
-    }
+    else winh.classList.add("hidden")
+    if (!this.A2D.youtube.displayed) this.sendAlive(false)
     iframe.classList.add("hidden")
     iframe.src= "about:blank"
     photo.classList.add("hidden")

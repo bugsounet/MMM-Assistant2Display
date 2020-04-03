@@ -17,7 +17,7 @@ class SCREEN {
   constructor(config, callback) {
     this.config = config
     this.sendSocketNotification = callback.sendSocketNotification
-    this.snowboy = callback.snowboy
+    this.governor = callback.governor
     var debug = (this.config.debug) ? this.config.debug : false
     if (debug == true) log = _log
     this.debug = debug
@@ -31,6 +31,7 @@ class SCREEN {
       ecoMode: true,
       displayCounter: true,
       detectorSleeping: false,
+      governorSleeping: false,
       rpi4: false,
       dev: false
     }
@@ -51,17 +52,20 @@ class SCREEN {
     this.start()
   }
 
-  start () {
+  start (restart) {
     if (this.locked || this.running || (!this.config.turnOffDisplay && !this.config.ecoMode)) return
-    log("Starts.")
-
-    if (this.config.turnOffDisplay) {
-      if (this.config.dev) this.setPowerDisplay(true)
-      else this.wantedPowerDisplay(true)
-    }
-    if (this.config.ecoMode) {
-      this.sendSocketNotification("SCREEN_SHOWING")
-      this.powerDisplay = true
+    if (!restart) log("Starts.")
+    else log("Restart.")
+    if (!this.powerDisplay) {
+      if (this.config.turnOffDisplay) {
+        if (this.config.dev) this.setPowerDisplay(true)
+        else this.wantedPowerDisplay(true)
+      }
+      if (this.config.ecoMode) {
+        this.sendSocketNotification("SCREEN_SHOWING")
+        this.powerDisplay = true
+      }
+      if (this.config.governorSleeping) this.governor("WORKING")
     }
     clearInterval(this.interval)
     this.interval = null
@@ -75,25 +79,32 @@ class SCREEN {
       if (this.counter <= 0) {
         clearInterval(this.interval)
         this.running = false
-        if (this.config.ecoMode) {
-          this.sendSocketNotification("SCREEN_HIDING")
-          this.powerDisplay = false
+        if (this.powerDisplay) {
+          if (this.config.ecoMode) {
+            this.sendSocketNotification("SCREEN_HIDING")
+            this.powerDisplay = false
+          }
+          if (this.config.turnOffDisplay) this.wantedPowerDisplay(false)
         }
-        if (this.config.turnOffDisplay) this.wantedPowerDisplay(false)
         this.interval = null
         log("Stops by counter.")
         if (this.config.detectorSleeping) this.sendSocketNotification("SNOWBOY_STOP")
+        if (this.config.governorSleeping && this.config.ecoMode) this.governor("SLEEPING")
       }
     }, 1000)
   }
 
   stop (lock) {
+    if (this.locked) return
     if (lock == true) this.locked = true
 
-    if (this.config.turnOffDisplay) this.wantedPowerDisplay(true)
-    if (this.config.ecoMode) {
-      this.sendSocketNotification("SCREEN_SHOWING")
-      this.powerDisplay = true
+    if (!this.powerDisplay) {
+      if (this.config.governorSleeping) this.governor("WORKING")
+      if (this.config.turnOffDisplay) this.wantedPowerDisplay(true)
+      if (this.config.ecoMode) {
+        this.sendSocketNotification("SCREEN_SHOWING")
+        this.powerDisplay = true
+      }
     }
     if (!this.running) return
     clearInterval(this.interval)
@@ -108,13 +119,15 @@ class SCREEN {
 
   reset(unlock, detectorSleeping) {
     if (unlock == true) this.locked = false
-
-    if (this.locked) return log("[Restart] Screen is Locked !")
+    if (this.locked) return
     clearInterval(this.interval)
     this.interval = null
     this.running = false
-    if (detectorSleeping && !this.powerDisplay) this.sendSocketNotification("SNOWBOY_START")
-    this.start()
+    if (!this.powerDisplay) {
+      if (this.config.governorSleeping) this.governor("WORKING")
+      if (detectorSleeping) this.sendSocketNotification("SNOWBOY_START")
+    }
+    this.start(true)
   }
 
   wantedPowerDisplay (wanted) {

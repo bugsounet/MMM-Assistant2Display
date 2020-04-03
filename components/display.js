@@ -29,7 +29,6 @@ class DisplayClass {
       },
       links: {
         displayed: false,
-        position: 0,
         urls: null,
         length: 0
       }
@@ -53,7 +52,6 @@ class DisplayClass {
         length: response.photos.length
       },
       links: {
-        position: 0,
         urls: response.urls,
         length: response.urls.length
       }
@@ -74,8 +72,8 @@ class DisplayClass {
     let tmp = {}
     var ytL = new RegExp("youtube\.com\/watch\\?v\=([0-9a-zA-Z\-\_]+)", "ig")
     var ytP = new RegExp("youtube\.com\/playlist\\?list\=([a-zA-Z0-9\-\_]+)", "ig")
-    var ytLink = ytL.exec(this.A2D.links.urls[this.A2D.links.position])
-    var ytPlayList = ytP.exec(this.A2D.links.urls[this.A2D.links.position])
+    var ytLink = ytL.exec(this.A2D.links.urls[0])
+    var ytPlayList = ytP.exec(this.A2D.links.urls[0])
 
     if (ytLink || ytPlayList) {
       tmp = {
@@ -87,9 +85,9 @@ class DisplayClass {
         this.sendAlive(true)
         this.player.load({id: this.A2D.youtube.id, type : this.A2D.youtube.type})
       }
-    } else if(this.config.useLinks) {
+    } else if(this.config.useLinks) { // display only first link
       this.sendAlive(true)
-      this.sendSocketNotification("PROXY_OPEN", this.A2D.links.urls[this.A2D.links.position])
+      this.sendSocketNotification("PROXY_OPEN", this.A2D.links.urls[0])
     }
   }
 
@@ -125,29 +123,20 @@ class DisplayClass {
 
   linksDisplay() {
     var iframe = document.getElementById("A2D_OUTPUT")
-    A2D("Loading", this.A2D.links.urls[this.A2D.links.position])
+    A2D("Loading", this.A2D.links.urls[0])
     this.A2D.links.displayed = true
     this.showDisplay()
-    iframe.src = "http://127.0.0.1:" + this.config.proxyPort + "/"+ this.A2D.links.urls[this.A2D.links.position]
+    iframe.src = "http://127.0.0.1:" + this.config.proxyPort + "/"+ this.A2D.links.urls[0]
     if (this.config.sandbox) iframe.sandbox = this.config.sandbox
 
     iframe.addEventListener("load", () => {
       A2D("URL Loaded")
       this.timer = setTimeout( () => {
-        this.linksNext()
+        this.sendSocketNotification("PROXY_CLOSE")
+        this.resetTimer()
+        this.hideDisplay()
       }, this.config.displayDelay)
     }, {once: true})
-  }
-
-  linksNext() {
-    this.sendSocketNotification("PROXY_CLOSE")
-    if (this.A2D.links.position >= (this.A2D.links.length-1)) {
-      this.resetTimer()
-      this.hideDisplay()
-    } else {
-      this.A2D.links.position++
-      this.urlsScan()
-    }
   }
 
   showDisplay() {

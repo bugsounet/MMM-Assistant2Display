@@ -39,22 +39,17 @@ Module.register("MMM-Assistant2Display",{
       displayCounter: true,
       text: "Auto Turn Off Screen:",
       detectorSleeping: false,
+      governorSleeping: false,
       rpi4: false
     },
     pir: {
       usePir: false,
       pin: 21
     },
-    snowboy: {
-      useSnowboy: false,
-      audioGain: 2.0,
-      Frontend: true,
-      Model: "jarvis",
-      Sensitivity: null
-    },
     governor: {
       useGovernor: false,
-      governor: ""
+      sleeping: "powersave",
+      working: "ondemand"
     },
     internet: {
       useInternet: false,
@@ -69,10 +64,8 @@ Module.register("MMM-Assistant2Display",{
   },
 
   start: function () {
-    this.useA2D = false
     this.A2D= {}
     this.config.micConfig= {}
-    this.scanAMk2()
     this.config = this.configAssignment({}, this.defaults, this.config)
     this.volumeScript= {
       "OSX": `osascript -e 'set volume output volume #VOLUME#'`,
@@ -93,10 +86,8 @@ Module.register("MMM-Assistant2Display",{
       useA2D: this.useA2D,
       screen: this.config.screen,
       pir: this.config.pir,
-      snowboy: this.config.snowboy,
       governor: this.config.governor,
-      internet: this.config.internet,
-      micConfig: this.config.micConfig
+      internet: this.config.internet
     }
 
     if (this.config.debug) A2D = A2D_
@@ -114,7 +105,7 @@ Module.register("MMM-Assistant2Display",{
       }
     }
     this.displayResponse = new Display(this.config, callbacks)
-    if (!this.useA2D) console.log("[A2D] A2D desactived")
+    if (this.useA2D) console.log("[A2D] initialized.")
   },
 
   getDom: function () {
@@ -228,11 +219,11 @@ Module.register("MMM-Assistant2Display",{
           this.sendSocketNotification("SET_VOLUME", payload)
         }
         break
-      case "WAKEUP":
+      case "WAKEUP": /** for external wakeup **/
         if (this.useA2D && this.config.screen.useScreen) {
           this.sendSocketNotification("SCREEN_WAKEUP")
-          break
         }
+        break
     }
   },
 
@@ -250,9 +241,6 @@ Module.register("MMM-Assistant2Display",{
       case "SCREEN_TIMER":
         var counter = document.getElementById("SCREEN_COUNTER")
         counter.textContent = payload
-        break
-      case "SNOWBOY_DETECTED":
-        this.sendNotification("ASSISTANT_ACTIVATE", { profile:"default", type: "MIC" })
         break
       case "INTERNET_DOWN":
         this.sendNotification("SHOW_ALERT", {
@@ -278,28 +266,15 @@ Module.register("MMM-Assistant2Display",{
         break
       case "SNOWBOY_STOP":
         if (this.config.useMMMSnowboy) this.sendNotification("SNOWBOY_STOP")
-        if (this.config.snowboy.useSnowboy) this.sendSocketNotification("SNOWBOY_STOP")
         break
       case "SNOWBOY_START":
         if (this.config.useMMMSnowboy) this.sendNotification("SNOWBOY_START")
-        if (this.config.snowboy.useSnowboy) this.sendSocketNotification("SNOWBOY_START")
         break
-    }
-  },
-
-  scanAMk2: function() {
-    for (let [item, value] of Object.entries(config.modules)) {
-      if (value.module == "MMM-AssistantMk2") {
-        this.useA2D = value.config.useA2D ? value.config.useA2D : false
-        if (this.useA2D) {
-            this.config.micConfig.recorder = (value.config.micConfig && value.config.micConfig.recorder) ? value.config.micConfig.recorder : "arecord"
-            this.config.micConfig.device = (value.config.micConfig && value.config.micConfig.device) ? value.config.micConfig.device : null
-        }
-      }
     }
   },
 
   uiAutoChoice: function() {
+    this.useA2D = false
     if (this.config.ui == "AMk2") {
       var modify = false
       for (let [item, value] of Object.entries(config.modules)) {
@@ -311,6 +286,7 @@ Module.register("MMM-Assistant2Display",{
             this.config.ui = "Fullscreen"
             modify = true
           }
+          this.useA2D = value.config.useA2D ? value.config.useA2D : false
         }
       }
       if (!modify) {
@@ -319,6 +295,10 @@ Module.register("MMM-Assistant2Display",{
       }
     }
     console.log("[A2D] Auto choice UI", this.config.ui)
+    if (!this.useA2D) {
+      console.log("[A2D][ERROR] A2D is desactived!")
+      console.log("[A2D][ERROR] set `useA2D: true,` in AMk2 configuration !")
+    }
   },
 
   configAssignment : function (result) {
@@ -351,18 +331,13 @@ Module.register("MMM-Assistant2Display",{
 
   onBefore: function () {
     if (this.config.screen.useScreen) this.sendSocketNotification("SCREEN_STOP")
-    if (this.config.useMMMSnowboy) this.sendNotification("SNOWBOY_STOP")
-    if (this.config.snowboy.useSnowboy) this.sendSocketNotification("SNOWBOY_STOP")
   },
 
   onAfter: function () {
     if (this.config.screen.useScreen) this.sendSocketNotification("SCREEN_RESET")
-    if (this.config.useMMMSnowboy) this.sendNotification("SNOWBOY_START")
-    if (this.config.snowboy.useSnowboy) this.sendSocketNotification("SNOWBOY_START")
   },
 
   onReady: function() {
-    if (this.config.useMMMSnowboy) this.sendNotification("SNOWBOY_START")
     if (this.config.briefToday.useBriefToday) this.briefToday()
   },
 

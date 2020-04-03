@@ -36,7 +36,7 @@ module.exports = NodeHelper.create({
         break
       case "SCREEN_LOCK":
         if (this.config.screen.useScreen) {
-          if (payload) this.screen.stop(true)
+          if (payload == true) this.screen.stop(true)
           else this.screen.reset(true)
         }
         break
@@ -51,12 +51,6 @@ module.exports = NodeHelper.create({
         break
       case "SCREEN_WAKEUP":
         if (this.config.screen.useScreen) this.screen.wakeup()
-        break
-      case "SNOWBOY_START":
-        if (this.config.snowboy.useSnowboy) this.snowboy.start()
-        break
-      case "SNOWBOY_STOP":
-        if (this.config.snowboy.useSnowboy) this.snowboy.stop()
         break
     }
   },
@@ -102,16 +96,16 @@ module.exports = NodeHelper.create({
       "sendSocketNotification": (noti, params) => {
         this.sendSocketNotification(noti, params)
       },
-      "snowboy": (param) => {
-        if (this.snowboy && param == "STOP") this.snowboy.stop()
-        if (this.snowboy && param == "START") this.snowboy.start()
-      },
       "screen": (param) => {
         if (this.screen && param == "RESET") this.screen.reset()
         if (this.screen && param == "START") this.screen.start()
         if (this.screen && param == "STOP") this.screen.stop()
         if (this.screen && param == "WAKEUP") this.screen.wakeup()
       },
+      "governor": (param) => {
+        if (this.governor && param == "SLEEPING") this.governor.sleeping()
+        if (this.governor && param == "WORKING") this.governor.working()
+      }
     }
 
     if (this.config.screen.useScreen) {
@@ -126,17 +120,11 @@ module.exports = NodeHelper.create({
       this.pir = new Pir(this.config.pir, callbacks)
       this.pir.activate()
     }
-    if (this.config.snowboy.useSnowboy) {
-      this.config.snowboy.debug = this.config.debug
-      const Snowboy = require("./components/snowboy.js")
-      this.snowboy = new Snowboy(this.config.snowboy, this.config.micConfig, callbacks)
-      this.snowboy.init()
-    }
     if (this.config.governor.useGovernor) {
       this.config.governor.debug = this.config.debug
       const Governor = require("./components/governor.js")
       this.governor = new Governor(this.config.governor,callbacks)
-      this.governor.activate()
+      this.governor.init()
     }
     if (this.config.internet.useInternet) {
       this.config.internet.debug = this.config.debug
