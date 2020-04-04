@@ -266,9 +266,11 @@ Module.register("MMM-Assistant2Display",{
         break
       case "SNOWBOY_STOP":
         if (this.config.useMMMSnowboy) this.sendNotification("SNOWBOY_STOP")
+        else if (this.config.useMMMHotword) this.sendNotification("HOTWORD_PAUSE")
         break
       case "SNOWBOY_START":
         if (this.config.useMMMSnowboy) this.sendNotification("SNOWBOY_START")
+        else if (this.config.useMMMHotword) this.sendNotification("HOTWORD_RESUME")
         break
     }
   },
