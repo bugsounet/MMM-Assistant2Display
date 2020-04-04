@@ -12,7 +12,6 @@ var A2D = function() {
 
 Module.register("MMM-Assistant2Display",{
   defaults: {
-    ui : "AMk2",
     debug:false,
     verbose: false,
     displayDelay: 30 * 1000,
@@ -59,13 +58,10 @@ Module.register("MMM-Assistant2Display",{
       command: "pm2 restart 0",
       showAlert: true
     },
-    useMMMHotword: false,
-    useMMMSnowboy: false,
   },
 
   start: function () {
     this.A2D= {}
-    this.config.micConfig= {}
     this.config = this.configAssignment({}, this.defaults, this.config)
     this.volumeScript= {
       "OSX": `osascript -e 'set volume output volume #VOLUME#'`,
@@ -144,8 +140,8 @@ Module.register("MMM-Assistant2Display",{
   },
 
   getScripts: function() {
-    this.uiAutoChoice()
-    var ui = this.config.ui + "/" + this.config.ui + '.js'
+    this.scanConfig()
+    var ui = this.ui + "/" + this.ui + '.js'
     return [
        "/modules/MMM-Assistant2Display/components/display.js",
        "/modules/MMM-Assistant2Display/ui/" + ui,
@@ -155,7 +151,7 @@ Module.register("MMM-Assistant2Display",{
 
   getStyles: function() {
     return [
-      "/modules/MMM-Assistant2Display/ui/" + this.config.ui + "/" + this.config.ui + ".css",
+      "/modules/MMM-Assistant2Display/ui/" + this.ui + "/" + this.ui + ".css",
       "screen.css"
     ];
   },
@@ -205,7 +201,7 @@ Module.register("MMM-Assistant2Display",{
           if (this.config.useYoutube && this.displayResponse.player) this.displayResponse.player.command("stopVideo")
           this.displayResponse.resetTimer()
           this.displayResponse.hideDisplay()
-          this.displayResponse.sendAlive(false)
+          this.displayResponse.unlock()
         }
         break
       case "A2D_AMK2_BUSY":
@@ -265,38 +261,46 @@ Module.register("MMM-Assistant2Display",{
         ping.textContent = payload
         break
       case "SNOWBOY_STOP":
-        if (this.config.useMMMSnowboy) this.sendNotification("SNOWBOY_STOP")
-        else if (this.config.useMMMHotword) this.sendNotification("HOTWORD_PAUSE")
+        if (this.Snowboy) this.sendNotification("SNOWBOY_STOP")
+        else if (this.Hotword) this.sendNotification("HOTWORD_PAUSE")
         break
       case "SNOWBOY_START":
-        if (this.config.useMMMSnowboy) this.sendNotification("SNOWBOY_START")
-        else if (this.config.useMMMHotword) this.sendNotification("HOTWORD_RESUME")
+        if (this.Snowboy) this.sendNotification("SNOWBOY_START")
+        else if (this.Hotword) this.sendNotification("HOTWORD_RESUME")
         break
     }
   },
 
-  uiAutoChoice: function() {
+  scanConfig: function() {
     this.useA2D = false
-    if (this.config.ui == "AMk2") {
-      var modify = false
-      for (let [item, value] of Object.entries(config.modules)) {
-        if (value.module == "MMM-AssistantMk2") {
-          if (value.config.ui && ((value.config.ui === "Classic2") || (value.config.ui === "Classic"))) {
-            this.config.ui = value.config.ui
-            modify = true
-          } else {
-            this.config.ui = "Fullscreen"
-            modify = true
-          }
-          this.useA2D = value.config.useA2D ? value.config.useA2D : false
+    this.Hotword = false
+    this.Snowboy = false
+    this.ui = "Fullscreen"
+
+    console.log("[A2D] Scan config.js file")
+    var AMk2Found = false
+    for (let [item, value] of Object.entries(config.modules)) {
+      if (value.module == "MMM-AssistantMk2") {
+        AMk2Found = true
+        if (value.config.ui && ((value.config.ui === "Classic2") || (value.config.ui === "Classic"))) {
+          this.ui = value.config.ui
         }
+        this.useA2D = value.config.useA2D ? value.config.useA2D : false
       }
-      if (!modify) {
-        console.log("[A2D][ERROR] AMk2 not found!")
-        this.config.ui = "Fullscreen"
+      if (value.module == "MMM-Snowboy" && !value.disabled) {
+        console.log("[A2D] MMM-Snowboy detected!")
+        this.Snowboy = true
+      }
+      if (value.module == "MMM-Hotword"&& !value.disabled) {
+        console.log("[A2D] MMM-Hotword detected!")
+        this.Hotword = true
       }
     }
-    console.log("[A2D] Auto choice UI", this.config.ui)
+    if (!AMk2Found) console.log("[A2D][ERROR] AMk2 not found!")
+
+    if (this.Hotword && this.Snowboy) console.log("[A2D][ERROR] 2 detectors actived !")
+
+    console.log("[A2D] Auto choice UI", this.ui)
     if (!this.useA2D) {
       console.log("[A2D][ERROR] A2D is desactived!")
       console.log("[A2D][ERROR] set `useA2D: true,` in AMk2 configuration !")

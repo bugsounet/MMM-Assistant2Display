@@ -36,18 +36,18 @@ module.exports = NodeHelper.create({
         break
       case "SCREEN_LOCK":
         if (this.config.screen.useScreen) {
-          if (payload == true) this.screen.stop(true)
-          else this.screen.reset(true)
+          if (payload) this.screen.lock()
+          else this.screen.unlock()
         }
         break
       case "SCREEN_START":
         if (this.config.screen.useScreen) this.screen.start()
         break
       case "SCREEN_STOP":
-        if (this.config.screen.useScreen) this.screen.stop(payload)
+        if (this.config.screen.useScreen) this.screen.stop()
         break
       case "SCREEN_RESET":
-        if (this.config.screen.useScreen) this.screen.reset(payload)
+        if (this.config.screen.useScreen) this.screen.reset()
         break
       case "SCREEN_WAKEUP":
         if (this.config.screen.useScreen) this.screen.wakeup()

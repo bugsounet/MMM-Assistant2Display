@@ -8,6 +8,7 @@ class DisplayClass {
     this.sendTunnel = callbacks.tunnel
     this.timer = null
     this.player = null
+    this.screenLock = false
     this.A2D = {
       AMk2: {
         transcription: null,
@@ -59,7 +60,6 @@ class DisplayClass {
     this.A2D = this.objAssign({}, this.A2D, tmp)
     this.prepareDisplay()
     if(this.config.usePhotos && this.A2D.photos.length > 0) {
-      this.sendAlive(true)
       this.photoDisplay()
     } else if (this.A2D.links.length > 0) {
       this.urlsScan()
@@ -82,16 +82,16 @@ class DisplayClass {
       },
       this.A2D.youtube = this.objAssign({}, this.A2D.youtube, tmp)
       if (this.config.useYoutube) {
-        this.sendAlive(true)
+        this.lock()
         this.player.load({id: this.A2D.youtube.id, type : this.A2D.youtube.type})
       }
     } else if(this.config.useLinks) { // display only first link
-      this.sendAlive(true)
       this.sendSocketNotification("PROXY_OPEN", this.A2D.links.urls[0])
     }
   }
 
   photoDisplay() {
+    this.lock()
     var photo = document.getElementById("A2D_PHOTO")
     A2D("Loading photo #" + (this.A2D.photos.position+1) + "/" + (this.A2D.photos.length))
     this.A2D.photos.displayed = true
@@ -122,6 +122,7 @@ class DisplayClass {
   }
 
   linksDisplay() {
+    this.lock()
     var iframe = document.getElementById("A2D_OUTPUT")
     A2D("Loading", this.A2D.links.urls[0])
     this.A2D.links.displayed = true
@@ -174,7 +175,7 @@ class DisplayClass {
     var YT = document.getElementById("A2D_YOUTUBE")
     var winh = document.getElementById("A2D")
     if (this.A2D.youtube.displayed) {
-      this.sendAlive(true) // for YT playlist
+      this.lock() // for YT playlist
       winh.classList.remove("hidden")
       YT.classList.remove("hidden")
     } else {
@@ -224,7 +225,6 @@ class DisplayClass {
       },
       links: {
         displayed: false,
-        position: 0,
         urls: null,
         length: 0
       }
@@ -234,22 +234,23 @@ class DisplayClass {
     this.sendTunnel(this.A2D)
   }
 
-  sendAlive(status) {
-    if (status) this.lock()
-    else this.unlock()
-    A2D("SendAlive:", status)
-    this.sendSocketNotification("SCREEN_LOCK", status)
-  }
-
   lock() {
+    if (this.screenLock) return
+    A2D("Lock Screen")
     MM.getModules().exceptWithClass("MMM-AssistantMk2").enumerate((module)=> {
       module.hide(15, {lockString: "A2D_LOCKED"})
     })
+    this.sendSocketNotification("SCREEN_LOCK", true)
+    this.screenLock = true
   }
 
   unlock () {
+    if (!this.screenLock) return
+    A2D("Unlock Screen")
     MM.getModules().exceptWithClass("MMM-AssistantMk2").enumerate((module)=> {
       module.show(15, {lockString: "A2D_LOCKED"})
     })
+    this.sendSocketNotification("SCREEN_LOCK", false)
+    this.screenLock = false
   }
 }
