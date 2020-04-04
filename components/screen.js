@@ -45,6 +45,7 @@ class SCREEN {
 
     process.on('exit', (code) => {
       if (this.config.turnOffDisplay) this.setPowerDisplay(true)
+      if (this.config.governorSleeping) this.governor("WORKING")
       log('ByeBye !')
       log('@bugsounet')
     });
