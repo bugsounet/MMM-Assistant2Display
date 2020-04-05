@@ -37,7 +37,8 @@ class Display extends DisplayClass {
           this.titleYT()
         },
         (ended) => {
-          this.sendAlive(false)
+          this.A2DUnlock()
+          this.resetYT()
         }
       )
       this.player.init()
@@ -88,7 +89,6 @@ class Display extends DisplayClass {
 
   prepareDisplay() {
     A2D("Prepare Display with:", this.A2D.AMk2)
-    var self = this
     var iframe = document.getElementById("A2D_OUTPUT")
     var tr = document.getElementById("A2D_TRANSCRIPTION")
     tr.innerHTML = ""
@@ -107,10 +107,10 @@ class Display extends DisplayClass {
         word[item] = document.createElement("div")
         word[item].id = "A2D_WORD"
         word[item].textContent = value
-        word[item].addEventListener("click", function() {
+        word[item].addEventListener("click", ()=> {
           log("Clicked", value)
-          self.resetTimer()
-          self.hideDisplay()
+          this.resetTimer()
+          this.hideDisplay()
           iframe.src = "http://localhost:8080/activatebytext/?query=" + value
         })
         wordbox.appendChild(word[item])
@@ -135,7 +135,7 @@ class Display extends DisplayClass {
     }
     else winh.classList.add("hidden")
     if (!this.A2D.youtube.displayed) {
-      this.sendAlive(false)
+      this.A2DUnlock()
       tr.innerHTML= ""
       trysay.textContent = ""
       wordbox.innerHTML = ""

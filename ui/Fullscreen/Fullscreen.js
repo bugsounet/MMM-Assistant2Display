@@ -36,7 +36,8 @@ class Display extends DisplayClass {
           this.A2D.youtube.title = title
         },
         (ended) => {
-          this.unlock()
+          this.A2DUnlock()
+          this.resetYT()
         }
       )
       if (this.config.useYoutube) this.player.init()
@@ -59,7 +60,7 @@ class Display extends DisplayClass {
     var photo = document.getElementById("A2D_PHOTO")
     if (!force && this.A2D.youtube.displayed) YT.classList.remove("hidden")
     else winh.classList.add("hidden")
-    if (!this.A2D.youtube.displayed) this.unlock()
+    if (!this.A2D.youtube.displayed) this.A2DUnlock()
     iframe.classList.add("hidden")
     iframe.src= "about:blank"
     photo.classList.add("hidden")

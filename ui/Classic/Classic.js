@@ -37,7 +37,8 @@ class Display extends DisplayClass {
           this.titleYT()
         },
         (ended) => {
-          this.sendAlive(false)
+          this.A2DUnlock()
+          this.resetYT()
         }
       )
       this.player.init()
@@ -90,7 +91,7 @@ class Display extends DisplayClass {
     else winh.classList.add("hidden")
     if (!this.A2D.youtube.displayed) {
       tr.innerHTML= ""
-      this.sendAlive(false)
+      this.A2DUnlock()
     }
     iframe.classList.add("hidden")
     iframe.src= "about:blank"

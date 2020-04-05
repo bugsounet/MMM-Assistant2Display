@@ -141,7 +141,6 @@ class YOUTUBE {
       method = "cuePlaylist"
       this.list = true
     } else return false
-
     this.YTStarted = true
     this.errorYT = false
     this.command(method, option)

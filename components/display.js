@@ -24,6 +24,7 @@ class DisplayClass {
       },
       photos: {
         displayed: false,
+        forceClose: false,
         position: 0,
         urls: null,
         length: 0
@@ -50,16 +51,26 @@ class DisplayClass {
       photos: {
         position: 0,
         urls: response.photos,
-        length: response.photos.length
+        length: response.photos.length,
       },
       links: {
         urls: response.urls,
         length: response.urls.length
       }
     }
+    /** Close all active windows and reset it **/
+    //if (this.A2D.youtube.displayed) this.player.command("stopVideo")
+    this.A2D.photos.forceClose = true
+    this.A2D.photos.displayed = false
+    this.A2D.links.displayed = false
+    this.resetTimer()
+    this.showDisplay()
+
+    /** the show must go on ! **/
     this.A2D = this.objAssign({}, this.A2D, tmp)
     this.prepareDisplay()
-    if(this.config.usePhotos && this.A2D.photos.length > 0) {
+    if(this.config.photos.usePhotos && this.A2D.photos.length > 0) {
+      this.A2D.photos.forceClose= false
       this.photoDisplay()
     } else if (this.A2D.links.length > 0) {
       this.urlsScan()
@@ -82,37 +93,40 @@ class DisplayClass {
       },
       this.A2D.youtube = this.objAssign({}, this.A2D.youtube, tmp)
       if (this.config.useYoutube) {
-        this.lock()
+        this.A2DLock()
         this.player.load({id: this.A2D.youtube.id, type : this.A2D.youtube.type})
       }
-    } else if(this.config.useLinks) { // display only first link
+    } else if(this.config.links.useLinks) { // display only first link
       this.sendSocketNotification("PROXY_OPEN", this.A2D.links.urls[0])
     }
   }
 
   photoDisplay() {
-    this.lock()
+    this.A2DLock()
     var photo = document.getElementById("A2D_PHOTO")
     A2D("Loading photo #" + (this.A2D.photos.position+1) + "/" + (this.A2D.photos.length))
-    this.A2D.photos.displayed = true
-    this.showDisplay()
     photo.src = this.A2D.photos.urls[this.A2D.photos.position]
     photo.addEventListener("load", () => {
       A2D("Photo Loaded")
+      this.A2D.photos.displayed = true
+      this.showDisplay()
       this.timer = setTimeout( () => {
         this.photoNext()
-      }, this.config.displayDelay)
+      }, this.config.photos.displayDelay)
     }, {once: true})
     photo.addEventListener("error", (event) => {
-      A2D("Photo Loading Error... retry with next")
-      clearTimeout(this.timer)
-      this.timer = null
-      this.photoNext()
+      if (!this.A2D.photos.forceClose) {
+        A2D("Photo Loading Error... retry with next")
+        clearTimeout(this.timer)
+        this.timer = null
+        this.photoNext()
+      }
     }, {once: true})
   }
 
   photoNext() {
-    if (this.A2D.photos.position >= (this.A2D.photos.length-1)) {
+    this.A2D.photos.displayed = false
+    if (this.A2D.photos.position >= (this.A2D.photos.length-1) || this.A2D.photos.forceClose) {
       this.resetTimer()
       this.hideDisplay()
     } else {
@@ -122,13 +136,13 @@ class DisplayClass {
   }
 
   linksDisplay() {
-    this.lock()
+    this.A2DLock()
     var iframe = document.getElementById("A2D_OUTPUT")
     A2D("Loading", this.A2D.links.urls[0])
     this.A2D.links.displayed = true
     this.showDisplay()
-    iframe.src = "http://127.0.0.1:" + this.config.proxyPort + "/"+ this.A2D.links.urls[0]
-    if (this.config.sandbox) iframe.sandbox = this.config.sandbox
+    iframe.src = "http://127.0.0.1:" + this.config.links.proxyPort + "/"+ this.A2D.links.urls[0]
+    if (this.config.links.sandbox) iframe.sandbox = this.config.links.sandbox
 
     iframe.addEventListener("load", () => {
       A2D("URL Loaded")
@@ -136,7 +150,7 @@ class DisplayClass {
         this.sendSocketNotification("PROXY_CLOSE")
         this.resetTimer()
         this.hideDisplay()
-      }, this.config.displayDelay)
+      }, this.config.links.displayDelay)
     }, {once: true})
   }
 
@@ -148,6 +162,7 @@ class DisplayClass {
     var winh = document.getElementById("A2D")
     if (this.A2D.links.displayed) iframe.classList.remove("hidden")
     if (this.A2D.photos.displayed) photo.classList.remove("hidden")
+    if (this.A2D.photos.forceClose) photo.classList.add("hidden")
     if (this.A2D.youtube.displayed) YT.classList.add("hidden")
     winh.classList.remove("hidden")
   }
@@ -175,7 +190,7 @@ class DisplayClass {
     var YT = document.getElementById("A2D_YOUTUBE")
     var winh = document.getElementById("A2D")
     if (this.A2D.youtube.displayed) {
-      this.lock() // for YT playlist
+      this.A2DLock() // for YT playlist
       winh.classList.remove("hidden")
       YT.classList.remove("hidden")
     } else {
@@ -234,7 +249,21 @@ class DisplayClass {
     this.sendTunnel(this.A2D)
   }
 
-  lock() {
+  resetYT() {
+    let tmp = {
+      youtube: {
+        displayed: false,
+        id: null,
+        type: null,
+        title: null
+      }
+    }
+    this.A2D = this.objAssign({}, this.A2D, tmp)
+    A2D("Reset YT Struct", this.A2D)
+    this.sendTunnel(this.A2D)
+  }
+
+  A2DLock() {
     if (this.screenLock) return
     A2D("Lock Screen")
     MM.getModules().exceptWithClass("MMM-AssistantMk2").enumerate((module)=> {
@@ -244,7 +273,7 @@ class DisplayClass {
     this.screenLock = true
   }
 
-  unlock () {
+  A2DUnlock () {
     if (!this.screenLock) return
     A2D("Unlock Screen")
     MM.getModules().exceptWithClass("MMM-AssistantMk2").enumerate((module)=> {

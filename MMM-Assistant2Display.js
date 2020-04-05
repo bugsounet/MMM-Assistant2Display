@@ -14,13 +14,20 @@ Module.register("MMM-Assistant2Display",{
   defaults: {
     debug:false,
     verbose: false,
-    displayDelay: 30 * 1000,
-    scrollSpeed: 15,
-    scrollStart: 1000,
-    proxyPort: 8081,
-    sandbox: null,
-    useLinks: true,
-    usePhotos: true,
+    links: {
+      useLinks: true,
+      displayDelay: 30 * 1000,
+      scrollStep: 25,
+      scrollInterval: 1000,
+      scrollStart: 1000,
+      proxyPort: 8081,
+      sandbox: null,
+      verbose: true
+    },
+    photos: {
+      usePhotos: true,
+      displayDelay: 15 * 1000,
+    },
     useYoutube: true,
     volume: {
       useVolume: true,
@@ -75,11 +82,9 @@ Module.register("MMM-Assistant2Display",{
     this.helperConfig= {
       debug: this.config.debug,
       verbose: this.config.verbose,
-      scrollSpeed: this.config.scrollSpeed,
-      scrollStart: this.config.scrollStart,
-      proxyPort: this.config.proxyPort,
       volumeScript: this.volumeScript[this.config.volume.volumePreset],
       useA2D: this.useA2D,
+      links: this.config.links,
       screen: this.config.screen,
       pir: this.config.pir,
       governor: this.config.governor,
@@ -201,7 +206,7 @@ Module.register("MMM-Assistant2Display",{
           if (this.config.useYoutube && this.displayResponse.player) this.displayResponse.player.command("stopVideo")
           this.displayResponse.resetTimer()
           this.displayResponse.hideDisplay()
-          this.displayResponse.unlock()
+          this.displayResponse.A2DUnlock()
         }
         break
       case "A2D_AMK2_BUSY":

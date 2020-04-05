@@ -17,7 +17,6 @@ module.exports = NodeHelper.create({
 
   start: function () {
     this.config = {}
-    this.proxyServer = null
   },
 
   socketNotificationReceived: function (noti, payload) {
@@ -57,13 +56,15 @@ module.exports = NodeHelper.create({
 
   initialize: function(config) {
     this.config = config
+    this.proxyServer = null
     var debug = (this.config.debug) ? this.config.debug : false
     if (debug == true) log = _log
     if (this.config.useA2D) {
-      this.addons(callback = (send,params) => { this.callback(send,params)})
+      this.addons()
       log("Initialized: Assistant2Display Version",  require('./package.json').version)
     }
     else log("Disabled.")
+    log(this.config)
   },
 
   callback: function(send,params) {
@@ -73,7 +74,7 @@ module.exports = NodeHelper.create({
 
   openProxy: function(url) {
     if (this.proxyServer) this.proxyServer.stop()
-    this.proxyServer = new proxy(this.config, (send,params)=>{ this.callback(send,params) })
+    this.proxyServer = new proxy(this.config.links, (send,params)=>{ this.callback(send,params) })
     this.proxyServer.start(url)
   },
 
