@@ -28,13 +28,15 @@ class Display extends DisplayClass {
     window.onYouTubeIframeAPIReady = () => {
       this.player = new YOUTUBE(
         "A2D_YOUTUBE",
-        (show) => {
-          this.A2D.youtube.displayed = show
+        (status) => {
+          this.A2D.youtube.displayed = status
           this.showYT()
+          this.sendTunnel(this.A2D)
         },
         (title) => {
           this.A2D.youtube.title = title
           this.titleYT()
+          this.sendTunnel(this.A2D)
         },
         (ended) => {
           this.A2DUnlock()
@@ -109,7 +111,7 @@ class Display extends DisplayClass {
         word[item].textContent = value
         word[item].addEventListener("click", ()=> {
           log("Clicked", value)
-          this.resetTimer()
+          this.resetLinks()
           this.hideDisplay()
           iframe.src = "http://localhost:8080/activatebytext/?query=" + value
         })
@@ -120,30 +122,27 @@ class Display extends DisplayClass {
     super.prepareDisplay()
   }
 
-  hideDisplay(force) {
+  hideDisplay() {
     A2D("Hide Iframe")
-    var YT = document.getElementById("A2D_YOUTUBE")
     var winh = document.getElementById("A2D")
     var tr = document.getElementById("A2D_TRANSCRIPTION")
     var iframe = document.getElementById("A2D_OUTPUT")
     var photo = document.getElementById("A2D_PHOTO")
+    var YT = document.getElementById("A2D_YOUTUBE")
     var trysay = document.getElementById("A2D_TRYSAY")
     var wordbox = document.getElementById("A2D_WORDBOX")
-    if (!force && this.A2D.youtube.displayed) {
-      this.titleYT()
-      YT.classList.remove("hidden")
-    }
-    else winh.classList.add("hidden")
-    if (!this.A2D.youtube.displayed) {
-      this.A2DUnlock()
+    winh.classList.add("hidden")
+    iframe.classList.add("hidden")
+    photo.classList.add("hidden")
+    YT.classList.add("hidden")
+    if (!this.A2D.speak) {
+      iframe.src= "about:blank"
+      photo.removeAttribute('src')
       tr.innerHTML= ""
       trysay.textContent = ""
       wordbox.innerHTML = ""
+      if (!this.A2D.youtube.displayed && !this.A2D.links.displayed && !this.A2D.photos.displayed) this.A2DUnlock()
     }
-    iframe.classList.add("hidden")
-    iframe.src= "about:blank"
-    photo.classList.add("hidden")
-    photo.src= ""
-    super.hideDisplay(force)
+    super.hideDisplay()
   }
 }

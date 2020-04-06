@@ -92,11 +92,9 @@ class YOUTUBE {
           this.status(false)
           break
         case 1:
-          // to make better: if title is not available ... retry with new method (API Change...)
           //A2D("!!! TEMP YT DEBUG !!!", this.YTPlayer)
           try {
-            var title = this.YTPlayer.l.videoData ? this.YTPlayer.l.videoData.title : (
-              this.YTPlayer.playerInfo.videoData ? this.YTPlayer.playerInfo.videoData.title : "unknow")
+            var title = this.YTPlayer.playerInfo.videoData ? this.YTPlayer.playerInfo.videoData.title : "unknow"
             A2D("YT Playing Title:" , title)
             this.title(title)
           } catch (e) {
@@ -111,7 +109,11 @@ class YOUTUBE {
             if (!Array.isArray(list)) return false
             A2D("YT Playlist count:", list.length)
           }
-          if(!this.errorYT && this.YTStarted) this.command("playVideo")
+          if (!this.errorYT && this.YTStarted) this.command("playVideo")
+          if (!this.YTStarted) {
+            this.status(false)
+            this.ended(true)
+          }
           break
       }
       A2D("YT Status:", this.state[ev.data])

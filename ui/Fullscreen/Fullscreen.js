@@ -31,9 +31,11 @@ class Display extends DisplayClass {
         (status) => {
           this.A2D.youtube.displayed = status
           this.showYT()
+          this.sendTunnel(this.A2D)
         },
         (title) => {
           this.A2D.youtube.title = title
+          this.sendTunnel(this.A2D)
         },
         (ended) => {
           this.A2DUnlock()
@@ -52,19 +54,21 @@ class Display extends DisplayClass {
     return dom
   }
 
-  hideDisplay(force) {
+  hideDisplay() {
     A2D("Hide Iframe")
-    var YT = document.getElementById("A2D_YOUTUBE")
     var winh = document.getElementById("A2D")
     var iframe = document.getElementById("A2D_OUTPUT")
     var photo = document.getElementById("A2D_PHOTO")
-    if (!force && this.A2D.youtube.displayed) YT.classList.remove("hidden")
-    else winh.classList.add("hidden")
-    if (!this.A2D.youtube.displayed) this.A2DUnlock()
+    var YT = document.getElementById("A2D_YOUTUBE")
+    winh.classList.add("hidden")
     iframe.classList.add("hidden")
-    iframe.src= "about:blank"
     photo.classList.add("hidden")
-    photo.src= ""
+    YT.classList.add("hidden")
+    if (!this.A2D.speak) {
+      iframe.src= "about:blank"
+      photo.removeAttribute('src')
+      if (!this.A2D.youtube.displayed && !this.A2D.links.displayed && !this.A2D.photos.displayed) this.A2DUnlock()
+    }
     super.hideDisplay()
   }
 }

@@ -28,13 +28,15 @@ class Display extends DisplayClass {
     window.onYouTubeIframeAPIReady = () => {
       this.player = new YOUTUBE(
         "A2D_YOUTUBE",
-        (show) => {
-          this.A2D.youtube.displayed = show
+        (status) => {
+          this.A2D.youtube.displayed = status
           this.showYT()
+          this.sendTunnel(this.A2D)
         },
         (title) => {
           this.A2D.youtube.title = title
           this.titleYT()
+          this.sendTunnel(this.A2D)
         },
         (ended) => {
           this.A2DUnlock()
@@ -77,26 +79,23 @@ class Display extends DisplayClass {
     super.prepareDisplay()
   }
 
-  hideDisplay(force) {
+  hideDisplay() {
     A2D("Hide Iframe")
-    var YT = document.getElementById("A2D_YOUTUBE")
     var winh = document.getElementById("A2D")
     var tr = document.getElementById("A2D_TRANSCRIPTION")
     var iframe = document.getElementById("A2D_OUTPUT")
     var photo = document.getElementById("A2D_PHOTO")
-    if (!force && this.A2D.youtube.displayed) {
-      this.titleYT()
-      YT.classList.remove("hidden")
-    }
-    else winh.classList.add("hidden")
-    if (!this.A2D.youtube.displayed) {
-      tr.innerHTML= ""
-      this.A2DUnlock()
-    }
+    var YT = document.getElementById("A2D_YOUTUBE")
+    winh.classList.add("hidden")
     iframe.classList.add("hidden")
-    iframe.src= "about:blank"
     photo.classList.add("hidden")
-    photo.src= ""
+    YT.classList.add("hidden")
+    if (!this.A2D.speak) {
+      iframe.src= "about:blank"
+      photo.removeAttribute('src')
+      tr.innerHTML= ""
+    }
+    if (!this.A2D.youtube.displayed && !this.A2D.links.displayed && !this.A2D.photos.displayed) this.A2DUnlock()
     super.hideDisplay()
   }
 }

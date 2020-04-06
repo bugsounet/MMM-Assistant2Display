@@ -26,7 +26,7 @@ Module.register("MMM-Assistant2Display",{
     },
     photos: {
       usePhotos: true,
-      displayDelay: 15 * 1000,
+      displayDelay: 10 * 1000,
     },
     useYoutube: true,
     volume: {
@@ -103,6 +103,7 @@ Module.register("MMM-Assistant2Display",{
         this.A2D.AMk2 = payload.AMk2
         this.A2D.photos= payload.photos
         this.A2D.links= payload.links
+        this.A2D.youtube = payload.youtube
       }
     }
     this.displayResponse = new Display(this.config, callbacks)
@@ -181,21 +182,35 @@ Module.register("MMM-Assistant2Display",{
       case "ASSISTANT_LISTEN":
       case "ASSISTANT_THINK":
         if (this.useA2D) {
-          if (this.config.useYoutube && this.displayResponse.player) this.displayResponse.player.command("setVolume", 5)
-          this.displayResponse.hideDisplay(true)
+          this.displayResponse.A2D.speak = true
+          if (this.config.useYoutube && this.A2D.youtube.displayed) {
+            this.displayResponse.player.command("setVolume", 5)
+          }
+          if ((this.config.photos.usePhotos && this.A2D.photos.displayed) ||
+            (this.config.links.useLinks && this.A2D.links.displayed) ||
+            (this.config.useYoutube && this.A2D.youtube.displayed)) {
+              this.displayResponse.hideDisplay()
+          }
         }
         break
       case "ASSISTANT_STANDBY":
         if (this.useA2D) {
-          this.displayResponse.showYT()
-          if (this.config.useYoutube && this.displayResponse.player) this.displayResponse.player.command("setVolume", 100)
+          this.displayResponse.A2D.speak = false
+          if (this.config.useYoutube && this.A2D.youtube.displayed) {
+            this.displayResponse.player.command("setVolume", 100)
+          }
+          if ((this.config.photos.usePhotos && this.A2D.photos.displayed) ||
+            (this.config.links.useLinks && this.A2D.links.displayed) ||
+            (this.config.useYoutube && this.A2D.youtube.displayed)) {
+              this.displayResponse.showDisplay()
+          }
+          else this.displayResponse.hideDisplay()
         }
         break
       case "ASSISTANT_HOOK":
       case "ASSISTANT_CONFIRMATION":
         if (this.useA2D) {
-          this.displayResponse.resetTimer()
-          this.sendSocketNotification("PROXY_CLOSE")
+          /** do to : some test with hook **/
         }
         break
       case "A2D":
@@ -203,10 +218,19 @@ Module.register("MMM-Assistant2Display",{
         break
       case "A2D_STOP":
         if (this.useA2D) {
-          if (this.config.useYoutube && this.displayResponse.player) this.displayResponse.player.command("stopVideo")
-          this.displayResponse.resetTimer()
-          this.displayResponse.hideDisplay()
-          this.displayResponse.A2DUnlock()
+          if (this.config.useYoutube && this.A2D.youtube.displayed) {
+            this.displayResponse.player.command("stopVideo")
+          }
+          if (this.config.photos.usePhotos && this.A2D.photos.displayed) {
+            this.displayResponse.A2D.photos.displayed = false
+            this.displayResponse.resetPhotos()
+            this.displayResponse.hideDisplay()
+          }
+          if (this.config.links.useLinks && this.A2D.links.displayed) {
+            this.displayResponse.resetLinks()
+            this.sendSocketNotification("PROXY_CLOSE")
+            this.displayResponse.hideDisplay()
+          }
         }
         break
       case "A2D_AMK2_BUSY":

@@ -28,7 +28,7 @@ class PROXY {
     var debug = (this.config.debug) ? this.config.debug : false
     if (debug == true) log = _log
     var verbose = (this.config.verbose) ? this.config.verbose : false
-    if (verbose == true) logv= _log
+    if (verbose == true) logv = _log
     this.proxy = null
     this.sendSocketNotification= callback
     this.header= false

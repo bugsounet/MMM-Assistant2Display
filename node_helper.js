@@ -74,6 +74,7 @@ module.exports = NodeHelper.create({
 
   openProxy: function(url) {
     if (this.proxyServer) this.proxyServer.stop()
+    this.config.links.debug = this.config.debug
     this.proxyServer = new proxy(this.config.links, (send,params)=>{ this.callback(send,params) })
     this.proxyServer.start(url)
   },
