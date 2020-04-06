@@ -22,7 +22,7 @@ Module.register("MMM-Assistant2Display",{
       scrollStart: 1000,
       proxyPort: 8081,
       sandbox: null,
-      verbose: true
+      verbose: false
     },
     photos: {
       usePhotos: true,
@@ -68,7 +68,6 @@ Module.register("MMM-Assistant2Display",{
   },
 
   start: function () {
-    this.A2D= {}
     this.config = this.configAssignment({}, this.defaults, this.config)
     this.volumeScript= {
       "OSX": `osascript -e 'set volume output volume #VOLUME#'`,
@@ -99,14 +98,9 @@ Module.register("MMM-Assistant2Display",{
       "sendNotification": (noti, params)=> {
         this.sendNotification(noti, params)
       },
-      "tunnel": (payload) => {
-        this.A2D.AMk2 = payload.AMk2
-        this.A2D.photos= payload.photos
-        this.A2D.links= payload.links
-        this.A2D.youtube = payload.youtube
-      }
     }
     this.displayResponse = new Display(this.config, callbacks)
+    this.A2D = this.displayResponse.A2D
     if (this.useA2D) console.log("[A2D] initialized.")
   },
 
@@ -171,58 +165,47 @@ Module.register("MMM-Assistant2Display",{
   },
 
   notificationReceived: function (notification, payload) {
-    switch(notification) {
-      case "DOM_OBJECTS_CREATED":
-        if (this.useA2D) this.displayResponse.prepare()
-        this.sendSocketNotification("INIT", this.helperConfig)
-        break
-      case "ASSISTANT_READY":
-        if (this.useA2D) this.onReady()
-        break
-      case "ASSISTANT_LISTEN":
-      case "ASSISTANT_THINK":
-        if (this.useA2D) {
-          this.displayResponse.A2D.speak = true
+    if (notification == "DOM_OBJECTS_CREATED") {
+      this.sendSocketNotification("INIT", this.helperConfig)
+    }
+    if (this.useA2D) {
+      this.A2D = this.displayResponse.A2D
+      switch(notification) {
+        case "DOM_OBJECTS_CREATED":
+          this.displayResponse.prepare()
+          break
+        case "ASSISTANT_READY":
+          this.onReady()
+          break
+        case "ASSISTANT_LISTEN":
+        case "ASSISTANT_THINK":
+          this.A2D.speak = true
           if (this.config.useYoutube && this.A2D.youtube.displayed) {
             this.displayResponse.player.command("setVolume", 5)
           }
-          if ((this.config.photos.usePhotos && this.A2D.photos.displayed) ||
-            (this.config.links.useLinks && this.A2D.links.displayed) ||
-            (this.config.useYoutube && this.A2D.youtube.displayed)) {
-              this.displayResponse.hideDisplay()
-          }
-        }
-        break
-      case "ASSISTANT_STANDBY":
-        if (this.useA2D) {
-          this.displayResponse.A2D.speak = false
+          if (this.A2D.locked) this.displayResponse.hideDisplay()
+          break
+        case "ASSISTANT_STANDBY":
+          this.A2D.speak = false
           if (this.config.useYoutube && this.A2D.youtube.displayed) {
             this.displayResponse.player.command("setVolume", 100)
           }
-          if ((this.config.photos.usePhotos && this.A2D.photos.displayed) ||
-            (this.config.links.useLinks && this.A2D.links.displayed) ||
-            (this.config.useYoutube && this.A2D.youtube.displayed)) {
-              this.displayResponse.showDisplay()
-          }
+          if (this.displayResponse.working()) this.displayResponse.showDisplay()
           else this.displayResponse.hideDisplay()
-        }
-        break
-      case "ASSISTANT_HOOK":
-      case "ASSISTANT_CONFIRMATION":
-        if (this.useA2D) {
+          break
+        case "ASSISTANT_HOOK":
+        case "ASSISTANT_CONFIRMATION":
           /** do to : some test with hook **/
-        }
-        break
-      case "A2D":
-        if (this.useA2D) this.displayResponse.start(payload)
-        break
-      case "A2D_STOP":
-        if (this.useA2D) {
+          break
+        case "A2D":
+          this.displayResponse.start(payload)
+          break
+        case "A2D_STOP":
           if (this.config.useYoutube && this.A2D.youtube.displayed) {
             this.displayResponse.player.command("stopVideo")
           }
           if (this.config.photos.usePhotos && this.A2D.photos.displayed) {
-            this.displayResponse.A2D.photos.displayed = false
+            this.A2D.photos.displayed = false
             this.displayResponse.resetPhotos()
             this.displayResponse.hideDisplay()
           }
@@ -231,24 +214,24 @@ Module.register("MMM-Assistant2Display",{
             this.sendSocketNotification("PROXY_CLOSE")
             this.displayResponse.hideDisplay()
           }
-        }
-        break
-      case "A2D_AMK2_BUSY":
-        if (this.useA2D) this.onBefore()
-        break
-      case "A2D_AMK2_READY":
-        if (this.useA2D) this.onAfter()
-        break
-      case "VOLUME_SET":
-        if (this.useA2D && this.config.volume.useVolume) {
-          this.sendSocketNotification("SET_VOLUME", payload)
-        }
-        break
-      case "WAKEUP": /** for external wakeup **/
-        if (this.useA2D && this.config.screen.useScreen) {
-          this.sendSocketNotification("SCREEN_WAKEUP")
-        }
-        break
+          break
+        case "A2D_AMK2_BUSY":
+          this.onBefore()
+          break
+        case "A2D_AMK2_READY":
+          this.onAfter()
+          break
+        case "VOLUME_SET":
+          if (this.config.volume.useVolume) {
+            this.sendSocketNotification("SET_VOLUME", payload)
+          }
+          break
+        case "WAKEUP": /** for external wakeup **/
+          if (this.config.screen.useScreen) {
+            this.sendSocketNotification("SCREEN_WAKEUP")
+          }
+          break
+      }
     }
   },
 

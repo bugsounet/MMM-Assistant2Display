@@ -31,11 +31,9 @@ class Display extends DisplayClass {
         (status) => {
           this.A2D.youtube.displayed = status
           this.showYT()
-          this.sendTunnel(this.A2D)
         },
         (title) => {
           this.A2D.youtube.title = title
-          this.sendTunnel(this.A2D)
         },
         (ended) => {
           this.A2DUnlock()
@@ -67,7 +65,7 @@ class Display extends DisplayClass {
     if (!this.A2D.speak) {
       iframe.src= "about:blank"
       photo.removeAttribute('src')
-      if (!this.A2D.youtube.displayed && !this.A2D.links.displayed && !this.A2D.photos.displayed) this.A2DUnlock()
+      if (!this.working()) this.A2DUnlock()
     }
     super.hideDisplay()
   }

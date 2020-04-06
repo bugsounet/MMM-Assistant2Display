@@ -98,7 +98,7 @@ class YOUTUBE {
             A2D("YT Playing Title:" , title)
             this.title(title)
           } catch (e) {
-            A2D("YT Playing Title: API Error")
+            A2D("YT Playing Title: API Error", e)
           }
         case 3:
           this.status(true)

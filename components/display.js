@@ -5,12 +5,12 @@ class DisplayClass {
     this.config = Config
     this.sendSocketNotification = callbacks.sendSocketNotification
     this.sendNotification= callbacks.sendNotification
-    this.sendTunnel = callbacks.tunnel
     this.timer = null
     this.player = null
-    this.screenLock = false
     this.A2D = {
       speak : false,
+      locked: false,
+      working: false,
       AMk2: {
         transcription: null,
         done: null,
@@ -36,8 +36,6 @@ class DisplayClass {
         length: 0
       }
     }
-
-    this.sendTunnel(this.A2D)
     console.log("[A2D] DisplayClass Loaded")
   }
 
@@ -84,7 +82,6 @@ class DisplayClass {
       this.A2DLock()
       this.A2D.photos.displayed = true
       this.A2D.photos.forceClose= false
-      this.sendTunnel(this.A2D)
       this.photoDisplay()
     }
     else if (this.A2D.links.length > 0) {
@@ -142,7 +139,6 @@ class DisplayClass {
     }
     this.A2D = this.objAssign({}, this.A2D, tmp)
     A2D("Reset Photo", this.A2D)
-    this.sendTunnel(this.A2D)
   }
 
 /** urls scan : dispatch links and youtube **/
@@ -166,7 +162,6 @@ class DisplayClass {
     } else if(this.config.links.useLinks) { // display only first link
       this.A2DLock()
       this.A2D.links.displayed = true
-      this.sendTunnel(this.A2D)
       this.sendSocketNotification("PROXY_OPEN", this.A2D.links.urls[0])
     }
   }
@@ -216,7 +211,6 @@ class DisplayClass {
     }
     this.A2D = this.objAssign({}, this.A2D, tmp)
     A2D("Reset Links", this.A2D)
-    this.sendTunnel(this.A2D)
   }
 
 /** youtube rules **/
@@ -232,8 +226,7 @@ class DisplayClass {
         winh.classList.remove("hidden")
         YT.classList.add("hidden")
       } else {
-        winh.classList.add("hidden")
-        YT.classList.add("hidden")
+        this.hideDisplay()
       }
     }
   }
@@ -254,7 +247,6 @@ class DisplayClass {
     }
     this.A2D = this.objAssign({}, this.A2D, tmp)
     A2D("Reset YT Struct", this.A2D)
-    this.sendTunnel(this.A2D)
   }
 
 /** Other Cmds **/
@@ -271,23 +263,23 @@ class DisplayClass {
   }
 
   A2DLock() {
-    if (this.screenLock) return
+    if (this.A2D.locked) return
     A2D("Lock Screen")
     MM.getModules().exceptWithClass("MMM-AssistantMk2").enumerate((module)=> {
       module.hide(15, {lockString: "A2D_LOCKED"})
     })
     this.sendSocketNotification("SCREEN_LOCK", true)
-    this.screenLock = true
+    this.A2D.locked = true
   }
 
   A2DUnlock () {
-    if (!this.screenLock || this.A2D.youtube.displayed || this.A2D.photos.displayed || this.A2D.links.displayed) return
+    if (!this.A2D.locked || this.working()) return
     A2D("Unlock Screen")
     MM.getModules().exceptWithClass("MMM-AssistantMk2").enumerate((module)=> {
       module.show(15, {lockString: "A2D_LOCKED"})
     })
     this.sendSocketNotification("SCREEN_LOCK", false)
-    this.screenLock = false
+    this.A2D.locked = false
   }
 
   objAssign (result) {
@@ -311,5 +303,9 @@ class DisplayClass {
       }
     }
     return result
+  }
+
+  working () {
+    return (this.A2D.youtube.displayed || this.A2D.photos.displayed || this.A2D.links.displayed)
   }
 }
