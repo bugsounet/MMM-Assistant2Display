@@ -10,7 +10,6 @@ class DisplayClass {
     this.A2D = {
       speak : false,
       locked: false,
-      working: false,
       AMk2: {
         transcription: null,
         done: null,
@@ -133,7 +132,7 @@ class DisplayClass {
     this.A2D = this.objAssign({}, this.A2D, tmp)
     var photo = document.getElementById("A2D_PHOTO")
     photo.removeAttribute('src')
-    A2D("Reset Photo", this.A2D)
+    A2D("Reset Photos", this.A2D)
 
   }
 
@@ -229,7 +228,7 @@ class DisplayClass {
       }
     }
     this.A2D = this.objAssign({}, this.A2D, tmp)
-    A2D("Reset YT Struct", this.A2D)
+    A2D("Reset YouTube", this.A2D)
   }
 
 /** Other Cmds **/
