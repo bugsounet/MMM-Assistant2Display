@@ -43,7 +43,6 @@ class DisplayClass {
     /** Close all active windows and reset it **/
     if (this.A2D.youtube.displayed) this.player.command("stopVideo")
     if (this.A2D.photos.displayed) {
-      this.A2D.photos.displayed = false
       this.resetPhotos()
       this.hideDisplay()
     }
@@ -73,7 +72,6 @@ class DisplayClass {
         length: response.urls.length
       }
     }
-
 
     /** the show must go on ! **/
     this.A2D = this.objAssign({}, this.A2D, tmp)
@@ -116,7 +114,6 @@ class DisplayClass {
 
   photoNext() {
     if (this.A2D.photos.position >= (this.A2D.photos.length-1) || this.A2D.photos.forceClose) {
-      this.A2D.photos.displayed = false
       this.resetPhotos()
       this.hideDisplay()
     } else {
@@ -183,21 +180,6 @@ class DisplayClass {
     }, {once: true})
   }
 
-  showDisplay() {
-    A2D("Show Iframe")
-    var YT = document.getElementById("A2D_YOUTUBE")
-    var iframe = document.getElementById("A2D_OUTPUT")
-    var photo = document.getElementById("A2D_PHOTO")
-    var winh = document.getElementById("A2D")
-    if (this.A2D.speak) winh.classList.add("hidden")
-    else winh.classList.remove("hidden")
-
-    if (this.A2D.links.displayed) iframe.classList.remove("hidden")
-    if (this.A2D.photos.displayed) photo.classList.remove("hidden")
-    if (this.A2D.photos.forceClose) photo.classList.add("hidden")
-    if (this.A2D.youtube.displayed) YT.classList.remove("hidden")
-  }
-
   resetLinks() {
     clearTimeout(this.timerLinks)
     this.timerLinks = null
@@ -258,8 +240,38 @@ class DisplayClass {
     // reserved for extends
   }
 
-  hideDisplay() {
-    // reserved for extends
+  showDisplay() {
+    A2D("Show Iframe")
+    var YT = document.getElementById("A2D_YOUTUBE")
+    var iframe = document.getElementById("A2D_OUTPUT")
+    var photo = document.getElementById("A2D_PHOTO")
+    var winA2D = document.getElementById("A2D")
+    if (this.A2D.speak) winA2D.classList.add("hidden")
+    else winA2D.classList.remove("hidden")
+
+    if (this.A2D.links.displayed) iframe.classList.remove("hidden")
+    if (this.A2D.photos.displayed) photo.classList.remove("hidden")
+    if (this.A2D.photos.forceClose) photo.classList.add("hidden")
+    if (this.A2D.youtube.displayed) YT.classList.remove("hidden")
+  }
+
+  hideDisplay() {
+    A2D("Hide Iframe")
+    var winA2D = document.getElementById("A2D")
+    var iframe = document.getElementById("A2D_OUTPUT")
+    var photo = document.getElementById("A2D_PHOTO")
+    var YT = document.getElementById("A2D_YOUTUBE")
+
+    if (!this.A2D.youtube.displayed) YT.classList.add("hidden")
+    if (!this.A2D.links.displayed) iframe.classList.add("hidden")
+    if (!this.A2D.photos.displayed) photo.classList.add("hidden")
+    if (this.A2D.speak || !this.working()) winA2D.classList.add("hidden")
+
+    if (!this.A2D.speak) {
+      iframe.src= "about:blank"
+      photo.removeAttribute('src')
+      if (!this.working()) this.A2DUnlock()
+    }
   }
 
   A2DLock() {
@@ -268,7 +280,7 @@ class DisplayClass {
     MM.getModules().exceptWithClass("MMM-AssistantMk2").enumerate((module)=> {
       module.hide(15, {lockString: "A2D_LOCKED"})
     })
-    this.sendSocketNotification("SCREEN_LOCK", true)
+    if (this.config.screen.useScreen) this.sendSocketNotification("SCREEN_LOCK", true)
     this.A2D.locked = true
   }
 
@@ -278,7 +290,7 @@ class DisplayClass {
     MM.getModules().exceptWithClass("MMM-AssistantMk2").enumerate((module)=> {
       module.show(15, {lockString: "A2D_LOCKED"})
     })
-    this.sendSocketNotification("SCREEN_LOCK", false)
+    if (this.config.screen.useScreen) this.sendSocketNotification("SCREEN_LOCK", false)
     this.A2D.locked = false
   }
 

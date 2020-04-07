@@ -22,9 +22,6 @@ class SCREEN {
     if (debug == true) log = _log
     this.debug = debug
     this.interval = null
-    this.running = false
-    this.locked = false
-    this.powerDisplay = false
     this.default = {
       delay: 5 * 60 * 1000,
       turnOffDisplay: true,
@@ -36,6 +33,11 @@ class SCREEN {
       dev: false
     }
     this.config = Object.assign(this.default, this.config)
+    this.screen = {
+      running: false,
+      locked: false,
+      power: false
+    }
   }
   activate () {
     if (!this.config.turnOffDisplay && !this.config.ecoMode) return log("Disabled.")
@@ -54,17 +56,17 @@ class SCREEN {
   }
 
   start (restart) {
-    if (this.locked || this.running || (!this.config.turnOffDisplay && !this.config.ecoMode)) return
+    if (this.screen.locked || this.screen.running || (!this.config.turnOffDisplay && !this.config.ecoMode)) return
     if (!restart) log("Start.")
     else log("Restart.")
-    if (!this.powerDisplay) {
+    if (!this.screen.power) {
       if (this.config.turnOffDisplay) {
         if (this.config.dev) this.setPowerDisplay(true)
         else this.wantedPowerDisplay(true)
       }
       if (this.config.ecoMode) {
         this.sendSocketNotification("SCREEN_SHOWING")
-        this.powerDisplay = true
+        this.screen.power = true
       }
       if (this.config.governorSleeping) this.governor("WORKING")
     }
@@ -72,7 +74,7 @@ class SCREEN {
     this.interval = null
     this.counter = this.config.delay
     this.interval = setInterval( ()=> {
-      this.running = true
+      this.screen.running = true
       this.counter -= 1000
       if (this.config.displayCounter) {
         this.sendSocketNotification("SCREEN_TIMER", new Date(this.counter).toUTCString().match(/\d{2}:\d{2}:\d{2}/)[0])
@@ -80,51 +82,51 @@ class SCREEN {
       }
       if (this.counter <= 0) {
         clearInterval(this.interval)
-        this.running = false
-        if (this.powerDisplay) {
+        this.screen.running = false
+        if (this.screen.power) {
           if (this.config.ecoMode) {
             this.sendSocketNotification("SCREEN_HIDING")
-            this.powerDisplay = false
+            this.screen.power = false
           }
           if (this.config.turnOffDisplay) this.wantedPowerDisplay(false)
         }
         this.interval = null
         if (this.config.detectorSleeping) this.sendSocketNotification("SNOWBOY_STOP")
-        if (this.config.governorSleeping && this.config.ecoMode) this.governor("SLEEPING")
+        if (this.config.governorSleeping) this.governor("SLEEPING")
         log("Stops by counter.")
       }
     }, 1000)
   }
 
   stop () {
-    if (this.locked) return log("want to stop but locked")
+    if (this.screen.locked) return
 
-    if (!this.powerDisplay) {
+    if (!this.screen.power) {
       if (this.config.governorSleeping) this.governor("WORKING")
       if (this.config.turnOffDisplay) this.wantedPowerDisplay(true)
       if (this.config.ecoMode) {
         this.sendSocketNotification("SCREEN_SHOWING")
-        this.powerDisplay = true
+        this.screen.power = true
       }
     }
-    if (!this.running) return
+    if (!this.screen.running) return
     clearInterval(this.interval)
     this.interval = null
-    this.running = false
-    log("Stops.", (this.locked ? "(Locked)" : ""))
+    this.screen.running = false
+    log("Stops.")
   }
 
   reset() {
-    if (this.locked) return log("want reset but locked")
+    if (this.screen.locked) return
     clearInterval(this.interval)
     this.interval = null
-    this.running = false
+    this.screen.running = false
     this.start(true)
   }
 
   wakeup() {
-    if (this.locked) return log("want wakeup but locked")
-    if (!this.powerDisplay) {
+    if (this.screen.locked) return
+    if (!this.screen.power) {
       if (this.config.governorSleeping) this.governor("WORKING")
       if (this.config.detectorSleeping) this.sendSocketNotification("SNOWBOY_START")
     }
@@ -132,18 +134,18 @@ class SCREEN {
   }
 
   lock() {
-    if (this.locked) return log("Already locked")
-    this.locked = true
+    if (this.screen.locked) return
+    this.screen.locked = true
     clearInterval(this.interval)
     this.interval = null
-    this.running = false
+    this.screen.running = false
     log("Locked !")
   }
 
   unlock() {
     log("Unlocked !")
-    this.locked=false
-    this.reset()
+    this.screen.locked = false
+    this.start()
   }
 
   wantedPowerDisplay (wanted) {
@@ -185,7 +187,7 @@ class SCREEN {
       else exec("/usr/bin/vcgencmd display_power 0")
     }
     log("Display " + (set ? "ON." : "OFF."))
-    this.powerDisplay = set
+    this.screen.power = set
   }
 }
 

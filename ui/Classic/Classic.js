@@ -76,23 +76,4 @@ class Display extends DisplayClass {
     A2D("Prepare ok")
     super.prepareDisplay()
   }
-
-  hideDisplay() {
-    A2D("Hide Iframe")
-    var winh = document.getElementById("A2D")
-    var tr = document.getElementById("A2D_TRANSCRIPTION")
-    var iframe = document.getElementById("A2D_OUTPUT")
-    var photo = document.getElementById("A2D_PHOTO")
-    var YT = document.getElementById("A2D_YOUTUBE")
-    winh.classList.add("hidden")
-    iframe.classList.add("hidden")
-    photo.classList.add("hidden")
-    YT.classList.add("hidden")
-    if (!this.A2D.speak) {
-      iframe.src= "about:blank"
-      photo.removeAttribute('src')
-      if (!this.working()) this.A2DUnlock()
-    }
-    super.hideDisplay()
-  }
 }

@@ -180,14 +180,14 @@ Module.register("MMM-Assistant2Display",{
         case "ASSISTANT_LISTEN":
         case "ASSISTANT_THINK":
           this.A2D.speak = true
-          if (this.config.useYoutube && this.A2D.youtube.displayed) {
+          if (this.A2D.youtube.displayed) {
             this.displayResponse.player.command("setVolume", 5)
           }
           if (this.A2D.locked) this.displayResponse.hideDisplay()
           break
         case "ASSISTANT_STANDBY":
           this.A2D.speak = false
-          if (this.config.useYoutube && this.A2D.youtube.displayed) {
+          if (this.A2D.youtube.displayed) {
             this.displayResponse.player.command("setVolume", 100)
           }
           if (this.displayResponse.working()) this.displayResponse.showDisplay()
@@ -201,25 +201,25 @@ Module.register("MMM-Assistant2Display",{
           this.displayResponse.start(payload)
           break
         case "A2D_STOP":
-          if (this.config.useYoutube && this.A2D.youtube.displayed) {
-            this.displayResponse.player.command("stopVideo")
-          }
-          if (this.config.photos.usePhotos && this.A2D.photos.displayed) {
-            this.A2D.photos.displayed = false
-            this.displayResponse.resetPhotos()
-            this.displayResponse.hideDisplay()
-          }
-          if (this.config.links.useLinks && this.A2D.links.displayed) {
-            this.displayResponse.resetLinks()
-            this.sendSocketNotification("PROXY_CLOSE")
-            this.displayResponse.hideDisplay()
+          if (this.A2D.locked) {
+            if (this.A2D.youtube.displayed) {
+              this.displayResponse.player.command("stopVideo")
+            }
+            if (this.A2D.photos.displayed) {
+              this.displayResponse.resetPhotos()
+              this.displayResponse.hideDisplay()
+            }
+            if (this.A2D.links.displayed) {
+              this.displayResponse.resetLinks()
+              this.displayResponse.hideDisplay()
+            }
           }
           break
         case "A2D_AMK2_BUSY":
-          this.onBefore()
+          if (this.config.screen.useScreen && !this.A2D.locked) this.sendSocketNotification("SCREEN_STOP")
           break
         case "A2D_AMK2_READY":
-          this.onAfter()
+          if (this.config.screen.useScreen && !this.A2D.locked) this.sendSocketNotification("SCREEN_RESET")
           break
         case "VOLUME_SET":
           if (this.config.volume.useVolume) {
@@ -345,14 +345,6 @@ Module.register("MMM-Assistant2Display",{
   /** briefToday **/
   briefToday: function() {
     this.sendNotification("ASSISTANT_ACTIVATE", { profile: "default", type: "TEXT", key: this.config.briefToday.welcome, chime: false })
-  },
-
-  onBefore: function () {
-    if (this.config.screen.useScreen) this.sendSocketNotification("SCREEN_STOP")
-  },
-
-  onAfter: function () {
-    if (this.config.screen.useScreen) this.sendSocketNotification("SCREEN_RESET")
   },
 
   onReady: function() {

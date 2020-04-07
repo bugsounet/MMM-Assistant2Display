@@ -36,7 +36,6 @@ class PIR {
         this.screen("WAKEUP")
         log("Sended WAKEUP in Sensor value:", value)
       }
-      else this.pir.detected = false
     })
   }
 }

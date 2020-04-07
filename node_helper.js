@@ -34,22 +34,17 @@ module.exports = NodeHelper.create({
         this.setVolume(payload)
         break
       case "SCREEN_LOCK":
-        if (this.config.screen.useScreen) {
-          if (payload) this.screen.lock()
-          else this.screen.unlock()
-        }
-        break
-      case "SCREEN_START":
-        if (this.config.screen.useScreen) this.screen.start()
+        if (payload) this.screen.lock()
+        else this.screen.unlock()
         break
       case "SCREEN_STOP":
-        if (this.config.screen.useScreen) this.screen.stop()
+        this.screen.stop()
         break
       case "SCREEN_RESET":
-        if (this.config.screen.useScreen) this.screen.reset()
+        this.screen.reset()
         break
       case "SCREEN_WAKEUP":
-        if (this.config.screen.useScreen) this.screen.wakeup()
+        this.screen.wakeup()
         break
     }
   },
@@ -64,7 +59,6 @@ module.exports = NodeHelper.create({
       log("Initialized: Assistant2Display Version",  require('./package.json').version)
     }
     else log("Disabled.")
-    log(this.config)
   },
 
   callback: function(send,params) {
@@ -99,9 +93,6 @@ module.exports = NodeHelper.create({
         this.sendSocketNotification(noti, params)
       },
       "screen": (param) => {
-        if (this.screen && param == "RESET") this.screen.reset()
-        if (this.screen && param == "START") this.screen.start()
-        if (this.screen && param == "STOP") this.screen.stop()
         if (this.screen && param == "WAKEUP") this.screen.wakeup()
       },
       "governor": (param) => {
@@ -117,7 +108,7 @@ module.exports = NodeHelper.create({
       this.screen.activate()
     }
     if (this.config.pir.usePir) {
-      this.config.screen.debug = this.config.debug
+      this.config.pir.debug = this.config.debug
       const Pir = require("./components/pir.js")
       this.pir = new Pir(this.config.pir, callbacks)
       this.pir.activate()
@@ -125,7 +116,7 @@ module.exports = NodeHelper.create({
     if (this.config.governor.useGovernor) {
       this.config.governor.debug = this.config.debug
       const Governor = require("./components/governor.js")
-      this.governor = new Governor(this.config.governor,callbacks)
+      this.governor = new Governor(this.config.governor)
       this.governor.init()
     }
     if (this.config.internet.useInternet) {

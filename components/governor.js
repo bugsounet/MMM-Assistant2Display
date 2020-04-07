@@ -13,9 +13,8 @@ var log = function() {
 }
 
 class GOVERNOR {
-  constructor(config, callback) {
+  constructor(config) {
     this.config = config
-    this.tunnel = callback.tunnel
     var debug = (this.config.debug) ? this.config.debug : false
     if (debug == true) log = _log
     this.debug = debug
