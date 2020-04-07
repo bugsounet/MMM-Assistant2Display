@@ -25,7 +25,6 @@ class DisplayClass {
       },
       photos: {
         displayed: false,
-        forceClose: false,
         position: 0,
         urls: null,
         length: 0
@@ -79,8 +78,8 @@ class DisplayClass {
     if(this.config.photos.usePhotos && this.A2D.photos.length > 0) {
       this.A2DLock()
       this.A2D.photos.displayed = true
-      this.A2D.photos.forceClose= false
       this.photoDisplay()
+      this.showDisplay()
     }
     else if (this.A2D.links.length > 0) {
       this.urlsScan()
@@ -90,12 +89,10 @@ class DisplayClass {
 
 /** photos code **/
   photoDisplay() {
-    if (this.A2D.photos.forceClose) return A2D("force close")
-    this.A2DLock()
     var photo = document.getElementById("A2D_PHOTO")
     A2D("Loading photo #" + (this.A2D.photos.position+1) + "/" + (this.A2D.photos.length))
     photo.src = this.A2D.photos.urls[this.A2D.photos.position]
-    this.showDisplay()
+
     photo.addEventListener("load", () => {
       A2D("Photo Loaded")
       this.timerPhoto = setTimeout( () => {
@@ -103,7 +100,7 @@ class DisplayClass {
       }, this.config.photos.displayDelay)
     }, {once: true})
     photo.addEventListener("error", (event) => {
-      if (!this.A2D.photos.forceClose) {
+      if (this.A2D.photos.displayed) {
         A2D("Photo Loading Error... retry with next")
         clearTimeout(this.timerPhoto)
         this.timerPhoto = null
@@ -113,7 +110,7 @@ class DisplayClass {
   }
 
   photoNext() {
-    if (this.A2D.photos.position >= (this.A2D.photos.length-1) || this.A2D.photos.forceClose) {
+    if (this.A2D.photos.position >= (this.A2D.photos.length-1) ) {
       this.resetPhotos()
       this.hideDisplay()
     } else {
@@ -123,7 +120,6 @@ class DisplayClass {
   }
 
   resetPhotos() {
-    this.A2D.photos.forceClose = true
     clearTimeout(this.timerPhoto)
     this.timerPhoto = null
     let tmp = {
@@ -135,7 +131,10 @@ class DisplayClass {
       }
     }
     this.A2D = this.objAssign({}, this.A2D, tmp)
+    var photo = document.getElementById("A2D_PHOTO")
+    photo.removeAttribute('src')
     A2D("Reset Photo", this.A2D)
+
   }
 
 /** urls scan : dispatch links and youtube **/
@@ -192,6 +191,8 @@ class DisplayClass {
       }
     }
     this.A2D = this.objAssign({}, this.A2D, tmp)
+    var iframe = document.getElementById("A2D_OUTPUT")
+    iframe.src= "about:blank"
     A2D("Reset Links", this.A2D)
   }
 
@@ -267,11 +268,7 @@ class DisplayClass {
     if (!this.A2D.photos.displayed) photo.classList.add("hidden")
     if (this.A2D.speak || !this.working()) winA2D.classList.add("hidden")
 
-    if (!this.A2D.speak) {
-      iframe.src= "about:blank"
-      photo.removeAttribute('src')
-      if (!this.working()) this.A2DUnlock()
-    }
+    if (!this.A2D.speak && !this.working()) this.A2DUnlock()
   }
 
   A2DLock() {
