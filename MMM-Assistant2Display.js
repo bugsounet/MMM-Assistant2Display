@@ -50,7 +50,8 @@ Module.register("MMM-Assistant2Display",{
     },
     pir: {
       usePir: false,
-      pin: 21
+      pin: 21,
+      reverseValue: false
     },
     governor: {
       useGovernor: false,
