@@ -180,14 +180,14 @@ Module.register("MMM-Assistant2Display",{
         case "ASSISTANT_LISTEN":
         case "ASSISTANT_THINK":
           this.A2D.speak = true
-          if (this.A2D.youtube.displayed) {
+          if (this.config.youtube.useYoutube) {
             this.displayResponse.player.command("setVolume", 5)
           }
           if (this.A2D.locked) this.displayResponse.hideDisplay()
           break
         case "ASSISTANT_STANDBY":
           this.A2D.speak = false
-          if (this.A2D.youtube.displayed) {
+          if (this.config.youtube.useYoutube) {
             this.displayResponse.player.command("setVolume", 100)
           }
           if (this.displayResponse.working()) this.displayResponse.showDisplay()
