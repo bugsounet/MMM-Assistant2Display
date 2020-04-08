@@ -21,14 +21,14 @@ class PIR {
     if (debug == true) log = _log
     this.debug = debug
     this.default = {
-      pin: 21,
+      gpio: 21,
       reverseValue: false
     }
     this.config = Object.assign(this.default, this.config)
   }
   activate () {
     log(this.default.version + " Starts.")
-    this.pir = new Gpio(this.config.pin, 'in', 'both')
+    this.pir = new Gpio(this.config.gpio, 'in', 'both')
     this.pir.watch( (err, value)=> {
       if (err) return log("[Error]", err)
       log("Sensor read value: " + value)
