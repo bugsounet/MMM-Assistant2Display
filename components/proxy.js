@@ -22,14 +22,15 @@ var logv = function() {
 }
 
 class PROXY {
-  constructor(config, callback = ()=>{}) {
+  constructor(config, callback) {
+
     this.config = config
     var debug = (this.config.debug) ? this.config.debug : false
     if (debug == true) log = _log
     var verbose = (this.config.verbose) ? this.config.verbose : false
-    if (verbose == true) logv= _log
+    if (verbose == true) logv = _log
     this.proxy = null
-    this.callback= callback
+    this.sendSocketNotification= callback
     this.header= false
     this.script = `<script type="text/javascript">
 // A2D auto scrolling by bugsounet
@@ -42,11 +43,11 @@ function scrollDown(posY){
     if (posY == 0) console.log("[A2D:PROXY] Begin Scrolling")
     if (posY < scrollHeight) {
       window.scrollTo(0, posY);
-      posY++
+      posY = posY + ${this.config.scrollStep}
       scrollDown(posY);
     }
     else console.log("[A2D:PROXY] End Scrolling")
-  }, ${this.config.scrollSpeed});
+  }, ${this.config.scrollInterval});
 }
 
 if (window.addEventListener)
@@ -60,12 +61,11 @@ if (window.addEventListener)
 
   start (url) {
     log("Initialize for request: " + url)
-    var self = this
     var targetDocumentURL = url
     var targetBaseURL = new urlParser(targetDocumentURL).origin
     app = express()
     app.use(bodyParser.json())
-    app.get("*", function (request, response) {
+    app.get("*", (request, response)=> {
       var requested = request.originalUrl
       var isAbsolute = /\/http[s]?\:\/\/[^\/]+\//.exec(requested)
       if (isAbsolute) {
@@ -90,7 +90,7 @@ if (window.addEventListener)
               $("head").append(`<base href="${targetBaseURL}">`)
             }
             var addScript = $("head")
-            addScript.append(self.script)
+            addScript.append(this.script)
             response.send($.html())
           })
           .catch(function (error) {
@@ -120,9 +120,9 @@ if (window.addEventListener)
         }
     })
     app.set('port', this.config.proxyPort)
-    this.proxy = app.listen(app.get('port'), function () {
+    this.proxy = app.listen(app.get('port'), ()=> {
       log('Proxy Start listening ' + app.get('port'))
-      self.callback("A2D_READY")
+      this.sendSocketNotification("A2D_READY")
     })
   }
 

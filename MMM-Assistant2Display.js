@@ -2,7 +2,7 @@
 /** @bugsounet **/
 
 var A2D_ = function() {
-  var context = "[AMK2:ADDONS:A2D]";
+  var context = "[A2D]";
   return Function.prototype.bind.call(console.log, console, context);
 }()
 
@@ -12,25 +12,64 @@ var A2D = function() {
 
 Module.register("MMM-Assistant2Display",{
   defaults: {
-    ui : "AMk2",
     debug:false,
     verbose: false,
-    displayDelay: 30 * 1000,
-    scrollSpeed: 15,
-    scrollStart: 1000,
-    proxyPort: 8081,
-    sandbox: null,
-    useLinks: true,
-    usePhotos: true,
+    links: {
+      useLinks: true,
+      displayDelay: 30 * 1000,
+      scrollStep: 25,
+      scrollInterval: 1000,
+      scrollStart: 1000,
+      proxyPort: 8081,
+      sandbox: null,
+      verbose: false
+    },
+    photos: {
+      usePhotos: true,
+      displayDelay: 10 * 1000,
+    },
     useYoutube: true,
-    useVolume: true,
-    volumePreset: "ALSA"
+    volume: {
+      useVolume: true,
+      volumePreset: "ALSA"
+    },
+    briefToday: {
+      useBriefToday: false,
+      welcome: "brief Today"
+    },
+    screen: {
+      useScreen: false,
+      delay: 5 * 60 * 1000,
+      turnOffDisplay: true,
+      ecoMode: true,
+      displayCounter: true,
+      text: "Auto Turn Off Screen:",
+      detectorSleeping: false,
+      governorSleeping: false,
+      rpi4: false
+    },
+    pir: {
+      usePir: false,
+      gpio: 21,
+      reverseValue: false
+    },
+    governor: {
+      useGovernor: false,
+      sleeping: "powersave",
+      working: "ondemand"
+    },
+    internet: {
+      useInternet: false,
+      displayPing: false,
+      delay: 2* 60 * 1000,
+      scan: "google.fr",
+      command: "pm2 restart 0",
+      showAlert: true
+    },
   },
 
   start: function () {
-    this.useA2D = false
-    this.scanAMk2()
-    this.config = Object.assign({}, this.default, this.config)
+    this.config = this.configAssignment({}, this.defaults, this.config)
     this.volumeScript= {
       "OSX": `osascript -e 'set volume output volume #VOLUME#'`,
       "ALSA": `amixer sset -M 'PCM' #VOLUME#%`,
@@ -43,11 +82,13 @@ Module.register("MMM-Assistant2Display",{
     this.helperConfig= {
       debug: this.config.debug,
       verbose: this.config.verbose,
-      scrollSpeed: this.config.scrollSpeed,
-      scrollStart: this.config.scrollStart,
-      proxyPort: this.config.proxyPort,
-      volumeScript: this.volumeScript[this.config.volumePreset],
-      useA2D: this.useA2D
+      volumeScript: this.volumeScript[this.config.volume.volumePreset],
+      useA2D: this.useA2D,
+      links: this.config.links,
+      screen: this.config.screen,
+      pir: this.config.pir,
+      governor: this.config.governor,
+      internet: this.config.internet
     }
 
     if (this.config.debug) A2D = A2D_
@@ -57,14 +98,51 @@ Module.register("MMM-Assistant2Display",{
       },
       "sendNotification": (noti, params)=> {
         this.sendNotification(noti, params)
-      }
+      },
     }
     this.displayResponse = new Display(this.config, callbacks)
+    this.A2D = this.displayResponse.A2D
+    if (this.useA2D) console.log("[A2D] initialized.")
+  },
+
+  getDom: function () {
+    var dom = document.createElement("div")
+    dom.id = "A2D_DISPLAY"
+
+    var screen = document.createElement("div")
+    screen.id = "SCREEN"
+    if (!this.config.screen.useScreen || !this.config.screen.displayCounter) screen.className = "hidden"
+    var screenText = document.createElement("div")
+    screenText.id = "SCREEN_TEXT"
+    screenText.textContent = this.config.screen.text
+    screen.appendChild(screenText)
+    var screenCounter = document.createElement("div")
+    screenCounter.id = "SCREEN_COUNTER"
+    screenCounter.classList.add("counter")
+    screenCounter.textContent = "--:--:--"
+    screen.appendChild(screenCounter)
+
+    var internet = document.createElement("div")
+    internet.id = "INTERNET"
+    if (!this.config.internet.useInternet || !this.config.internet.displayPing) internet.className = "hidden"
+    var internetText = document.createElement("div")
+    internetText.id = "INTERNET_TEXT"
+    internetText.textContent = "Ping: "
+    internet.appendChild(internetText)
+    var internetPing = document.createElement("div")
+    internetPing.id = "INTERNET_PING"
+    internetPing.classList.add("ping")
+    internetPing.textContent = "Loading ..."
+    internet.appendChild(internetPing)
+
+    dom.appendChild(screen)
+    dom.appendChild(internet)
+    return dom
   },
 
   getScripts: function() {
-    this.uiAutoChoice()
-    var ui = this.config.ui + "/" + this.config.ui + '.js'
+    this.scanConfig()
+    var ui = this.ui + "/" + this.ui + '.js'
     return [
        "/modules/MMM-Assistant2Display/components/display.js",
        "/modules/MMM-Assistant2Display/ui/" + ui,
@@ -74,7 +152,8 @@ Module.register("MMM-Assistant2Display",{
 
   getStyles: function() {
     return [
-      "/modules/MMM-Assistant2Display/ui/" + this.config.ui + "/" + this.config.ui + ".css"
+      "/modules/MMM-Assistant2Display/ui/" + this.ui + "/" + this.ui + ".css",
+      "screen.css"
     ];
   },
 
@@ -87,47 +166,73 @@ Module.register("MMM-Assistant2Display",{
   },
 
   notificationReceived: function (notification, payload) {
-    switch(notification) {
-      case "DOM_OBJECTS_CREATED":
-        if (this.useA2D) this.displayResponse.prepare()
-        this.sendSocketNotification("INIT", this.helperConfig)
-        break
-      case "ASSISTANT_LISTEN":
-      case "ASSISTANT_THINK":
-        if (this.useA2D) {
-          this.displayResponse.player.command("setVolume", 5)
-          this.displayResponse.hideDisplay(true)
-        }
-        break
-      case "ASSISTANT_STANDBY":
-        if (this.useA2D) {
-          this.displayResponse.showYT()
-          this.displayResponse.player.command("setVolume", 100)
-        }
-        break
-      case "ASSISTANT_HOOK":
-      case "ASSISTANT_CONFIRMATION":
-        if (this.useA2D) {
-          this.displayResponse.resetTimer()
-          this.sendSocketNotification("PROXY_CLOSE")
-        }
-        break
-      case "ASSISTANT2DISPLAY":
-        if (this.useA2D) this.displayResponse.start(payload)
-        break
-      case "A2D_STOP":
-        if (this.useA2D) {
-          this.displayResponse.player.command("stopVideo")
-          this.displayResponse.resetTimer()
-          this.displayResponse.hideDisplay()
-          this.displayResponse.sendAlive(false)
-        }
-        break
-      case "VOLUME_SET":
-        if (this.useA2D && this.config.useVolume) {
-          this.sendSocketNotification("SET_VOLUME", payload)
-        }
-        break          
+    if (notification == "DOM_OBJECTS_CREATED") {
+      this.sendSocketNotification("INIT", this.helperConfig)
+    }
+    if (this.useA2D) {
+      this.A2D = this.displayResponse.A2D
+      switch(notification) {
+        case "DOM_OBJECTS_CREATED":
+          this.displayResponse.prepare()
+          break
+        case "ASSISTANT_READY":
+          this.onReady()
+          break
+        case "ASSISTANT_LISTEN":
+        case "ASSISTANT_THINK":
+          this.A2D.speak = true
+          if (this.config.useYoutube && this.displayResponse.player) {
+            this.displayResponse.player.command("setVolume", 5)
+          }
+          if (this.A2D.locked) this.displayResponse.hideDisplay()
+          break
+        case "ASSISTANT_STANDBY":
+          this.A2D.speak = false
+          if (this.config.useYoutube && this.displayResponse.player) {
+            this.displayResponse.player.command("setVolume", 100)
+          }
+          if (this.displayResponse.working()) this.displayResponse.showDisplay()
+          else this.displayResponse.hideDisplay()
+          break
+        case "ASSISTANT_HOOK":
+        case "ASSISTANT_CONFIRMATION":
+          /** do to : some test with hook **/
+          break
+        case "A2D":
+          this.displayResponse.start(payload)
+          break
+        case "A2D_STOP":
+          if (this.A2D.locked) {
+            if (this.A2D.youtube.displayed) {
+              this.displayResponse.player.command("stopVideo")
+            }
+            if (this.A2D.photos.displayed) {
+              this.displayResponse.resetPhotos()
+              this.displayResponse.hideDisplay()
+            }
+            if (this.A2D.links.displayed) {
+              this.displayResponse.resetLinks()
+              this.displayResponse.hideDisplay()
+            }
+          }
+          break
+        case "A2D_AMK2_BUSY":
+          if (this.config.screen.useScreen && !this.A2D.locked) this.sendSocketNotification("SCREEN_STOP")
+          break
+        case "A2D_AMK2_READY":
+          if (this.config.screen.useScreen && !this.A2D.locked) this.sendSocketNotification("SCREEN_RESET")
+          break
+        case "VOLUME_SET":
+          if (this.config.volume.useVolume) {
+            this.sendSocketNotification("SET_VOLUME", payload)
+          }
+          break
+        case "WAKEUP": /** for external wakeup **/
+          if (this.config.screen.useScreen) {
+            this.sendSocketNotification("SCREEN_WAKEUP")
+          }
+          break
+      }
     }
   },
 
@@ -136,36 +241,126 @@ Module.register("MMM-Assistant2Display",{
       case "A2D_READY":
         this.displayResponse.linksDisplay()
         break
+      case "SCREEN_SHOWING":
+        this.screenShowing()
+        break
+      case "SCREEN_HIDING":
+        this.screenHiding()
+        break
+      case "SCREEN_TIMER":
+        var counter = document.getElementById("SCREEN_COUNTER")
+        counter.textContent = payload
+        break
+      case "INTERNET_DOWN":
+        this.sendNotification("SHOW_ALERT", {
+          type: "alert" ,
+          message: "Internet is DOWN ! Retry: " + param.payload,
+          title: "Internet Scan",
+          timer: 10000
+        })
+        this.sendSocketNotification("SCREEN_WAKEUP")
+        break
+      case "INTERNET_RESTART":
+        this.sendNotification("SHOW_ALERT", {
+          type: "alert" ,
+          message: "Internet is now available! Restarting Magic Mirror...",
+          title: "Internet Scan",
+          timer: 10000
+        })
+        this.sendSocketNotification("SCREEN_WAKEUP")
+        break
+      case "INTERNET_PING":
+        var ping = document.getElementById("INTERNET_PING")
+        ping.textContent = payload
+        break
+      case "SNOWBOY_STOP":
+        if (this.Snowboy) this.sendNotification("SNOWBOY_STOP")
+        else if (this.Hotword) this.sendNotification("HOTWORD_PAUSE")
+        break
+      case "SNOWBOY_START":
+        if (this.Snowboy) this.sendNotification("SNOWBOY_START")
+        else if (this.Hotword) this.sendNotification("HOTWORD_RESUME")
+        break
     }
   },
 
-  scanAMk2: function() {
+  scanConfig: function() {
+    this.useA2D = false
+    this.Hotword = false
+    this.Snowboy = false
+    this.ui = "Fullscreen"
+
+    console.log("[A2D] Scan config.js file")
+    var AMk2Found = false
     for (let [item, value] of Object.entries(config.modules)) {
       if (value.module == "MMM-AssistantMk2") {
-        this.useA2D = value.config.addons ? value.config.addons : false
+        AMk2Found = true
+        if (value.config.ui && ((value.config.ui === "Classic2") || (value.config.ui === "Classic"))) {
+          this.ui = value.config.ui
+        }
+        this.useA2D = value.config.useA2D ? value.config.useA2D : false
       }
+      if (value.module == "MMM-Snowboy" && !value.disabled) {
+        console.log("[A2D] MMM-Snowboy detected!")
+        this.Snowboy = true
+      }
+      if (value.module == "MMM-Hotword"&& !value.disabled) {
+        console.log("[A2D] MMM-Hotword detected!")
+        this.Hotword = true
+      }
+    }
+    if (!AMk2Found) console.log("[A2D][ERROR] AMk2 not found!")
+
+    if (this.Hotword && this.Snowboy) console.log("[A2D][ERROR] 2 detectors actived !")
+
+    console.log("[A2D] Auto choice UI", this.ui)
+    if (!this.useA2D) {
+      console.log("[A2D][ERROR] A2D is desactived!")
+      console.log("[A2D][ERROR] set `useA2D: true,` in AMk2 configuration !")
     }
   },
 
-  uiAutoChoice: function() {
-    if (this.config.ui == "AMk2") {
-      var modify = false
-      for (let [item, value] of Object.entries(config.modules)) {
-        if (value.module == "MMM-AssistantMk2") {
-          if (value.config.ui && ((value.config.ui === "Classic2") || (value.config.ui === "Classic"))) {
-            this.config.ui = value.config.ui
-            modify = true
+  configAssignment : function (result) {
+    var stack = Array.prototype.slice.call(arguments, 1)
+    var item
+    var key
+    while (stack.length) {
+      item = stack.shift()
+      for (key in item) {
+        if (item.hasOwnProperty(key)) {
+          if (typeof result[key] === "object" && result[key] && Object.prototype.toString.call(result[key]) !== "[object Array]") {
+            if (typeof item[key] === "object" && item[key] !== null) {
+              result[key] = this.configAssignment({}, result[key], item[key])
+            } else {
+              result[key] = item[key]
+            }
           } else {
-            this.config.ui = "Fullscreen"
-            modify = true
+            result[key] = item[key]
           }
         }
       }
-      if (!modify) {
-        console.log("[AMK2:ADDONS:A2D][ERROR] AMk2 not found!")
-        this.config.ui = "Fullscreen"
-      }
     }
-    console.log("[AMK2:ADDONS:A2D] Auto choice UI", this.config.ui)
+    return result
+  },
+
+  /** briefToday **/
+  briefToday: function() {
+    this.sendNotification("ASSISTANT_ACTIVATE", { profile: "default", type: "TEXT", key: this.config.briefToday.welcome, chime: false })
+  },
+
+  onReady: function() {
+    if (this.config.briefToday.useBriefToday) this.briefToday()
+  },
+
+  screenShowing: function () {
+    MM.getModules().enumerate((module)=> {
+      module.show(1000, {lockString: "A2D_SCREEN"})
+    })
+  },
+
+  screenHiding: function () {
+    MM.getModules().enumerate((module)=> {
+      module.hide(1000, {lockString: "A2D_SCREEN"})
+    })
   },
 });

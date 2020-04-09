@@ -1,8 +1,8 @@
 #!/bin/bash
-# +--------------------------------+
-# | npm postinstall                |
-# | @bugsounet                     |
-# +--------------------------------+
+# +-----------------+
+# | npm postinstall |
+# | @bugsounet      |
+# +-----------------+
 
 # get the installer directory
 Installer_get_current_dir () {
@@ -23,6 +23,11 @@ cd "$Installer_dir"
 source utils.sh
 
 # module name
-Installer_module="Assistant2Display addons"
+Installer_module="Assistant2Display"
+
+Installer_info "Executing electron-rebuild..."
+cd ~/MagicMirror/modules/MMM-Assistant2Display/
+./node_modules/.bin/electron-rebuild
+sudo usermod -a -G gpio pi || echo "Error command: sudo usermod -a -G gpio pi"
 
 Installer_exit "$Installer_module is now installed !"

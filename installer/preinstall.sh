@@ -1,8 +1,8 @@
 #!/bin/bash
-# +--------------------------------+
-# | npm postinstall                |
-# | @bugsounet                     |
-# +--------------------------------+
+# +-----------------+
+# | npm postinstall |
+# | @bugsounet      |
+# +-----------------+
 
 # get the installer directory
 Installer_get_current_dir () {
@@ -23,7 +23,7 @@ cd "$Installer_dir"
 source utils.sh
 
 # module name
-Installer_module="Assistant2Display addons"
+Installer_module="Assistant2Display"
 
 # use beep request questions ?
 Installer_beep=false
@@ -45,13 +45,7 @@ fi
 # Check platform compatibility
 Installer_info "Checking OS..."
 Installer_checkOS
-if  [ "$platform" == "osx" ]; then
-  Installer_error "OS Detected: $OSTYPE ($os_name $os_version $arch)"
-  Installer_error "You need to read documents/install.md for Manual Install"
-  exit 0
-else
-  Installer_success "OS Detected: $OSTYPE ($os_name $os_version $arch)"
-fi
+Installer_success "OS Detected: $OSTYPE ($os_name $os_version $arch)"
 
 echo
 

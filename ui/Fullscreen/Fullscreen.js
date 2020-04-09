@@ -1,7 +1,7 @@
 class Display extends DisplayClass {
   constructor (Config, callbacks) {
     super(Config, callbacks)
-    console.log("[AMK2:ADDONS:A2D] Extend Display with Fullscreen ui Loaded")
+    console.log("[A2D] Extend Display with Fullscreen ui Loaded")
   }
 
   prepare() {
@@ -36,10 +36,11 @@ class Display extends DisplayClass {
           this.A2D.youtube.title = title
         },
         (ended) => {
-          this.sendAlive(false)
+          this.A2DUnlock()
+          this.resetYT()
         }
       )
-      this.player.init()
+      if (this.config.useYoutube) this.player.init()
     }
     scoutpan.appendChild(scoutyt)
     scoutpan.appendChild(scoutphoto)
@@ -49,23 +50,5 @@ class Display extends DisplayClass {
     document.body.appendChild(dom)
     super.prepare()
     return dom
-  }
-
-  hideDisplay(force) {
-    A2D("Hide Iframe")
-    var YT = document.getElementById("A2D_YOUTUBE")
-    var winh = document.getElementById("A2D")
-    var iframe = document.getElementById("A2D_OUTPUT")
-    var photo = document.getElementById("A2D_PHOTO")
-    if (!force && this.A2D.youtube.displayed) YT.classList.remove("hidden")
-    else {
-      winh.classList.add("hidden")
-      if (!this.A2D.youtube.displayed) this.sendAlive(false)
-    }
-    iframe.classList.add("hidden")
-    iframe.src= "about:blank"
-    photo.classList.add("hidden")
-    photo.src= ""
-    super.hideDisplay()
   }
 }

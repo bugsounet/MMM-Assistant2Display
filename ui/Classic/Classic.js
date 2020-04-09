@@ -1,7 +1,7 @@
 class Display extends DisplayClass {
   constructor (Config, callback) {
     super(Config, callback)
-    console.log("[AMK2:ADDONS:A2D] Extends Display with Classic ui Loaded")
+    console.log("[A2D] Extends Display with Classic ui Loaded")
   }
 
   prepare() {
@@ -28,8 +28,8 @@ class Display extends DisplayClass {
     window.onYouTubeIframeAPIReady = () => {
       this.player = new YOUTUBE(
         "A2D_YOUTUBE",
-        (show) => {
-          this.A2D.youtube.displayed = show
+        (status) => {
+          this.A2D.youtube.displayed = status
           this.showYT()
         },
         (title) => {
@@ -37,7 +37,8 @@ class Display extends DisplayClass {
           this.titleYT()
         },
         (ended) => {
-          this.sendAlive(false)
+          this.A2DUnlock()
+          this.resetYT()
         }
       )
       this.player.init()
@@ -74,28 +75,5 @@ class Display extends DisplayClass {
     tr.appendChild(t)
     A2D("Prepare ok")
     super.prepareDisplay()
-  }
-
-  hideDisplay(force) {
-    A2D("Hide Iframe")
-    var YT = document.getElementById("A2D_YOUTUBE")
-    var winh = document.getElementById("A2D")
-    var tr = document.getElementById("A2D_TRANSCRIPTION")
-    var iframe = document.getElementById("A2D_OUTPUT")
-    var photo = document.getElementById("A2D_PHOTO")
-    if (!force && this.A2D.youtube.displayed) {
-      this.titleYT()
-      YT.classList.remove("hidden")
-    }
-    else winh.classList.add("hidden")
-    if (!this.A2D.youtube.displayed) {
-      tr.innerHTML= ""
-      this.sendAlive(false)
-    }
-    iframe.classList.add("hidden")
-    iframe.src= "about:blank"
-    photo.classList.add("hidden")
-    photo.src= ""
-    super.hideDisplay()
   }
 }

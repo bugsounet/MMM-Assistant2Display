@@ -1,7 +1,7 @@
 class Display extends DisplayClass {
   constructor (Config, callback) {
     super(Config, callback)
-    console.log("[AMK2:ADDONS:A2D] Extends Display with Classic2 ui Loaded")
+    console.log("[A2D] Extends Display with Classic2 ui Loaded")
   }
 
   prepare() {
@@ -28,8 +28,8 @@ class Display extends DisplayClass {
     window.onYouTubeIframeAPIReady = () => {
       this.player = new YOUTUBE(
         "A2D_YOUTUBE",
-        (show) => {
-          this.A2D.youtube.displayed = show
+        (status) => {
+          this.A2D.youtube.displayed = status
           this.showYT()
         },
         (title) => {
@@ -37,7 +37,8 @@ class Display extends DisplayClass {
           this.titleYT()
         },
         (ended) => {
-          this.sendAlive(false)
+          this.A2DUnlock()
+          this.resetYT()
         }
       )
       this.player.init()
@@ -88,7 +89,6 @@ class Display extends DisplayClass {
 
   prepareDisplay() {
     A2D("Prepare Display with:", this.A2D.AMk2)
-    var self = this
     var iframe = document.getElementById("A2D_OUTPUT")
     var tr = document.getElementById("A2D_TRANSCRIPTION")
     tr.innerHTML = ""
@@ -107,10 +107,10 @@ class Display extends DisplayClass {
         word[item] = document.createElement("div")
         word[item].id = "A2D_WORD"
         word[item].textContent = value
-        word[item].addEventListener("click", function() {
+        word[item].addEventListener("click", ()=> {
           log("Clicked", value)
-          self.resetTimer()
-          self.hideDisplay()
+          this.resetLinks()
+          this.hideDisplay()
           iframe.src = "http://localhost:8080/activatebytext/?query=" + value
         })
         wordbox.appendChild(word[item])
@@ -118,32 +118,5 @@ class Display extends DisplayClass {
     }
     A2D("Prepare ok")
     super.prepareDisplay()
-  }
-
-  hideDisplay(force) {
-    A2D("Hide Iframe")
-    var YT = document.getElementById("A2D_YOUTUBE")
-    var winh = document.getElementById("A2D")
-    var tr = document.getElementById("A2D_TRANSCRIPTION")
-    var iframe = document.getElementById("A2D_OUTPUT")
-    var photo = document.getElementById("A2D_PHOTO")
-    var trysay = document.getElementById("A2D_TRYSAY")
-    var wordbox = document.getElementById("A2D_WORDBOX")
-    if (!force && this.A2D.youtube.displayed) {
-      this.titleYT()
-      YT.classList.remove("hidden")
-    }
-    else winh.classList.add("hidden")
-    if (!this.A2D.youtube.displayed) {
-      this.sendAlive(false)
-      tr.innerHTML= ""
-      trysay.textContent = ""
-      wordbox.innerHTML = ""
-    }
-    iframe.classList.add("hidden")
-    iframe.src= "about:blank"
-    photo.classList.add("hidden")
-    photo.src= ""
-    super.hideDisplay(force)
   }
 }

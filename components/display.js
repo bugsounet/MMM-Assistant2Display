@@ -8,6 +8,8 @@ class DisplayClass {
     this.timer = null
     this.player = null
     this.A2D = {
+      speak : false,
+      locked: false,
       AMk2: {
         transcription: null,
         done: null,
@@ -28,17 +30,29 @@ class DisplayClass {
       },
       links: {
         displayed: false,
-        position: 0,
         urls: null,
         length: 0
       }
     }
-    console.log("[AMK2:ADDONS:A2D] DisplayClass Loaded")
+    console.log("[A2D] DisplayClass Loaded")
   }
 
   start(response) {
+    /** Close all active windows and reset it **/
+    if (this.A2D.youtube.displayed) this.player.command("stopVideo")
+    if (this.A2D.photos.displayed) {
+      this.resetPhotos()
+      this.hideDisplay()
+    }
+    if (this.A2D.links.displayed) {
+      this.resetLinks()
+      this.hideDisplay()
+    }
+
+    /** prepare **/
     let tmp = {}
     A2D("Response Scan")
+
     tmp = {
       AMk2: {
         transcription: response.transcription.transcription,
@@ -49,67 +63,54 @@ class DisplayClass {
       photos: {
         position: 0,
         urls: response.photos,
-        length: response.photos.length
+        length: response.photos.length,
       },
       links: {
-        position: 0,
         urls: response.urls,
         length: response.urls.length
       }
     }
+
+    /** the show must go on ! **/
     this.A2D = this.objAssign({}, this.A2D, tmp)
     this.prepareDisplay()
-    this.sendAlive(true)
-    if(this.config.usePhotos && this.A2D.photos.length > 0) {
+    if(this.config.photos.usePhotos && this.A2D.photos.length > 0) {
+      this.A2DLock()
+      this.A2D.photos.displayed = true
       this.photoDisplay()
-    } else if (this.A2D.links.length > 0) {
+      this.showDisplay()
+    }
+    else if (this.A2D.links.length > 0) {
       this.urlsScan()
     }
     A2D("Response Structure:", this.A2D)
   }
 
-  urlsScan() {
-    let tmp = {}
-    var ytL = new RegExp("youtube\.com\/watch\\?v\=([0-9a-zA-Z\-\_]+)", "ig")
-    var ytP = new RegExp("youtube\.com\/playlist\\?list\=([a-zA-Z0-9\-\_]+)", "ig")
-    var ytLink = ytL.exec(this.A2D.links.urls[this.A2D.links.position])
-    var ytPlayList = ytP.exec(this.A2D.links.urls[this.A2D.links.position])
-
-    if (ytLink || ytPlayList) {
-      tmp = {
-        id: ytPlayList ?  ytPlayList[1] : ytLink[1],
-        type: ytPlayList ? "playlist" : "id"
-      },
-      this.A2D.youtube = this.objAssign({}, this.A2D.youtube, tmp)
-      if (this.config.useYoutube) this.player.load({id: this.A2D.youtube.id, type : this.A2D.youtube.type})
-    } else if(this.config.useLinks) {
-      this.sendSocketNotification("PROXY_OPEN", this.A2D.links.urls[this.A2D.links.position])
-    }
-  }
-
+/** photos code **/
   photoDisplay() {
     var photo = document.getElementById("A2D_PHOTO")
     A2D("Loading photo #" + (this.A2D.photos.position+1) + "/" + (this.A2D.photos.length))
-    this.A2D.photos.displayed = true
-    this.showDisplay()
     photo.src = this.A2D.photos.urls[this.A2D.photos.position]
+
     photo.addEventListener("load", () => {
       A2D("Photo Loaded")
-      this.timer = setTimeout( () => {
+      this.timerPhoto = setTimeout( () => {
         this.photoNext()
-      }, this.config.displayDelay)
+      }, this.config.photos.displayDelay)
     }, {once: true})
     photo.addEventListener("error", (event) => {
-      A2D("Photo Loading Error... retry with next")
-      clearTimeout(this.timer)
-      this.timer = null
-      this.photoNext()
+      if (this.A2D.photos.displayed) {
+        A2D("Photo Loading Error... retry with next")
+        clearTimeout(this.timerPhoto)
+        this.timerPhoto = null
+        this.photoNext()
+      }
     }, {once: true})
   }
 
   photoNext() {
-    if (this.A2D.photos.position >= (this.A2D.photos.length-1)) {
-      this.resetTimer()
+    if (this.A2D.photos.position >= (this.A2D.photos.length-1) ) {
+      this.resetPhotos()
       this.hideDisplay()
     } else {
       this.A2D.photos.position++
@@ -117,74 +118,98 @@ class DisplayClass {
     }
   }
 
-  linksDisplay() {
-    var iframe = document.getElementById("A2D_OUTPUT")
-    A2D("Loading", this.A2D.links.urls[this.A2D.links.position])
-    this.A2D.links.displayed = true
-    this.showDisplay()
-    iframe.src = "http://127.0.0.1:" + this.config.proxyPort + "/"+ this.A2D.links.urls[this.A2D.links.position]
-    if (this.config.sandbox) iframe.sandbox = this.config.sandbox
+  resetPhotos() {
+    clearTimeout(this.timerPhoto)
+    this.timerPhoto = null
+    let tmp = {
+      photos: {
+        displayed: false,
+        position: 0,
+        urls: null,
+        length: 0
+      }
+    }
+    this.A2D = this.objAssign({}, this.A2D, tmp)
+    var photo = document.getElementById("A2D_PHOTO")
+    photo.removeAttribute('src')
+    A2D("Reset Photos", this.A2D)
 
-    iframe.addEventListener("load", () => {
-      A2D("URL Loaded")
-      this.timer = setTimeout( () => {
-        this.linksNext()
-      }, this.config.displayDelay)
-    }, {once: true})
   }
 
-  linksNext() {
-    this.sendSocketNotification("PROXY_CLOSE")
-    if (this.A2D.links.position >= (this.A2D.links.length-1)) {
-      this.resetTimer()
-      this.hideDisplay()
-    } else {
-      this.A2D.links.position++
-      this.urlsScan()
+/** urls scan : dispatch links and youtube **/
+  urlsScan() {
+    let tmp = {}
+    var ytL = new RegExp("youtube\.com\/watch\\?v\=([0-9a-zA-Z\-\_]+)", "ig")
+    var ytP = new RegExp("youtube\.com\/playlist\\?list\=([a-zA-Z0-9\-\_]+)", "ig")
+    var ytLink = ytL.exec(this.A2D.links.urls[0])
+    var ytPlayList = ytP.exec(this.A2D.links.urls[0])
+
+    if (ytLink || ytPlayList) {
+      tmp = {
+        id: ytPlayList ?  ytPlayList[1] : ytLink[1],
+        type: ytPlayList ? "playlist" : "id"
+      },
+      this.A2D.youtube = this.objAssign({}, this.A2D.youtube, tmp)
+      if (this.config.useYoutube) {
+        this.A2DLock()
+        this.player.load({id: this.A2D.youtube.id, type : this.A2D.youtube.type})
+      }
+    } else if(this.config.links.useLinks) { // display only first link
+      this.A2DLock()
+      this.A2D.links.displayed = true
+      this.sendSocketNotification("PROXY_OPEN", this.A2D.links.urls[0])
     }
   }
 
-  showDisplay() {
-    A2D("Show Iframe")
-    var YT = document.getElementById("A2D_YOUTUBE")
+/** link display **/
+  linksDisplay() {
     var iframe = document.getElementById("A2D_OUTPUT")
-    var photo = document.getElementById("A2D_PHOTO")
-    var winh = document.getElementById("A2D")
-    if (this.A2D.links.displayed) iframe.classList.remove("hidden")
-    if (this.A2D.photos.displayed) photo.classList.remove("hidden")
-    if (this.A2D.youtube.displayed) YT.classList.add("hidden")
-    winh.classList.remove("hidden")
+    A2D("Loading", this.A2D.links.urls[0])
+    this.showDisplay()
+    iframe.src = "http://127.0.0.1:" + this.config.links.proxyPort + "/"+ this.A2D.links.urls[0]
+    if (this.config.links.sandbox) iframe.sandbox = this.config.links.sandbox
+
+    iframe.addEventListener("load", () => {
+      A2D("URL Loaded")
+      this.timerLinks = setTimeout( () => {
+        this.resetLinks()
+        this.hideDisplay()
+      }, this.config.links.displayDelay)
+    }, {once: true})
   }
 
-  resetTimer() {
-    clearTimeout(this.timer)
-    this.timer = null
-    this.resetStruct()
+  resetLinks() {
+    clearTimeout(this.timerLinks)
+    this.timerLinks = null
+    this.sendSocketNotification("PROXY_CLOSE")
+    let tmp = {
+      links: {
+        displayed: false,
+        urls: null,
+        length: 0
+      }
+    }
+    this.A2D = this.objAssign({}, this.A2D, tmp)
+    var iframe = document.getElementById("A2D_OUTPUT")
+    iframe.src= "about:blank"
+    A2D("Reset Links", this.A2D)
   }
 
-  prepare() {
-    // reserved for extends
-  }
-
-  prepareDisplay() {
-    // reserved for extends
-  }
-
-  hideDisplay(force) {
-    // reserved for extends
-  }
-
+/** youtube rules **/
   showYT() {
-    if (this.A2D.photos.displayed || this.A2D.links.displayed) return
     var YT = document.getElementById("A2D_YOUTUBE")
     var winh = document.getElementById("A2D")
     if (this.A2D.youtube.displayed) {
-      this.sendAlive(true) // for YT playlist
+      this.A2DLock() // for YT playlist
       winh.classList.remove("hidden")
       YT.classList.remove("hidden")
     } else {
-      winh.classList.add("hidden")
-      YT.classList.add("hidden")
+      if (this.A2D.photos.displayed || this.A2D.links.displayed) {
+        winh.classList.remove("hidden")
+        YT.classList.add("hidden")
+      } else {
+        this.hideDisplay()
+      }
     }
   }
 
@@ -193,7 +218,79 @@ class DisplayClass {
     tr[0].innerHTML= this.A2D.youtube.title
   }
 
-  objAssign(result) {
+  resetYT() {
+    let tmp = {
+      youtube: {
+        displayed: false,
+        id: null,
+        type: null,
+        title: null
+      }
+    }
+    this.A2D = this.objAssign({}, this.A2D, tmp)
+    A2D("Reset YouTube", this.A2D)
+  }
+
+/** Other Cmds **/
+  prepare() {
+    // reserved for extends
+  }
+
+  prepareDisplay() {
+    // reserved for extends
+  }
+
+  showDisplay() {
+    A2D("Show Iframe")
+    var YT = document.getElementById("A2D_YOUTUBE")
+    var iframe = document.getElementById("A2D_OUTPUT")
+    var photo = document.getElementById("A2D_PHOTO")
+    var winA2D = document.getElementById("A2D")
+    if (this.A2D.speak) winA2D.classList.add("hidden")
+    else winA2D.classList.remove("hidden")
+
+    if (this.A2D.links.displayed) iframe.classList.remove("hidden")
+    if (this.A2D.photos.displayed) photo.classList.remove("hidden")
+    if (this.A2D.photos.forceClose) photo.classList.add("hidden")
+    if (this.A2D.youtube.displayed) YT.classList.remove("hidden")
+  }
+
+  hideDisplay() {
+    A2D("Hide Iframe")
+    var winA2D = document.getElementById("A2D")
+    var iframe = document.getElementById("A2D_OUTPUT")
+    var photo = document.getElementById("A2D_PHOTO")
+    var YT = document.getElementById("A2D_YOUTUBE")
+
+    if (!this.A2D.youtube.displayed) YT.classList.add("hidden")
+    if (!this.A2D.links.displayed) iframe.classList.add("hidden")
+    if (!this.A2D.photos.displayed) photo.classList.add("hidden")
+    if (this.A2D.speak || !this.working()) winA2D.classList.add("hidden")
+
+    if (!this.A2D.speak && !this.working()) this.A2DUnlock()
+  }
+
+  A2DLock() {
+    if (this.A2D.locked) return
+    A2D("Lock Screen")
+    MM.getModules().exceptWithClass("MMM-AssistantMk2").enumerate((module)=> {
+      module.hide(15, {lockString: "A2D_LOCKED"})
+    })
+    if (this.config.screen.useScreen) this.sendSocketNotification("SCREEN_LOCK", true)
+    this.A2D.locked = true
+  }
+
+  A2DUnlock () {
+    if (!this.A2D.locked || this.working()) return
+    A2D("Unlock Screen")
+    MM.getModules().exceptWithClass("MMM-AssistantMk2").enumerate((module)=> {
+      module.show(15, {lockString: "A2D_LOCKED"})
+    })
+    if (this.config.screen.useScreen) this.sendSocketNotification("SCREEN_LOCK", false)
+    this.A2D.locked = false
+  }
+
+  objAssign (result) {
     var stack = Array.prototype.slice.call(arguments, 1)
     var item
     var key
@@ -201,10 +298,7 @@ class DisplayClass {
       item = stack.shift()
       for (key in item) {
         if (item.hasOwnProperty(key)) {
-          if (
-            typeof result[key] === "object" && result[key]
-            && Object.prototype.toString.call(result[key]) !== "[object Array]"
-          ) {
+          if (typeof result[key] === "object" && result[key] && Object.prototype.toString.call(result[key]) !== "[object Array]") {
             if (typeof item[key] === "object" && item[key] !== null) {
               result[key] = this.objAssign({}, result[key], item[key])
             } else {
@@ -219,27 +313,7 @@ class DisplayClass {
     return result
   }
 
-  resetStruct() {
-    let tmp = {
-      photos: {
-        displayed: false,
-        position: 0,
-        urls: null,
-        length: 0
-      },
-      links: {
-        displayed: false,
-        position: 0,
-        urls: null,
-        length: 0
-      }
-    }
-    this.A2D = this.objAssign({}, this.A2D, tmp)
-    A2D("Reset Struct", this.A2D)
-  }
-
-  sendAlive(status) {
-    A2D("SendAlive:", status)
-    this.sendNotification("USER_PRESENCE", status)
+  working () {
+    return (this.A2D.youtube.displayed || this.A2D.photos.displayed || this.A2D.links.displayed)
   }
 }
