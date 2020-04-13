@@ -103,6 +103,38 @@ Module.register("MMM-Assistant2Display",{
     this.displayResponse = new Display(this.config, callbacks)
     this.A2D = this.displayResponse.A2D
     if (this.useA2D) console.log("[A2D] initialized.")
+    this.radioPlayer = {
+      play: false,
+      img: null,
+      link: null,
+    }
+    this.radio = new Audio()
+
+    this.radio.addEventListener("ended", ()=> {
+      A2D("radio ended")
+      this.radioPlayer.play = false
+      this.showRadio()
+    })
+    this.radio.addEventListener("pause", ()=> {
+      A2D("radio paused")
+      this.radioPlayer.play = false
+      this.showRadio()
+    })
+    this.radio.addEventListener("abort", ()=> {
+      A2D("radio paused")
+      this.radioPlayer.play = false
+      this.showRadio()
+    })
+    this.radio.addEventListener("error", ()=> {
+      A2D("radio error")
+      this.radioPlayer.play = false
+      this.showRadio()
+    })
+    this.radio.addEventListener("loadstart", ()=> {
+      A2D("radio started")
+      this.radioPlayer.play = true
+      this.showRadio()
+    })
   },
 
   getDom: function () {
@@ -135,6 +167,14 @@ Module.register("MMM-Assistant2Display",{
     internetPing.textContent = "Loading ..."
     internet.appendChild(internetPing)
 
+    var radio = document.createElement("div")
+    radio.id = "RADIO"
+    radio.className = "hidden"
+    var radioImg = document.createElement("img")
+    radioImg.id = "RADIO_IMG"
+    radio.appendChild(radioImg)
+
+    dom.appendChild(radio)
     dom.appendChild(screen)
     dom.appendChild(internet)
     return dom
@@ -184,6 +224,7 @@ Module.register("MMM-Assistant2Display",{
           if (this.config.useYoutube && this.displayResponse.player) {
             this.displayResponse.player.command("setVolume", 5)
           }
+          if (this.radioPlayer.play) this.radio.volume = 0.1
           if (this.A2D.locked) this.displayResponse.hideDisplay()
           break
         case "ASSISTANT_STANDBY":
@@ -191,6 +232,7 @@ Module.register("MMM-Assistant2Display",{
           if (this.config.useYoutube && this.displayResponse.player) {
             this.displayResponse.player.command("setVolume", 100)
           }
+          if (this.radioPlayer.play) this.radio.volume = 1
           if (this.displayResponse.working()) this.displayResponse.showDisplay()
           else this.displayResponse.hideDisplay()
           break
@@ -215,6 +257,7 @@ Module.register("MMM-Assistant2Display",{
               this.displayResponse.hideDisplay()
             }
           }
+          if (this.radioPlayer.play) this.radio.pause()
           break
         case "A2D_AMK2_BUSY":
           if (this.config.screen.useScreen && !this.A2D.locked) this.sendSocketNotification("SCREEN_STOP")
@@ -230,6 +273,18 @@ Module.register("MMM-Assistant2Display",{
         case "WAKEUP": /** for external wakeup **/
           if (this.config.screen.useScreen) {
             this.sendSocketNotification("SCREEN_WAKEUP")
+          }
+          break
+        case "A2D_RADIO":
+          if (payload.img) {
+            var radioImg = document.getElementById("RADIO_IMG")
+            this.radioPlayer.img = payload.img
+            radioImg.src = this.radioPlayer.img
+          }
+          if (payload.link) {
+            this.radioPlayer.link = payload.link
+            this.radio.src = this.radioPlayer.link
+            this.radio.autoplay = true
           }
           break
       }
@@ -363,4 +418,12 @@ Module.register("MMM-Assistant2Display",{
       module.hide(1000, {lockString: "A2D_SCREEN"})
     })
   },
+
+  showRadio: function() {
+    if (this.radioPlayer.img) {
+      var radio = document.getElementById("RADIO")
+      if (this.radioPlayer.play) radio.classList.remove("hidden")
+      else radio.classList.add("hidden")
+    }
+  }
 });
