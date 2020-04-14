@@ -157,31 +157,48 @@ class DisplayClass {
     } else if(this.config.links.useLinks) { // display only first link
       this.A2DLock()
       this.A2D.links.displayed = true
-      this.sendSocketNotification("PROXY_OPEN", this.A2D.links.urls[0])
+      this.linksDisplay()
     }
   }
 
 /** link display **/
   linksDisplay() {
-    var iframe = document.getElementById("A2D_OUTPUT")
+    var webView = document.getElementById("A2D_OUTPUT")
     A2D("Loading", this.A2D.links.urls[0])
     this.showDisplay()
-    iframe.src = "http://127.0.0.1:" + this.config.links.proxyPort + "/"+ this.A2D.links.urls[0]
-    if (this.config.links.sandbox) iframe.sandbox = this.config.links.sandbox
+    webView.src= this.A2D.links.urls[0]
 
-    iframe.addEventListener("load", () => {
-      A2D("URL Loaded")
-      this.timerLinks = setTimeout( () => {
-        this.resetLinks()
-        this.hideDisplay()
-      }, this.config.links.displayDelay)
-    }, {once: true})
+    webView.addEventListener("console-message", (event) => {
+      if (event.level == 1) A2D("[LINKS]", event.message)
+    })
+    webView.addEventListener("did-stop-loading", () => {
+      if (webView.getURL() == "about:blank") return
+      A2D("URL Loaded", webView.getURL())
+      // need more debug ... to do test with google website
+      webView.executeJavaScript(`
+      function scrollDown(posY){
+        var scrollHeight = document.body.scrollHeight
+        window.setTimeout(function(){
+          if (posY == 0) console.log("Begin Scrolling")
+          if (posY < scrollHeight) {
+            document.documentElement.scrollTop = document.body.scrollTop = posY;
+            posY = posY + ${this.config.links.scrollStep}
+            scrollDown(posY);
+          }
+          else console.log("End Scrolling")
+        }, ${this.config.links.scrollInterval});
+      };
+      setTimeout(scrollDown(0), ${this.config.links.scrollStart});`)
+    });
+    this.timerLinks = setTimeout(() => {
+      this.resetLinks()
+      this.hideDisplay()
+    }, this.config.links.displayDelay)
   }
 
   resetLinks() {
     clearTimeout(this.timerLinks)
     this.timerLinks = null
-    this.sendSocketNotification("PROXY_CLOSE")
     let tmp = {
       links: {
         displayed: false,

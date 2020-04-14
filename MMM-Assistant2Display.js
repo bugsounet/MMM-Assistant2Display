@@ -20,8 +20,6 @@ Module.register("MMM-Assistant2Display",{
       scrollStep: 25,
       scrollInterval: 1000,
       scrollStart: 1000,
-      proxyPort: 8081,
-      sandbox: null,
       verbose: false
     },
     photos: {
@@ -294,9 +292,6 @@ Module.register("MMM-Assistant2Display",{
 
   socketNotificationReceived: function (notification, payload) {
     switch(notification) {
-      case "A2D_READY":
-        this.displayResponse.linksDisplay()
-        break
       case "SCREEN_SHOWING":
         this.screenShowing()
         break
