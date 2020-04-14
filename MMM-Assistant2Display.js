@@ -111,27 +111,27 @@ Module.register("MMM-Assistant2Display",{
     this.radio = new Audio()
 
     this.radio.addEventListener("ended", ()=> {
-      A2D("radio ended")
+      A2D("Radio ended")
       this.radioPlayer.play = false
       this.showRadio()
     })
     this.radio.addEventListener("pause", ()=> {
-      A2D("radio paused")
+      A2D("Radio paused")
       this.radioPlayer.play = false
       this.showRadio()
     })
     this.radio.addEventListener("abort", ()=> {
-      A2D("radio paused")
+      A2D("Radio aborted")
       this.radioPlayer.play = false
       this.showRadio()
     })
-    this.radio.addEventListener("error", ()=> {
-      A2D("radio error")
+    this.radio.addEventListener("error", (err)=> {
+      A2D("Radio error: " + err)
       this.radioPlayer.play = false
       this.showRadio()
     })
     this.radio.addEventListener("loadstart", ()=> {
-      A2D("radio started")
+      A2D("Radio started")
       this.radioPlayer.play = true
       this.showRadio()
     })
@@ -238,9 +238,10 @@ Module.register("MMM-Assistant2Display",{
           break
         case "ASSISTANT_HOOK":
         case "ASSISTANT_CONFIRMATION":
-          /** do to : some test with hook **/
+          /** Hooked **/
           break
         case "A2D":
+          if (this.radioPlayer.play) this.radio.pause()
           this.displayResponse.start(payload)
           break
         case "A2D_STOP":
@@ -276,12 +277,12 @@ Module.register("MMM-Assistant2Display",{
           }
           break
         case "A2D_RADIO":
-          if (payload.img) {
-            var radioImg = document.getElementById("RADIO_IMG")
-            this.radioPlayer.img = payload.img
-            radioImg.src = this.radioPlayer.img
-          }
           if (payload.link) {
+            if (payload.img) {
+              var radioImg = document.getElementById("RADIO_IMG")
+              this.radioPlayer.img = payload.img
+              radioImg.src = this.radioPlayer.img
+            }
             this.radioPlayer.link = payload.link
             this.radio.src = this.radioPlayer.link
             this.radio.autoplay = true
@@ -425,5 +426,5 @@ Module.register("MMM-Assistant2Display",{
       if (this.radioPlayer.play) radio.classList.remove("hidden")
       else radio.classList.add("hidden")
     }
-  }
+  },
 });
