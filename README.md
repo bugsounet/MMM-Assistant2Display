@@ -18,6 +18,11 @@ Turn on `useA2D: true` in your AMk2 config.js file
  ![](https://raw.githubusercontent.com/bugsounet/MMM-Assistant2Display/dev/screenshoot1.jpg)
 
 ## Update history
+
+ * xx/04/2020 (v1.3.0)
+   * **ADD**: Radio player core
+   * **DEL**: Link Proxy script
+   * **ADD**: Use now webview for links displaying
  * 09/04/2020 (v1.2.0)
    * **FIX**: A2D core code for new features
    * **ADD**: Screen feature
@@ -64,4 +69,3 @@ Remove existence then reinstall fresh.
   - @eouia
 - License : MIT
   - **By terms of Google Assistant SDK, You are not allowed to use or provide this module for commercial purpose.**
-  
