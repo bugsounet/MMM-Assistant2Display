@@ -76,7 +76,7 @@ Module.register("MMM-Assistant2Display",{
       "RESPEAKER_SPEAKER": `amixer -M sset Speaker #VOLUME#%`,
       "RESPEAKER_PLAYBACK": `amixer -M sset Playback #VOLUME#%`
     }
-    
+
     this.helperConfig= {
       debug: this.config.debug,
       verbose: this.config.verbose,
@@ -89,18 +89,6 @@ Module.register("MMM-Assistant2Display",{
       internet: this.config.internet
     }
 
-    if (this.config.debug) A2D = A2D_
-    var callbacks= {
-      "sendSocketNotification": (noti, params) => {
-        this.sendSocketNotification(noti, params)
-      },
-      "sendNotification": (noti, params)=> {
-        this.sendNotification(noti, params)
-      },
-    }
-    this.displayResponse = new Display(this.config, callbacks)
-    this.A2D = this.displayResponse.A2D
-    if (this.useA2D) console.log("[A2D] initialized.")
     this.radioPlayer = {
       play: false,
       img: null,
@@ -131,8 +119,23 @@ Module.register("MMM-Assistant2Display",{
     this.radio.addEventListener("loadstart", ()=> {
       A2D("Radio started")
       this.radioPlayer.play = true
+      this.radio.volume = 1
       this.showRadio()
     })
+
+    if (this.config.debug) A2D = A2D_
+    var callbacks= {
+      "sendSocketNotification": (noti, params) => {
+        this.sendSocketNotification(noti, params)
+      },
+      "sendNotification": (noti, params)=> {
+        this.sendNotification(noti, params)
+      },
+      "radioStop": ()=> this.radio.pause()
+    }
+    this.displayResponse = new Display(this.config, callbacks)
+    this.A2D = this.displayResponse.A2D
+    if (this.useA2D) console.log("[A2D] initialized.")
   },
 
   getDom: function () {
@@ -222,7 +225,7 @@ Module.register("MMM-Assistant2Display",{
           if (this.config.useYoutube && this.displayResponse.player) {
             this.displayResponse.player.command("setVolume", 5)
           }
-          if (this.radioPlayer.play) this.radio.volume = 0.1
+          if (this.A2D.radio) this.radio.volume = 0.1
           if (this.A2D.locked) this.displayResponse.hideDisplay()
           break
         case "ASSISTANT_STANDBY":
@@ -230,7 +233,7 @@ Module.register("MMM-Assistant2Display",{
           if (this.config.useYoutube && this.displayResponse.player) {
             this.displayResponse.player.command("setVolume", 100)
           }
-          if (this.radioPlayer.play) this.radio.volume = 1
+          if (this.A2D.radio) this.radio.volume = 1
           if (this.displayResponse.working()) this.displayResponse.showDisplay()
           else this.displayResponse.hideDisplay()
           break
@@ -239,7 +242,6 @@ Module.register("MMM-Assistant2Display",{
           /** Hooked **/
           break
         case "A2D":
-          if (this.radioPlayer.play) this.radio.pause()
           this.displayResponse.start(payload)
           break
         case "A2D_STOP":
@@ -256,7 +258,7 @@ Module.register("MMM-Assistant2Display",{
               this.displayResponse.hideDisplay()
             }
           }
-          if (this.radioPlayer.play) this.radio.pause()
+          if (this.A2D.radio) this.radio.pause()
           break
         case "A2D_AMK2_BUSY":
           if (this.config.screen.useScreen && !this.A2D.locked) this.sendSocketNotification("SCREEN_STOP")
@@ -275,6 +277,7 @@ Module.register("MMM-Assistant2Display",{
           }
           break
         case "A2D_RADIO":
+          if (this.A2D.youtube.displayed) this.displayResponse.player.command("stopVideo")
           if (payload.link) {
             if (payload.img) {
               var radioImg = document.getElementById("RADIO_IMG")
@@ -416,6 +419,8 @@ Module.register("MMM-Assistant2Display",{
   },
 
   showRadio: function() {
+    this.A2D = this.displayResponse.A2D
+    this.A2D.radio = this.radioPlayer.play
     if (this.radioPlayer.img) {
       var radio = document.getElementById("RADIO")
       if (this.radioPlayer.play) radio.classList.remove("hidden")

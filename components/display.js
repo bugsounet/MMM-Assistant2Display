@@ -5,10 +5,12 @@ class DisplayClass {
     this.config = Config
     this.sendSocketNotification = callbacks.sendSocketNotification
     this.sendNotification= callbacks.sendNotification
+    this.radioStop = callbacks.radioStop
     this.timer = null
     this.player = null
     this.A2D = {
-      speak : false,
+      radio: false,
+      speak: false,
       locked: false,
       AMk2: {
         transcription: null,
@@ -31,7 +33,8 @@ class DisplayClass {
       links: {
         displayed: false,
         urls: null,
-        length: 0
+        length: 0,
+        running: false
       }
     }
     console.log("[A2D] DisplayClass Loaded")
@@ -145,6 +148,7 @@ class DisplayClass {
     var ytPlayList = ytP.exec(this.A2D.links.urls[0])
 
     if (ytLink || ytPlayList) {
+      if (this.A2D.radio) this.radioStop()
       tmp = {
         id: ytPlayList ?  ytPlayList[1] : ytLink[1],
         type: ytPlayList ? "playlist" : "id"
@@ -154,7 +158,7 @@ class DisplayClass {
         this.A2DLock()
         this.player.load({id: this.A2D.youtube.id, type : this.A2D.youtube.type})
       }
-    } else if(this.config.links.useLinks) { // display only first link
+    } else if(this.config.links.useLinks) {
       this.A2DLock()
       this.A2D.links.displayed = true
       this.linksDisplay()
@@ -163,29 +167,31 @@ class DisplayClass {
 
 /** link display **/
   linksDisplay() {
+    this.A2D.links.running = false
     var webView = document.getElementById("A2D_OUTPUT")
     A2D("Loading", this.A2D.links.urls[0])
     this.showDisplay()
     webView.src= this.A2D.links.urls[0]
 
     webView.addEventListener("console-message", (event) => {
-      if (event.level == 1) A2D("[LINKS]", event.message)
+      if (event.level == 1 && this.config.debug) console.log("[A2D:LINKS]", event.message)
     })
     webView.addEventListener("did-stop-loading", () => {
-      if (webView.getURL() == "about:blank") return
+      if (this.A2D.links.running || webView.getURL() == "about:blank") return
+      this.A2D.links.running = true
       A2D("URL Loaded", webView.getURL())
-      // need more debug ... to do test with google website
       webView.executeJavaScript(`
       function scrollDown(posY){
         var scrollHeight = document.body.scrollHeight
+        if (posY == 0) console.log("Begin Scrolling")
+        if (posY > scrollHeight) posY = scrollHeight
+        document.documentElement.scrollTop = document.body.scrollTop = posY;
+        if (posY == scrollHeight) return console.log("End Scrolling")
         window.setTimeout(function(){
-          if (posY == 0) console.log("Begin Scrolling")
           if (posY < scrollHeight) {
-            document.documentElement.scrollTop = document.body.scrollTop = posY;
             posY = posY + ${this.config.links.scrollStep}
             scrollDown(posY);
           }
-          else console.log("End Scrolling")
         }, ${this.config.links.scrollInterval});
       };
       setTimeout(scrollDown(0), ${this.config.links.scrollStart});`)
@@ -203,7 +209,8 @@ class DisplayClass {
       links: {
         displayed: false,
         urls: null,
-        length: 0
+        length: 0,
+        running: false
       }
     }
     this.A2D = this.objAssign({}, this.A2D, tmp)
