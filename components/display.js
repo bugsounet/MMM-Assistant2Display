@@ -173,11 +173,19 @@ class DisplayClass {
     this.showDisplay()
     webView.src= this.A2D.links.urls[0]
 
+
+    webView.addEventListener("did-fail-load", () => {
+      console.log("[A2D:LINKS] Loading error")
+    })
+    webView.addEventListener("crashed", (event) => {
+      console.log("[A2D:LINKS] J'ai tout pété mon général !!!")
+      console.log("[A2D:LINKS]", event)
+    })
     webView.addEventListener("console-message", (event) => {
       if (event.level == 1 && this.config.debug) console.log("[A2D:LINKS]", event.message)
     })
     webView.addEventListener("did-stop-loading", () => {
-      if (this.A2D.links.running || webView.getURL() == "about:blank") return
+      if (this.A2D.links.running || (webView.getURL() == "about:blank")) return
       this.A2D.links.running = true
       A2D("URL Loaded", webView.getURL())
       webView.executeJavaScript(`
