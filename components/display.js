@@ -189,13 +189,16 @@ class DisplayClass {
       this.A2D.links.running = true
       A2D("URL Loaded", webView.getURL())
       webView.executeJavaScript(`
+      var timer = null
       function scrollDown(posY){
+        clearTimeout(timer)
+        timer = null
         var scrollHeight = document.body.scrollHeight
         if (posY == 0) console.log("Begin Scrolling")
         if (posY > scrollHeight) posY = scrollHeight
         document.documentElement.scrollTop = document.body.scrollTop = posY;
         if (posY == scrollHeight) return console.log("End Scrolling")
-        window.setTimeout(function(){
+        timer = setTimeout(function(){
           if (posY < scrollHeight) {
             posY = posY + ${this.config.links.scrollStep}
             scrollDown(posY);
