@@ -454,11 +454,13 @@ Module.register("MMM-Assistant2Display",{
       description: this.translate("RESTART_HELP"),
       callback: "tbRestart"
     })
-    commander.add({
-      command: "wakeup",
-      description: this.translate("WAKEUP_HELP"),
-      callback: "tbWakeup"
-    })
+    if (this.config.screen.useScreen) {
+      commander.add({
+        command: "wakeup",
+        description: this.translate("WAKEUP_HELP"),
+        callback: "tbWakeup"
+      })
+    }
     commander.add({
       command: "hide",
       description: this.translate("HIDE_HELP"),
