@@ -1,10 +1,11 @@
+#RADIO,
 #SCREEN,
 #INTERNET {
   font-size: large;
   display: flex;
 }
 
-
+#RADIO.hidden,
 #SCREEN.hidden,
 #INTERNET.hidden {
   display: none;
@@ -15,4 +16,10 @@
   margin-right: 10px;
 }
 
-
+#RADIO_IMG {
+  height: 100px;
+  width: auto;
+  background-size: 100%;
+  background-repeat: no-repeat;
+  background-position: 0;
+}

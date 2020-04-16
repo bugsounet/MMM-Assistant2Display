@@ -5,10 +5,12 @@ class DisplayClass {
     this.config = Config
     this.sendSocketNotification = callbacks.sendSocketNotification
     this.sendNotification= callbacks.sendNotification
+    this.radioStop = callbacks.radioStop
     this.timer = null
     this.player = null
     this.A2D = {
-      speak : false,
+      radio: false,
+      speak: false,
       locked: false,
       AMk2: {
         transcription: null,
@@ -31,7 +33,8 @@ class DisplayClass {
       links: {
         displayed: false,
         urls: null,
-        length: 0
+        length: 0,
+        running: false
       }
     }
     console.log("[A2D] DisplayClass Loaded")
@@ -145,6 +148,7 @@ class DisplayClass {
     var ytPlayList = ytP.exec(this.A2D.links.urls[0])
 
     if (ytLink || ytPlayList) {
+      if (this.A2D.radio) this.radioStop()
       tmp = {
         id: ytPlayList ?  ytPlayList[1] : ytLink[1],
         type: ytPlayList ? "playlist" : "id"
@@ -154,39 +158,72 @@ class DisplayClass {
         this.A2DLock()
         this.player.load({id: this.A2D.youtube.id, type : this.A2D.youtube.type})
       }
-    } else if(this.config.links.useLinks) { // display only first link
+    } else if(this.config.links.useLinks) {
       this.A2DLock()
       this.A2D.links.displayed = true
-      this.sendSocketNotification("PROXY_OPEN", this.A2D.links.urls[0])
+      this.linksDisplay()
     }
   }
 
 /** link display **/
   linksDisplay() {
-    var iframe = document.getElementById("A2D_OUTPUT")
+    this.A2D.links.running = false
+    var webView = document.getElementById("A2D_OUTPUT")
     A2D("Loading", this.A2D.links.urls[0])
     this.showDisplay()
-    iframe.src = "http://127.0.0.1:" + this.config.links.proxyPort + "/"+ this.A2D.links.urls[0]
-    if (this.config.links.sandbox) iframe.sandbox = this.config.links.sandbox
+    webView.src= this.A2D.links.urls[0]
 
-    iframe.addEventListener("load", () => {
-      A2D("URL Loaded")
-      this.timerLinks = setTimeout( () => {
-        this.resetLinks()
-        this.hideDisplay()
-      }, this.config.links.displayDelay)
-    }, {once: true})
+
+    webView.addEventListener("did-fail-load", () => {
+      console.log("[A2D:LINKS] Loading error")
+    })
+    webView.addEventListener("crashed", (event) => {
+      console.log("[A2D:LINKS] J'ai tout pété mon général !!!")
+      console.log("[A2D:LINKS]", event)
+    })
+    webView.addEventListener("console-message", (event) => {
+      if (event.level == 1 && this.config.debug) console.log("[A2D:LINKS]", event.message)
+    })
+    webView.addEventListener("did-stop-loading", () => {
+      if (this.A2D.links.running || (webView.getURL() == "about:blank")) return
+      this.A2D.links.running = true
+      A2D("URL Loaded", webView.getURL())
+      webView.executeJavaScript(`
+      var timer = null
+      function scrollDown(posY){
+        clearTimeout(timer)
+        timer = null
+        var scrollHeight = document.body.scrollHeight
+        if (posY == 0) console.log("Begin Scrolling")
+        if (posY > scrollHeight) posY = scrollHeight
+        document.documentElement.scrollTop = document.body.scrollTop = posY;
+        if (posY == scrollHeight) return console.log("End Scrolling")
+        timer = setTimeout(function(){
+          if (posY < scrollHeight) {
+            posY = posY + ${this.config.links.scrollStep}
+            scrollDown(posY);
+          }
+        }, ${this.config.links.scrollInterval});
+      };
+      if (${this.config.links.scrollActivate}) {
+        setTimeout(scrollDown(0), ${this.config.links.scrollStart});
+      };`)
+    })
+    this.timerLinks = setTimeout(() => {
+      this.resetLinks()
+      this.hideDisplay()
+    }, this.config.links.displayDelay)
   }
 
   resetLinks() {
     clearTimeout(this.timerLinks)
     this.timerLinks = null
-    this.sendSocketNotification("PROXY_CLOSE")
     let tmp = {
       links: {
         displayed: false,
         urls: null,
-        length: 0
+        length: 0,
+        running: false
       }
     }
     this.A2D = this.objAssign({}, this.A2D, tmp)

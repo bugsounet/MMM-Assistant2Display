@@ -11,10 +11,10 @@ class Display extends DisplayClass {
 
     var scoutpan = document.createElement("div")
     scoutpan.id = "A2D_WINDOW"
-    var scoutphoto = document.createElement("IMG")
+    var scoutphoto = document.createElement("img")
     scoutphoto.id = "A2D_PHOTO"
     scoutphoto.classList.add("hidden")    
-    var scout = document.createElement("iframe")
+    var scout = document.createElement("webview")
     scout.id = "A2D_OUTPUT"
     scout.scrolling="no"
     scout.classList.add("hidden")

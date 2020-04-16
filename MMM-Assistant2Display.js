@@ -13,22 +13,21 @@ var A2D = function() {
 Module.register("MMM-Assistant2Display",{
   defaults: {
     debug:false,
+    useYoutube: true,
     verbose: false,
     links: {
       useLinks: true,
-      displayDelay: 30 * 1000,
+      displayDelay: 60 * 1000,
+      scrollActivate: false,
       scrollStep: 25,
       scrollInterval: 1000,
-      scrollStart: 1000,
-      proxyPort: 8081,
-      sandbox: null,
+      scrollStart: 5000,
       verbose: false
     },
     photos: {
       usePhotos: true,
       displayDelay: 10 * 1000,
     },
-    useYoutube: true,
     volume: {
       useVolume: true,
       volumePreset: "ALSA"
@@ -66,6 +65,10 @@ Module.register("MMM-Assistant2Display",{
       command: "pm2 restart 0",
       showAlert: true
     },
+    TelegramBot: {
+      useTelecastSound: false,
+      TelecastSound: "TelegramBot.ogg"
+    }
   },
 
   start: function () {
@@ -78,7 +81,7 @@ Module.register("MMM-Assistant2Display",{
       "RESPEAKER_SPEAKER": `amixer -M sset Speaker #VOLUME#%`,
       "RESPEAKER_PLAYBACK": `amixer -M sset Playback #VOLUME#%`
     }
-    
+
     this.helperConfig= {
       debug: this.config.debug,
       verbose: this.config.verbose,
@@ -91,6 +94,40 @@ Module.register("MMM-Assistant2Display",{
       internet: this.config.internet
     }
 
+    this.radioPlayer = {
+      play: false,
+      img: null,
+      link: null,
+    }
+    this.radio = new Audio()
+
+    this.radio.addEventListener("ended", ()=> {
+      A2D("Radio ended")
+      this.radioPlayer.play = false
+      this.showRadio()
+    })
+    this.radio.addEventListener("pause", ()=> {
+      A2D("Radio paused")
+      this.radioPlayer.play = false
+      this.showRadio()
+    })
+    this.radio.addEventListener("abort", ()=> {
+      A2D("Radio aborted")
+      this.radioPlayer.play = false
+      this.showRadio()
+    })
+    this.radio.addEventListener("error", (err)=> {
+      A2D("Radio error: " + err)
+      this.radioPlayer.play = false
+      this.showRadio()
+    })
+    this.radio.addEventListener("loadstart", ()=> {
+      A2D("Radio started")
+      this.radioPlayer.play = true
+      this.radio.volume = 1
+      this.showRadio()
+    })
+
     if (this.config.debug) A2D = A2D_
     var callbacks= {
       "sendSocketNotification": (noti, params) => {
@@ -99,6 +136,7 @@ Module.register("MMM-Assistant2Display",{
       "sendNotification": (noti, params)=> {
         this.sendNotification(noti, params)
       },
+      "radioStop": ()=> this.radio.pause()
     }
     this.displayResponse = new Display(this.config, callbacks)
     this.A2D = this.displayResponse.A2D
@@ -135,6 +173,14 @@ Module.register("MMM-Assistant2Display",{
     internetPing.textContent = "Loading ..."
     internet.appendChild(internetPing)
 
+    var radio = document.createElement("div")
+    radio.id = "RADIO"
+    radio.className = "hidden"
+    var radioImg = document.createElement("img")
+    radioImg.id = "RADIO_IMG"
+    radio.appendChild(radioImg)
+
+    dom.appendChild(radio)
     dom.appendChild(screen)
     dom.appendChild(internet)
     return dom
@@ -155,6 +201,13 @@ Module.register("MMM-Assistant2Display",{
       "/modules/MMM-Assistant2Display/ui/" + this.ui + "/" + this.ui + ".css",
       "screen.css"
     ];
+  },
+
+  getTranslations: function() {
+    return {
+      en: "translations/en.json",
+      fr: "translations/fr.json"
+    }
   },
 
   suspend: function() {
@@ -184,6 +237,7 @@ Module.register("MMM-Assistant2Display",{
           if (this.config.useYoutube && this.displayResponse.player) {
             this.displayResponse.player.command("setVolume", 5)
           }
+          if (this.A2D.radio) this.radio.volume = 0.1
           if (this.A2D.locked) this.displayResponse.hideDisplay()
           break
         case "ASSISTANT_STANDBY":
@@ -191,12 +245,13 @@ Module.register("MMM-Assistant2Display",{
           if (this.config.useYoutube && this.displayResponse.player) {
             this.displayResponse.player.command("setVolume", 100)
           }
+          if (this.A2D.radio) this.radio.volume = 1
           if (this.displayResponse.working()) this.displayResponse.showDisplay()
           else this.displayResponse.hideDisplay()
           break
         case "ASSISTANT_HOOK":
         case "ASSISTANT_CONFIRMATION":
-          /** do to : some test with hook **/
+          /** Hooked **/
           break
         case "A2D":
           this.displayResponse.start(payload)
@@ -215,6 +270,7 @@ Module.register("MMM-Assistant2Display",{
               this.displayResponse.hideDisplay()
             }
           }
+          if (this.A2D.radio) this.radio.pause()
           break
         case "A2D_AMK2_BUSY":
           if (this.config.screen.useScreen && !this.A2D.locked) this.sendSocketNotification("SCREEN_STOP")
@@ -232,15 +288,32 @@ Module.register("MMM-Assistant2Display",{
             this.sendSocketNotification("SCREEN_WAKEUP")
           }
           break
+        case "A2D_RADIO":
+          if (this.A2D.youtube.displayed) this.displayResponse.player.command("stopVideo")
+          if (payload.link) {
+            if (payload.img) {
+              var radioImg = document.getElementById("RADIO_IMG")
+              this.radioPlayer.img = payload.img
+              radioImg.src = this.radioPlayer.img
+            }
+            this.radioPlayer.link = payload.link
+            this.radio.src = this.radioPlayer.link
+            this.radio.autoplay = true
+          }
+          break
+        case "TELBOT_TELECAST":
+          if (this.config.TelegramBot.useTelecastSound) {
+            this.radioPlayer.link = "modules/MMM-Assistant2Display/components/" + this.config.TelegramBot.TelecastSound
+            this.radio.src = this.radioPlayer.link
+            this.radio.autoplay = true
+          }
+          break
       }
     }
   },
 
   socketNotificationReceived: function (notification, payload) {
     switch(notification) {
-      case "A2D_READY":
-        this.displayResponse.linksDisplay()
-        break
       case "SCREEN_SHOWING":
         this.screenShowing()
         break
@@ -363,4 +436,122 @@ Module.register("MMM-Assistant2Display",{
       module.hide(1000, {lockString: "A2D_SCREEN"})
     })
   },
+
+  showRadio: function() {
+    this.A2D = this.displayResponse.A2D
+    this.A2D.radio = this.radioPlayer.play
+    if (this.radioPlayer.img) {
+      var radio = document.getElementById("RADIO")
+      if (this.radioPlayer.play) radio.classList.remove("hidden")
+      else radio.classList.add("hidden")
+    }
+  },
+
+  /** TelegramBot commands **/
+  getCommands: function(commander) {
+    commander.add({
+      command: "restart",
+      description: this.translate("RESTART_HELP"),
+      callback: "tbRestart"
+    })
+    if (this.config.screen.useScreen) {
+      commander.add({
+        command: "wakeup",
+        description: this.translate("WAKEUP_HELP"),
+        callback: "tbWakeup"
+      })
+    }
+    commander.add({
+      command: "hide",
+      description: this.translate("HIDE_HELP"),
+      callback: "tbHide"
+    })
+    commander.add({
+      command: "show",
+      description: this.translate("SHOW_HELP"),
+      callback: "tbShow"
+    })
+    commander.add({
+      command: "stop",
+      description: this.translate("STOP_HELP"),
+      callback: "tbStopA2D"
+    })
+  },
+
+  tbRestart: function(command, handler) {
+    if (handler.args) {
+      this.sendSocketNotification("RESTART", handler.args)
+      handler.reply("TEXT", this.translate("RESTART_DONE"))
+    } else handler.reply("TEXT", this.translate("RESTART_ERROR"))
+  },
+  tbWakeup: function(command, handler) {
+    this.sendSocketNotification("SCREEN_WAKEUP")
+    handler.reply("TEXT", this.translate("WAKEUP_REPLY"))
+  },
+  tbHide: function(command, handler) {
+    var found = false
+    var unlock = false
+    if (handler.args) {
+      if ((handler.args == "MMM-AssistantMk2") || (handler.args == "MMM-Assistant2Display")) {
+        return handler.reply("TEXT", this.translate("DADDY"))
+      }
+      MM.getModules().enumerate((m)=> {
+        if (m.name == handler.args) {
+          found = true
+          if (m.hidden) return handler.reply("TEXT", handler.args + this.translate("HIDE_ALREADY"))
+          if (m.lockStrings.length > 0) {
+            m.lockStrings.forEach( lock => {
+              if (lock == "TB_A2D") {
+                m.hide(500, {lockString: "TB_A2D"})
+                if (m.lockStrings.length == 0) {
+                  unlock = true
+                  handler.reply("TEXT", handler.args + this.translate("HIDE_DONE"))
+                }
+              }
+            })
+            if (!unlock) return handler.reply("TEXT", handler.args + this.translate("HIDE_LOCKED"))
+          }
+          else {
+            m.hide(500, {lockString: "TB_A2D"})
+            handler.reply("TEXT", handler.args + this.translate("HIDE_DONE"))
+          }
+        }
+      })
+      if (!found) handler.reply("TEXT", this.translate("MODULE_NOTFOUND") + handler.args)
+    } else return handler.reply("TEXT", this.translate("MODULE_NAME"))
+  },
+  tbShow: function(command, handler) {
+    var found = false
+    var unlock = false
+    if (handler.args) {
+      MM.getModules().enumerate((m)=> {
+        if (m.name == handler.args) {
+          found = true
+          if (!m.hidden) return handler.reply("TEXT", handler.args + this.translate("SHOW_ALREADY"))
+          if (m.lockStrings.length > 0) {
+            m.lockStrings.forEach( lock => {
+              if (lock == "TB_A2D") {
+                m.show(500, {lockString: "TB_A2D"})
+                if (m.lockStrings.length == 0) {
+                  unlock = true
+                  handler.reply("TEXT", handler.args + this.translate("SHOW_DONE"))
+                }
+              }
+            })
+            if (!unlock) return handler.reply("TEXT", handler.args + this.translate("SHOW_LOCKED"))
+          }
+          else {
+            m.show(500, {lockString: "TB_A2D"})
+            handler.reply("TEXT", handler.args + this.translate("SHOW_DONE"))
+          }
+        }
+      })
+      if (!found) handler.reply("TEXT", this.translate("MODULE_NOTFOUND") + handler.args)
+    } else return handler.reply("TEXT", this.translate("MODULE_NAME"))
+  },
+  tbStopA2D: function(command, handler) {
+    this.notificationReceived("A2D_STOP")
+    handler.reply("TEXT", this.translate("STOP_A2D"))
+  },
+
 });

@@ -1,6 +1,5 @@
 /** node helper **/
 
-const proxy = require("./components/proxy.js")
 var exec = require('child_process').exec
 var NodeHelper = require("node_helper")
 
@@ -24,12 +23,6 @@ module.exports = NodeHelper.create({
       case "INIT":
         this.initialize(payload)
         break
-      case "PROXY_OPEN":
-        this.openProxy(payload)
-        break
-      case "PROXY_CLOSE":
-        this.closeProxy()
-        break
       case "SET_VOLUME":
         this.setVolume(payload)
         break
@@ -46,12 +39,14 @@ module.exports = NodeHelper.create({
       case "SCREEN_WAKEUP":
         this.screen.wakeup()
         break
+      case "RESTART":
+        this.pm2Restart(payload)
+        break
     }
   },
 
   initialize: function(config) {
     this.config = config
-    this.proxyServer = null
     var debug = (this.config.debug) ? this.config.debug : false
     if (debug == true) log = _log
     if (this.config.useA2D) {
@@ -66,24 +61,19 @@ module.exports = NodeHelper.create({
     //log("Socket callback: " + send,params ? params : "")
   },
 
-  openProxy: function(url) {
-    if (this.proxyServer) this.proxyServer.stop()
-    this.config.links.debug = this.config.debug
-    this.proxyServer = new proxy(this.config.links, (send,params)=>{ this.callback(send,params) })
-    this.proxyServer.start(url)
-  },
-
-  closeProxy: function () {
-    if (!this.proxyServer) return
-    this.proxyServer.stop()
-    this.proxyServer= null
-  },
-
   setVolume: function(level) {
     var script = this.config.volumeScript.replace("#VOLUME#", level)
     exec (script, (err, stdout, stderr)=> {
       if (err) console.log("[A2D:VOLUME] Set Volume Error:", err)
       else log("[VOLUME] Set Volume To:", level)
+    })
+  },
+
+  pm2Restart: function(id) {
+    var pm2 = "pm2 restart " + id
+    exec (pm2, (err, stdout, stderr)=> {
+      if (err) console.log("[A2D:PM2] " + err)
+      else log("[PM2] Restart", id)
     })
   },
 
