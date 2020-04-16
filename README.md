@@ -6,11 +6,7 @@ It allows to display the links, photos and YouTube video found by your assistant
 
 You can control MagicMirror sound volume, screen, detector, pir sensor, and more
 
-Needed: AMk2 v3.2.0 with special configuration
-
-Turn on `useA2D: true` in your AMk2 config.js file
-
-`config: { useA2D: true }`
+Needed: AMk2 v3.2.0 and more
 
 ## Screenshoot
 
@@ -25,7 +21,7 @@ Turn on `useA2D: true` in your AMk2 config.js file
    * **ADD**: Use now webview for links displaying
    * **ADD**: TelegramBot Commands
    * **ADD**: scrollActivate feature
-   * **ADD**: Telecast sound on inconning message
+   * **ADD**: Telecast sound on incoming message
  * 09/04/2020 (v1.2.0)
    * **FIX**: A2D core code for new features
    * **ADD**: Screen feature
