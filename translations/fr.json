@@ -3,7 +3,7 @@
   "RESTART_DONE" : "Redémarrage en cours !",
   "RESTART_ERROR" : "<id> manquant !",
 
-  "WAKEUP_HELP": "Allume l'écran et redémarre de compteur",
+  "WAKEUP_HELP": "Allume l'écran et redémarre le compteur",
   "WAKEUP_REPLY": "Ecran allumé !",
 
   "HIDE_HELP": "Cache le module désiré",
