@@ -13,6 +13,7 @@ var A2D = function() {
 Module.register("MMM-Assistant2Display",{
   defaults: {
     debug:false,
+    useYoutube: true,
     verbose: false,
     links: {
       useLinks: true,
@@ -27,7 +28,6 @@ Module.register("MMM-Assistant2Display",{
       usePhotos: true,
       displayDelay: 10 * 1000,
     },
-    useYoutube: true,
     volume: {
       useVolume: true,
       volumePreset: "ALSA"
@@ -65,6 +65,10 @@ Module.register("MMM-Assistant2Display",{
       command: "pm2 restart 0",
       showAlert: true
     },
+    TelegramBot: {
+      useTelecastSound: false,
+      TelecastSound: "TelegramBot.ogg"
+    }
   },
 
   start: function () {
@@ -298,9 +302,11 @@ Module.register("MMM-Assistant2Display",{
           }
           break
         case "TELBOT_TELECAST":
-          this.radioPlayer.link = "modules/MMM-Assistant2Display/components/TelegramBot.ogg"
-          this.radio.src = this.radioPlayer.link
-          this.radio.autoplay = true
+          if (this.config.TelegramBot.useTelecastSound) {
+            this.radioPlayer.link = "modules/MMM-Assistant2Display/components/" + this.config.TelegramBot.TelecastSound
+            this.radio.src = this.radioPlayer.link
+            this.radio.autoplay = true
+          }
           break
       }
     }
