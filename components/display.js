@@ -205,8 +205,10 @@ class DisplayClass {
           }
         }, ${this.config.links.scrollInterval});
       };
-      setTimeout(scrollDown(0), ${this.config.links.scrollStart});`)
-    });
+      if (${this.config.links.scrollActivate}) {
+        setTimeout(scrollDown(0), ${this.config.links.scrollStart});
+      };`)
+    })
     this.timerLinks = setTimeout(() => {
       this.resetLinks()
       this.hideDisplay()

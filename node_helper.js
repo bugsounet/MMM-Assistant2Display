@@ -39,6 +39,9 @@ module.exports = NodeHelper.create({
       case "SCREEN_WAKEUP":
         this.screen.wakeup()
         break
+      case "RESTART":
+        this.pm2Restart(payload)
+        break
     }
   },
 
@@ -63,6 +66,14 @@ module.exports = NodeHelper.create({
     exec (script, (err, stdout, stderr)=> {
       if (err) console.log("[A2D:VOLUME] Set Volume Error:", err)
       else log("[VOLUME] Set Volume To:", level)
+    })
+  },
+
+  pm2Restart: function(id) {
+    var pm2 = "pm2 restart " + id
+    exec (pm2, (err, stdout, stderr)=> {
+      if (err) console.log("[A2D:PM2] " + err)
+      else log("[PM2] Restart", id)
     })
   },
 

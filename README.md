@@ -23,6 +23,9 @@ Turn on `useA2D: true` in your AMk2 config.js file
    * **ADD**: Radio player core
    * **DEL**: Link Proxy script
    * **ADD**: Use now webview for links displaying
+   * **ADD**: TelegramBot Commands
+   * **ADD**: scrollActivate feature
+   * **ADD**: Telecast sound on inconning message
  * 09/04/2020 (v1.2.0)
    * **FIX**: A2D core code for new features
    * **ADD**: Screen feature

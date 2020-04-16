@@ -16,10 +16,11 @@ Module.register("MMM-Assistant2Display",{
     verbose: false,
     links: {
       useLinks: true,
-      displayDelay: 30 * 1000,
+      displayDelay: 60 * 1000,
+      scrollActivate: false,
       scrollStep: 25,
       scrollInterval: 1000,
-      scrollStart: 1000,
+      scrollStart: 5000,
       verbose: false
     },
     photos: {
@@ -198,6 +199,13 @@ Module.register("MMM-Assistant2Display",{
     ];
   },
 
+  getTranslations: function() {
+    return {
+      en: "translations/en.json",
+      fr: "translations/fr.json"
+    }
+  },
+
   suspend: function() {
     A2D("This module cannot be suspended.")
   },
@@ -288,6 +296,11 @@ Module.register("MMM-Assistant2Display",{
             this.radio.src = this.radioPlayer.link
             this.radio.autoplay = true
           }
+          break
+        case "TELBOT_TELECAST":
+          this.radioPlayer.link = "modules/MMM-Assistant2Display/components/TelegramBot.ogg"
+          this.radio.src = this.radioPlayer.link
+          this.radio.autoplay = true
           break
       }
     }
@@ -427,4 +440,110 @@ Module.register("MMM-Assistant2Display",{
       else radio.classList.add("hidden")
     }
   },
+
+  /** TelegramBot commands **/
+  getCommands: function(commander) {
+    commander.add({
+      command: "restart",
+      description: this.translate("RESTART_HELP"),
+      callback: "tbRestart"
+    })
+    commander.add({
+      command: "wakeup",
+      description: this.translate("WAKEUP_HELP"),
+      callback: "tbWakeup"
+    })
+    commander.add({
+      command: "hide",
+      description: this.translate("HIDE_HELP"),
+      callback: "tbHide"
+    })
+    commander.add({
+      command: "show",
+      description: this.translate("SHOW_HELP"),
+      callback: "tbShow"
+    })
+    commander.add({
+      command: "stop",
+      description: this.translate("STOP_HELP"),
+      callback: "tbStopA2D"
+    })
+  },
+
+  tbRestart: function(command, handler) {
+    if (handler.args) {
+      this.sendSocketNotification("RESTART", handler.args)
+      handler.reply("TEXT", this.translate("RESTART_DONE"))
+    } else handler.reply("TEXT", this.translate("RESTART_ERROR"))
+  },
+  tbWakeup: function(command, handler) {
+    this.sendSocketNotification("SCREEN_WAKEUP")
+    handler.reply("TEXT", this.translate("WAKEUP_REPLY"))
+  },
+  tbHide: function(command, handler) {
+    var found = false
+    var unlock = false
+    if (handler.args) {
+      if ((handler.args == "MMM-AssistantMk2") || (handler.args == "MMM-Assistant2Display")) {
+        return handler.reply("TEXT", this.translate("DADDY"))
+      }
+      MM.getModules().enumerate((m)=> {
+        if (m.name == handler.args) {
+          found = true
+          if (m.hidden) return handler.reply("TEXT", handler.args + this.translate("HIDE_ALREADY"))
+          if (m.lockStrings.length > 0) {
+            m.lockStrings.forEach( lock => {
+              if (lock == "TB_A2D") {
+                m.hide(500, {lockString: "TB_A2D"})
+                if (m.lockStrings.length == 0) {
+                  unlock = true
+                  handler.reply("TEXT", handler.args + this.translate("HIDE_DONE"))
+                }
+              }
+            })
+            if (!unlock) return handler.reply("TEXT", handler.args + this.translate("HIDE_LOCKED"))
+          }
+          else {
+            m.hide(500, {lockString: "TB_A2D"})
+            handler.reply("TEXT", handler.args + this.translate("HIDE_DONE"))
+          }
+        }
+      })
+      if (!found) handler.reply("TEXT", this.translate("MODULE_NOTFOUND") + handler.args)
+    } else return handler.reply("TEXT", this.translate("MODULE_NAME"))
+  },
+  tbShow: function(command, handler) {
+    var found = false
+    var unlock = false
+    if (handler.args) {
+      MM.getModules().enumerate((m)=> {
+        if (m.name == handler.args) {
+          found = true
+          if (!m.hidden) return handler.reply("TEXT", handler.args + this.translate("SHOW_ALREADY"))
+          if (m.lockStrings.length > 0) {
+            m.lockStrings.forEach( lock => {
+              if (lock == "TB_A2D") {
+                m.show(500, {lockString: "TB_A2D"})
+                if (m.lockStrings.length == 0) {
+                  unlock = true
+                  handler.reply("TEXT", handler.args + this.translate("SHOW_DONE"))
+                }
+              }
+            })
+            if (!unlock) return handler.reply("TEXT", handler.args + this.translate("SHOW_LOCKED"))
+          }
+          else {
+            m.show(500, {lockString: "TB_A2D"})
+            handler.reply("TEXT", handler.args + this.translate("SHOW_DONE"))
+          }
+        }
+      })
+      if (!found) handler.reply("TEXT", this.translate("MODULE_NOTFOUND") + handler.args)
+    } else return handler.reply("TEXT", this.translate("MODULE_NAME"))
+  },
+  tbStopA2D: function(command, handler) {
+    this.notificationReceived("A2D_STOP")
+    handler.reply("TEXT", this.translate("STOP_A2D"))
+  },
+
 });
