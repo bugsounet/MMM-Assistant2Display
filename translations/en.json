@@ -22,5 +22,11 @@
   "STOP_HELP": "Stop A2D if running",
   "STOP_A2D": "I stop A2D",
 
+  "A2D_OPEN": "Opening link: ",
+  "A2D_INVALID": "This link is not invalid!",
+  "A2D_HELP": "Activate Assisant2Display with link",
+
+  "VOLUME_HELP": "Set the volume of your device",
+
   "DADDY": "daddy @bugsounet says... NO,NO AND NO !!!"
 }

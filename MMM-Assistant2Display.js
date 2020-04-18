@@ -476,6 +476,18 @@ Module.register("MMM-Assistant2Display",{
       description: this.translate("STOP_HELP"),
       callback: "tbStopA2D"
     })
+    commander.add({
+      command: "A2D",
+      description: this.translate("A2D_HELP"),
+      callback: "tbA2D"
+    })
+    if (this.config.volume.useVolume) {
+      commander.add({
+        command: "volume",
+        description: this.translate("VOLUME_HELP"),
+        callback: "tbVolume"
+      })
+    }
   },
 
   tbRestart: function(command, handler) {
@@ -553,5 +565,39 @@ Module.register("MMM-Assistant2Display",{
     this.notificationReceived("A2D_STOP")
     handler.reply("TEXT", this.translate("STOP_A2D"))
   },
+  tbA2D: function (command, handler) {
+    if (handler.args) {
+      var responseEmulate = {
+        "photos": [],
+        "urls": [],
+        "transcription": {},
+        "trysay": null,
+        "help": null
+      }
+      var regexp = /^((http(s)?):\/\/)(?:(?!(?:10|127)(?:\.\d{1,3}){3})(?!(?:169\.254|192\.168)(?:\.\d{1,3}){2})(?!172\.(?:1[6-9]|2\d|3[0-1])(?:\.\d{1,3}){2})(?:[1-9]\d?|1\d\d|2[01]\d|22[0-3])(?:\.(?:1?\d{1,2}|2[0-4]\d|25[0-5])){2}(?:\.(?:[1-9]\d?|1\d\d|2[0-4]\d|25[0-4]))|(?:(?:[a-z\u00a1-\uffff0-9]-*)*[a-z\u00a1-\uffff0-9]+)(?:\.(?:[a-z\u00a1-\uffff0-9]-*)*[a-z\u00a1-\uffff0-9]+)*(?:\.(?:[a-z\u00a1-\uffff]{2,})))(?::\d{2,5})?(?:\/\S*)?$/;
+      var isLink = regexp.test(handler.args)
+      var retryWithHttp = regexp.test("http://" + handler.args)
+      if (isLink || retryWithHttp) {
+        handler.reply("TEXT", this.translate("A2D_OPEN") + handler.args)
+        console.log(handler)
+        responseEmulate.transcription.transcription = " Telegram @"+ handler.message.from.username + ": " + handler.args
+        responseEmulate.transcription.done = true
+        responseEmulate.urls[0] = isLink ? handler.args : ("http://" + handler.args)
+        this.displayResponse.start(responseEmulate)
+      }
+      else handler.reply("TEXT", this.translate("A2D_INVALID"))
+    }
+    else handler.reply("TEXT", "/A2D <link>")
+  },
+
+  tbVolume: function(command, handler) {
+    if (handler.args) {
+      var value = Number(handler.args)
+      if ((!value && value != 0) || ((value < 0) || (value > 100))) return handler.reply("TEXT", "/volume [0-100]")
+      this.sendSocketNotification("SET_VOLUME", value)
+      handler.reply("TEXT", "Volume " + value+"%")
+    }
+    else handler.reply("TEXT", "/volume [0-100]")
+  }
 
 });
