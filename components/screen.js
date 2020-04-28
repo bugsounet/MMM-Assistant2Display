@@ -38,6 +38,7 @@ class SCREEN {
       locked: false,
       power: false
     }
+    console.log("[A2D:SCREEN] Initialized...")
   }
   activate () {
     if (!this.config.turnOffDisplay && !this.config.ecoMode) return log("Disabled.")

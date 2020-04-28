@@ -51,9 +51,9 @@ module.exports = NodeHelper.create({
     if (debug == true) log = _log
     if (this.config.useA2D) {
       this.addons()
-      log("Initialized: Assistant2Display Version",  require('./package.json').version)
+      console.log("[A2D] Initialized: Assistant2Display Version",  require('./package.json').version)
     }
-    else log("Disabled.")
+    else console.log("[A2D] Disabled.")
   },
 
   callback: function(send,params) {

@@ -1,6 +1,6 @@
 {
   "name": "MMM-Assistant2Display",
-  "version": "1.3.0",
+  "version": "1.3.1",
   "description": "AMk2 Display",
   "main": "MMM-Assistant2Display.js",
   "scripts": {
@@ -23,13 +23,8 @@
   },
   "homepage": "https://github.com/bugsounet/MMM-Assistant2Display",
   "dependencies": {
-    "axios": "^0.19.2",
-    "body-parser": "^1.19.0",
-    "cheerio": "^1.0.0-rc.3",
     "electron-rebuild": "^1.10.1",
-    "express": "^4.17.1",
     "onoff": "^5.0.1",
-    "ping": "^0.2.2",
-    "url-parse": "^1.4.7"
+    "ping": "^0.2.2"
   }
 }

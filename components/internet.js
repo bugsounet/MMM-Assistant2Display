@@ -42,9 +42,10 @@ class INTERNET {
       showAlert: true
     }
     this.config = Object.assign(this.default, this.config)
+    console.log("[A2D:INTERNET] Initialized")
   }
   activate () {
-    log("Initialize...")
+	log("Activate...")
     this.internet = {
       "status" : false,
       "ping" : null,
@@ -94,7 +95,7 @@ class INTERNET {
        log("Execute your restart command in 5 secs")
        setTimeout (() => { 
          exec (this.config.command, (e,stdo,stde) => {
-           if (e) log (e)
+           if (e) console.log ("[A2D:INTERNET] " + e)
          })
        } , 5000 )
       }

@@ -15,6 +15,12 @@ Needed: AMk2 v3.2.0 and more
 
 ## Update history
 
+
+ * xx/04/2020 (v1.3.1)
+   * **FIX**: Minor error
+   * **ADD**: Integred AMk2 Snowboy detect code
+   * **FIX**: Radio volume too high compared to assistant
+   * **CLN**: Cleaning package.json
  * 16/04/2020 (v1.3.0)
    * **ADD**: Radio player core
    * **DEL**: Link Proxy script

@@ -25,9 +25,10 @@ class PIR {
       reverseValue: false
     }
     this.config = Object.assign(this.default, this.config)
+    console.log("[A2D:PIR] Initialized...")
   }
   activate () {
-    log(this.default.version + " Starts.")
+    log("Starts.")
     this.pir = new Gpio(this.config.gpio, 'in', 'both')
     this.pir.watch( (err, value)=> {
       if (err) return log("[Error]", err)

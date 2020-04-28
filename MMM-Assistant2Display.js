@@ -124,7 +124,7 @@ Module.register("MMM-Assistant2Display",{
     this.radio.addEventListener("loadstart", ()=> {
       A2D("Radio started")
       this.radioPlayer.play = true
-      this.radio.volume = 1
+      this.radio.volume = 0.6
       this.showRadio()
     })
 
@@ -245,7 +245,7 @@ Module.register("MMM-Assistant2Display",{
           if (this.config.useYoutube && this.displayResponse.player) {
             this.displayResponse.player.command("setVolume", 100)
           }
-          if (this.A2D.radio) this.radio.volume = 1
+          if (this.A2D.radio) this.radio.volume = 0.6
           if (this.displayResponse.working()) this.displayResponse.showDisplay()
           else this.displayResponse.hideDisplay()
           break
@@ -327,7 +327,7 @@ Module.register("MMM-Assistant2Display",{
       case "INTERNET_DOWN":
         this.sendNotification("SHOW_ALERT", {
           type: "alert" ,
-          message: "Internet is DOWN ! Retry: " + param.payload,
+          message: "Internet is DOWN ! Retry: " + payload,
           title: "Internet Scan",
           timer: 10000
         })
@@ -361,6 +361,8 @@ Module.register("MMM-Assistant2Display",{
     this.useA2D = false
     this.Hotword = false
     this.Snowboy = false
+    this.Integred = false
+    this.Detector = 0
     this.ui = "Fullscreen"
 
     console.log("[A2D] Scan config.js file")
@@ -372,19 +374,27 @@ Module.register("MMM-Assistant2Display",{
           this.ui = value.config.ui
         }
         this.useA2D = value.config.useA2D ? value.config.useA2D : false
+        this.Integred = value.config.useSnowboy ? value.config.useSnowboy : false
+        if (this.Integred) {
+          console.log("[A2D] Integred AMk2 Snowboy detected!")
+          this.Detector++
+        }
       }
       if (value.module == "MMM-Snowboy" && !value.disabled) {
         console.log("[A2D] MMM-Snowboy detected!")
         this.Snowboy = true
+        this.Detector++
       }
       if (value.module == "MMM-Hotword"&& !value.disabled) {
         console.log("[A2D] MMM-Hotword detected!")
         this.Hotword = true
+        this.Detector++
       }
     }
     if (!AMk2Found) console.log("[A2D][ERROR] AMk2 not found!")
+    if (this.Integred && !this.Snowboy) this.Snowboy= this.Integred
 
-    if (this.Hotword && this.Snowboy) console.log("[A2D][ERROR] 2 detectors actived !")
+    if (this.Detector > 1) console.log("[A2D][ERROR] " + this.Detector + " detectors actived !")
 
     console.log("[A2D] Auto choice UI", this.ui)
     if (!this.useA2D) {
