@@ -26,6 +26,9 @@ class DialServer {
         state: "stopped",
         allowStop: true,
         pid: null,
+        launch: (data) => {
+          this.sendSocketNotification("CAST_START", "https://www.youtube.com/tv?" + data)
+        }
       }
     }
     this.server = http.createServer(app)
@@ -41,8 +44,8 @@ class DialServer {
       modelName: "DIAL Server",
       delegate: {
         getApp: (appName) => {
-          var app = this.apps[appName]
-          log("PONG", app)
+          var app = this.apps[appName] ? this.apps[appName] : "[unknow protocol]"
+          log("PONG "+ appName, app)
           return app
         },
         launchApp: (appName,data,callback) => {
@@ -53,17 +56,17 @@ class DialServer {
             app.pid = "run"
             app.state = "starting"
             app.state = "running"
-            this.sendSocketNotification("CAST_START", "https://www.youtube.com/tv?" + data)
+            app.launch(data)
           }
           callback(app.pid)
         },
         stopApp: (appName,pid,callback) => {
           log("Stop", appName)
-          this.sendSocketNotification("CAST_STOP")
           var app = this.apps[appName]
           if (app && app.pid == pid) {
             app.pid = null
             app.state = "stopped"
+            this.sendSocketNotification("CAST_STOP")
             callback(true)
           }
           else {
