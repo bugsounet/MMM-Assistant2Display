@@ -5,8 +5,7 @@
   "main": "MMM-Assistant2Display.js",
   "scripts": {
     "preinstall": "installer/preinstall.sh",
-    "postinstall": "installer/postinstall.sh",
-    "cast": "electron components/cast.js"
+    "postinstall": "installer/postinstall.sh"
   },
   "keywords": [
     "magic mirror",
@@ -25,7 +24,6 @@
   "homepage": "https://github.com/bugsounet/MMM-Assistant2Display",
   "dependencies": {
     "electron-rebuild": "^1.10.1",
-    "node-ipc": "^9.1.1",
     "onoff": "^5.0.1",
     "peer-dial": "0.0.8",
     "ping": "^0.2.2"
