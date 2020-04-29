@@ -1,33 +1,7 @@
 const dial = require("peer-dial")
 const http = require('http')
 const express = require('express')
-const { spawn } = require('cross-spawn')
-const { IpcClient } = require('./ipc.js')
-
 const app = express()
-const server = http.createServer(app)
-let child = null
-
-const apps = {
-  "YouTube": {
-    name: "YouTube",
-    state: "stopped",
-    allowStop: true,
-    pid: null,
-    launch: function (launchData, config) {
-      child = spawn('npm', ['run', 'cast'], {
-        cwd: 'modules/MMM-Assistant2Display'
-      })
-
-      this.ipc = new IpcClient((self) => {
-        self.on('connect', (data) => {
-          self.emit('SEND_CONFIG', { ...config })
-        })
-        self.on('error', (error) => console.log("[A2D:CAST] " + error))
-      })
-    }
-  }
-}
 
 var _log = function() {
     var context = "[A2D:CAST]"
@@ -39,67 +13,60 @@ var log = function() {
 }
 
 class DialServer {
-  constructor(config) {
-    this.dialServer
-    this._mmSendSocket
-    this._castAppName = null
+  constructor(config, callbacks) {
+    this.dialServer = null
     this.config = config
+    this.sendSocketNotification = callbacks.sendSocketNotification
     var debug = (this.config.debug) ? this.config.debug : false
     if (debug == true) log = _log
     this.debug = debug
+    this.apps = {
+      "YouTube": {
+        name: "YouTube",
+        state: "stopped",
+        allowStop: true,
+        pid: null,
+      }
+    }
     this.server = http.createServer(app)
     console.log("[A2D:CAST] Initialized")
   }
 
   initDialServer(port) {
     this.dialServer = new dial.Server({
-      port,
-      corsAllowOrigins: true,
       expressApp: app,
+      port: this.config.port,
       prefix: "/dial",
       manufacturer: "Assistant2Display",
       modelName: "DIAL Server",
-      launchFunction: null,
       delegate: {
-        getApp: function(appName) {
-          return apps[appName]
+        getApp: (appName) => {
+          var app = this.apps[appName]
+          log("PONG", app)
+          return app
         },
-
-        launchApp: (appName, lauchData, callback) => {
-          const castApp = apps[appName]
-          if (!!castApp) {
-            castApp.pid = "run"
-            castApp.state = "starting"
-            castApp.launch(lauchData, this.config)
-            const url = "https://www.youtube.com/tv?"+lauchData
-            this.mmSendSocket('CAST_START', url)
-            log(castApp.name + " is" + castApp.state)
-
-            castApp.ipc.on('APP_READY', () => {
-              castApp.state = "running"
-              this._castAppName = appName
-              log(castApp.name + " is " + castApp.state)
-              callback(app.pid)
-            })
+        launchApp: (appName,data,callback) => {
+          log("Launch " + appName + " with data:", data)
+          var app = this.apps[appName]
+          var pid = null
+          if (app) {
+            app.pid = "run"
+            app.state = "starting"
+            app.state = "running"
+            this.sendSocketNotification("CAST_START", "https://www.youtube.com/tv?" + data)
           }
+          callback(app.pid)
         },
-        stopApp: (appName, pid, callback) => {
-          this.mmSendSocket('CAST_STOP')
-          const castApp = apps[appName]
-
-          if (castApp && castApp.pid == pid) {
-            castApp.ipc.on('QUIT_HEARD', (data) => {
-              castApp.ipc.disconnect()
-              castApp.state = "stopped"
-              castApp.pid = null
-              child = null
-              this._castAppName = null
-              log(castApp.name + " is " + castApp.state)
-              callback(true)
-            })
-
-            castApp.ipc.emit('QUIT')
-          } else {
+        stopApp: (appName,pid,callback) => {
+          log("Stop", appName)
+          this.sendSocketNotification("CAST_STOP")
+          var app = this.apps[appName]
+          if (app && app.pid == pid) {
+            app.pid = null
+            app.state = "stopped"
+            callback(true)
+          }
+          else {
             callback(false)
           }
         }
@@ -111,21 +78,9 @@ class DialServer {
     this.initDialServer(this.config.port)
     this.dialServer.friendlyName = this.config.castName
     this.server.listen(this.config.port, () => {
-      this.dialServer.start()
-      log(this.config.castName + " is listening on port", this.config.port)
+	    this.dialServer.start()
+	    log(this.config.castName + " is running on port", this.config.port)
     })
-  }
-
-  get castSocket() {
-    return apps[this._castAppName].ipc
- }
-
-  get mmSendSocket() {
-    return this._mmSendSocket
-  }
-
-  set mmSendSocket(socket) {
-    return this._mmSendSocket = socket
   }
 }
 
