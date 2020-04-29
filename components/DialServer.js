@@ -78,8 +78,8 @@ class DialServer {
     this.initDialServer(this.config.port)
     this.dialServer.friendlyName = this.config.castName
     this.server.listen(this.config.port, () => {
-	    this.dialServer.start()
-	    log(this.config.castName + " is running on port", this.config.port)
+      this.dialServer.start()
+      log(this.config.castName + " is listening on port", this.config.port)
     })
   }
 }
