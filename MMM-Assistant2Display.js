@@ -68,7 +68,12 @@ Module.register("MMM-Assistant2Display",{
     TelegramBot: {
       useTelecastSound: false,
       TelecastSound: "TelegramBot.ogg"
-    }
+    },
+    cast: {
+	  useCast: false,
+      castName: "MagicMirror_A2D",
+      port: 8569
+	},
   },
 
   start: function () {
@@ -91,7 +96,8 @@ Module.register("MMM-Assistant2Display",{
       screen: this.config.screen,
       pir: this.config.pir,
       governor: this.config.governor,
-      internet: this.config.internet
+      internet: this.config.internet,
+      cast: this.config.cast
     }
 
     this.radioPlayer = {
@@ -353,6 +359,12 @@ Module.register("MMM-Assistant2Display",{
       case "SNOWBOY_START":
         if (this.Snowboy) this.sendNotification("SNOWBOY_START")
         else if (this.Hotword) this.sendNotification("HOTWORD_RESUME")
+        break
+      case "CAST_START":
+        this.displayResponse.castStart(payload)
+        break
+      case "CAST_STOP":
+        this.displayResponse.castStop()
         break
     }
   },

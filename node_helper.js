@@ -115,5 +115,16 @@ module.exports = NodeHelper.create({
       this.internet = new Internet(this.config.internet, callbacks)
       this.internet.activate()
     }
+    if (this.config.cast.useCast) {
+      const DialServer = require("./components/DialServer.js");
+      this.dialServer= new DialServer(),
+      this.dialServer.setConfig(this.config.cast);
+      this.dialServer.start();
+      this.dialServer.mmSendSocket = (noti,payload) => {
+        if (noti == "CAST_STATUS") console.log("[A2D:CAST] " + payload);
+        if (noti == "CAST_START") this.sendSocketNotification("CAST_START", payload)
+        if (noti == "CAST_STOP") this.sendSocketNotification("CAST_STOP") 
+      }
+    }
   },
 });
