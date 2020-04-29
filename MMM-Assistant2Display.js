@@ -70,10 +70,10 @@ Module.register("MMM-Assistant2Display",{
       TelecastSound: "TelegramBot.ogg"
     },
     cast: {
-	  useCast: false,
+      useCast: false,
       castName: "MagicMirror_A2D",
       port: 8569
-	},
+    },
   },
 
   start: function () {
