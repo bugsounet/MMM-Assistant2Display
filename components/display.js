@@ -283,7 +283,7 @@ class DisplayClass {
     if (this.A2D.radio) this.radioStop()
 
     /** emulation of displaying links **/
-    this.A2D.AMk2.transcription = "Youtube Cast"
+    this.A2D.AMk2.transcription = "YouTube Cast"
     this.prepareDisplay()
     this.A2D.links.running = false
     var webView = document.getElementById("A2D_OUTPUT")
