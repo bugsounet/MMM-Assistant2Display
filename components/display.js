@@ -290,7 +290,6 @@ class DisplayClass {
     A2D("Cast Loading", url)
     this.A2D.links.displayed = true
     this.A2D.links.running = true
-    this.A2D.AMk2.transcription = "Youtube Cast"
     this.showDisplay()
     this.A2DLock()
     webView.src= url
