@@ -2,6 +2,11 @@
 
 var exec = require('child_process').exec
 var NodeHelper = require("node_helper")
+const Screen = require("./components/screen.js")
+const Pir = require("./components/pir.js")
+const Governor = require("./components/governor.js")
+const Internet = require("./components/internet.js")
+const DialServer = require("./components/DialServer.js")
 
 var _log = function() {
   var context = "[A2D]"
@@ -46,14 +51,15 @@ module.exports = NodeHelper.create({
   },
 
   initialize: function(config) {
+    console.log("[A2D] MMM-Assistant2Display Version:",  require('./package.json').version)
     this.config = config
     var debug = (this.config.debug) ? this.config.debug : false
     if (debug == true) log = _log
     if (this.config.useA2D) {
       this.addons()
-      log("Initialized: Assistant2Display Version",  require('./package.json').version)
+      console.log("[A2D] Assistant2Display is initialized.")
     }
-    else log("Disabled.")
+    else console.log("[A2D] Assistant2Display is disabled.")
   },
 
   callback: function(send,params) {
@@ -93,27 +99,28 @@ module.exports = NodeHelper.create({
 
     if (this.config.screen.useScreen) {
       this.config.screen.debug = this.config.debug
-      const Screen = require("./components/screen.js")
       this.screen = new Screen(this.config.screen, callbacks)
       this.screen.activate()
     }
     if (this.config.pir.usePir) {
       this.config.pir.debug = this.config.debug
-      const Pir = require("./components/pir.js")
       this.pir = new Pir(this.config.pir, callbacks)
       this.pir.activate()
     }
     if (this.config.governor.useGovernor) {
       this.config.governor.debug = this.config.debug
-      const Governor = require("./components/governor.js")
       this.governor = new Governor(this.config.governor)
       this.governor.init()
     }
     if (this.config.internet.useInternet) {
       this.config.internet.debug = this.config.debug
-      const Internet = require("./components/internet.js")
       this.internet = new Internet(this.config.internet, callbacks)
       this.internet.activate()
+    }
+    if (this.config.cast.useCast) {
+      this.config.cast.debug = this.config.debug
+      this.dialServer= new DialServer(this.config.cast, callbacks)
+      this.dialServer.start()
     }
   },
 });

@@ -22,5 +22,11 @@
   "STOP_HELP": "Stop A2D si besoin",
   "STOP_A2D": "j'arrête A2D",
 
+  "A2D_OPEN": "Ouverture du lien: ",
+  "A2D_INVALID": "Ce lien n'est pas valide !",
+  "A2D_HELP": "Active Assisant2Display avec un lien",
+
+  "VOLUME_HELP": "Défini le volume sonore",
+
   "DADDY": "Papa @bugsounet a dit... NON,NON ET NON !!!"
 }

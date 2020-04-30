@@ -29,7 +29,7 @@ class GOVERNOR {
       "wanted" : "",
       "actual" : ""
     }
-    log("initialized")
+    console.log("[A2D:GOVERNOR] Initialized")
   }
   init () {
     this.Governor.wanted = this.config.working

@@ -268,6 +268,39 @@ class DisplayClass {
     A2D("Reset YouTube", this.A2D)
   }
 
+/** Cast **/
+  castStart(url) {
+    /** stop all process before starting cast **/
+    if (this.A2D.youtube.displayed) this.player.command("stopVideo")
+    if (this.A2D.photos.displayed) {
+      this.resetPhotos()
+      this.hideDisplay()
+    }
+    if (this.A2D.links.displayed) {
+      this.resetLinks()
+      this.hideDisplay()
+    }
+    if (this.A2D.radio) this.radioStop()
+
+    /** emulation of displaying links **/
+    this.A2D.AMk2.transcription = "YouTube Cast"
+    this.prepareDisplay()
+    this.A2D.links.running = false
+    var webView = document.getElementById("A2D_OUTPUT")
+    A2D("Cast Loading", url)
+    this.A2D.links.displayed = true
+    this.A2D.links.running = true
+    this.showDisplay()
+    this.A2DLock()
+    webView.src= url
+  }
+
+  castStop() {
+    var webView = document.getElementById("A2D_OUTPUT")
+    this.resetLinks()
+    this.hideDisplay()
+  }
+
 /** Other Cmds **/
   prepare() {
     // reserved for extends

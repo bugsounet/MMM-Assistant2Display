@@ -68,7 +68,12 @@ Module.register("MMM-Assistant2Display",{
     TelegramBot: {
       useTelecastSound: false,
       TelecastSound: "TelegramBot.ogg"
-    }
+    },
+    cast: {
+      useCast: false,
+      castName: "MagicMirror_A2D",
+      port: 8569
+    },
   },
 
   start: function () {
@@ -91,7 +96,8 @@ Module.register("MMM-Assistant2Display",{
       screen: this.config.screen,
       pir: this.config.pir,
       governor: this.config.governor,
-      internet: this.config.internet
+      internet: this.config.internet,
+      cast: this.config.cast
     }
 
     this.radioPlayer = {
@@ -124,7 +130,7 @@ Module.register("MMM-Assistant2Display",{
     this.radio.addEventListener("loadstart", ()=> {
       A2D("Radio started")
       this.radioPlayer.play = true
-      this.radio.volume = 1
+      this.radio.volume = 0.6
       this.showRadio()
     })
 
@@ -245,7 +251,7 @@ Module.register("MMM-Assistant2Display",{
           if (this.config.useYoutube && this.displayResponse.player) {
             this.displayResponse.player.command("setVolume", 100)
           }
-          if (this.A2D.radio) this.radio.volume = 1
+          if (this.A2D.radio) this.radio.volume = 0.6
           if (this.displayResponse.working()) this.displayResponse.showDisplay()
           else this.displayResponse.hideDisplay()
           break
@@ -327,7 +333,7 @@ Module.register("MMM-Assistant2Display",{
       case "INTERNET_DOWN":
         this.sendNotification("SHOW_ALERT", {
           type: "alert" ,
-          message: "Internet is DOWN ! Retry: " + param.payload,
+          message: "Internet is DOWN ! Retry: " + payload,
           title: "Internet Scan",
           timer: 10000
         })
@@ -354,6 +360,12 @@ Module.register("MMM-Assistant2Display",{
         if (this.Snowboy) this.sendNotification("SNOWBOY_START")
         else if (this.Hotword) this.sendNotification("HOTWORD_RESUME")
         break
+      case "CAST_START":
+        this.displayResponse.castStart(payload)
+        break
+      case "CAST_STOP":
+        this.displayResponse.castStop()
+        break
     }
   },
 
@@ -361,6 +373,8 @@ Module.register("MMM-Assistant2Display",{
     this.useA2D = false
     this.Hotword = false
     this.Snowboy = false
+    this.Integred = false
+    this.Detector = 0
     this.ui = "Fullscreen"
 
     console.log("[A2D] Scan config.js file")
@@ -372,19 +386,27 @@ Module.register("MMM-Assistant2Display",{
           this.ui = value.config.ui
         }
         this.useA2D = value.config.useA2D ? value.config.useA2D : false
+        this.Integred = value.config.useSnowboy ? value.config.useSnowboy : false
+        if (this.Integred) {
+          console.log("[A2D] Integred AMk2 Snowboy detected!")
+          this.Detector++
+        }
       }
       if (value.module == "MMM-Snowboy" && !value.disabled) {
         console.log("[A2D] MMM-Snowboy detected!")
         this.Snowboy = true
+        this.Detector++
       }
       if (value.module == "MMM-Hotword"&& !value.disabled) {
         console.log("[A2D] MMM-Hotword detected!")
         this.Hotword = true
+        this.Detector++
       }
     }
     if (!AMk2Found) console.log("[A2D][ERROR] AMk2 not found!")
+    if (this.Integred && !this.Snowboy) this.Snowboy= this.Integred
 
-    if (this.Hotword && this.Snowboy) console.log("[A2D][ERROR] 2 detectors actived !")
+    if (this.Detector > 1) console.log("[A2D][ERROR] " + this.Detector + " detectors actived !")
 
     console.log("[A2D] Auto choice UI", this.ui)
     if (!this.useA2D) {
@@ -476,6 +498,18 @@ Module.register("MMM-Assistant2Display",{
       description: this.translate("STOP_HELP"),
       callback: "tbStopA2D"
     })
+    commander.add({
+      command: "A2D",
+      description: this.translate("A2D_HELP"),
+      callback: "tbA2D"
+    })
+    if (this.config.volume.useVolume) {
+      commander.add({
+        command: "volume",
+        description: this.translate("VOLUME_HELP"),
+        callback: "tbVolume"
+      })
+    }
   },
 
   tbRestart: function(command, handler) {
@@ -553,5 +587,39 @@ Module.register("MMM-Assistant2Display",{
     this.notificationReceived("A2D_STOP")
     handler.reply("TEXT", this.translate("STOP_A2D"))
   },
+  tbA2D: function (command, handler) {
+    if (handler.args) {
+      var responseEmulate = {
+        "photos": [],
+        "urls": [],
+        "transcription": {},
+        "trysay": null,
+        "help": null
+      }
+      var regexp = /^((http(s)?):\/\/)(?:(?!(?:10|127)(?:\.\d{1,3}){3})(?!(?:169\.254|192\.168)(?:\.\d{1,3}){2})(?!172\.(?:1[6-9]|2\d|3[0-1])(?:\.\d{1,3}){2})(?:[1-9]\d?|1\d\d|2[01]\d|22[0-3])(?:\.(?:1?\d{1,2}|2[0-4]\d|25[0-5])){2}(?:\.(?:[1-9]\d?|1\d\d|2[0-4]\d|25[0-4]))|(?:(?:[a-z\u00a1-\uffff0-9]-*)*[a-z\u00a1-\uffff0-9]+)(?:\.(?:[a-z\u00a1-\uffff0-9]-*)*[a-z\u00a1-\uffff0-9]+)*(?:\.(?:[a-z\u00a1-\uffff]{2,})))(?::\d{2,5})?(?:\/\S*)?$/;
+      var isLink = regexp.test(handler.args)
+      var retryWithHttp = regexp.test("http://" + handler.args)
+      if (isLink || retryWithHttp) {
+        handler.reply("TEXT", this.translate("A2D_OPEN") + handler.args)
+        console.log(handler)
+        responseEmulate.transcription.transcription = " Telegram @"+ handler.message.from.username + ": " + handler.args
+        responseEmulate.transcription.done = true
+        responseEmulate.urls[0] = isLink ? handler.args : ("http://" + handler.args)
+        this.displayResponse.start(responseEmulate)
+      }
+      else handler.reply("TEXT", this.translate("A2D_INVALID"))
+    }
+    else handler.reply("TEXT", "/A2D <link>")
+  },
+
+  tbVolume: function(command, handler) {
+    if (handler.args) {
+      var value = Number(handler.args)
+      if ((!value && value != 0) || ((value < 0) || (value > 100))) return handler.reply("TEXT", "/volume [0-100]")
+      this.sendSocketNotification("SET_VOLUME", value)
+      handler.reply("TEXT", "Volume " + value+"%")
+    }
+    else handler.reply("TEXT", "/volume [0-100]")
+  }
 
 });
