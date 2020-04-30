@@ -12,11 +12,12 @@ Needed: AMk2 v3.2.0 and more
 
  ![](https://raw.githubusercontent.com/bugsounet/MMM-Assistant2Display/dev/screenshoot2.jpeg)
  ![](https://raw.githubusercontent.com/bugsounet/MMM-Assistant2Display/dev/screenshoot1.jpg)
+ ![](https://raw.githubusercontent.com/bugsounet/MMM-Assistant2Display/dev/YouTube_Cast.png)
 
 ## Update history
 
 
- * xx/04/2020 (v1.4.0)
+ * 30/04/2020 (v1.4.0)
    * **ADD**: Youtube Cast
    * **FIX**: Minor error
    * **ADD**: Integred AMk2 Snowboy detect code
