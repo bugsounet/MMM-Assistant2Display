@@ -12,6 +12,7 @@ Needed: AMk2 v3.2.0 and more
 
  ![](https://raw.githubusercontent.com/bugsounet/MMM-Assistant2Display/dev/screenshoot2.jpeg)
  ![](https://raw.githubusercontent.com/bugsounet/MMM-Assistant2Display/dev/screenshoot1.jpg)
+ ![](https://raw.githubusercontent.com/bugsounet/MMM-Assistant2Display/dev/YouTube_Cast.png)
 
 ## Update history
 
