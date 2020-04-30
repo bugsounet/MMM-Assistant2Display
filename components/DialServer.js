@@ -1,5 +1,4 @@
 const dial = require("peer-dial")
-const http = require('http')
 const express = require('express')
 const app = express()
 
@@ -31,7 +30,7 @@ class DialServer {
         }
       }
     }
-    this.server = http.createServer(app)
+    this.server = null
     console.log("[A2D:CAST] Initialized")
   }
 
@@ -40,8 +39,9 @@ class DialServer {
       expressApp: app,
       port: this.config.port,
       prefix: "/dial",
+      corsAllowOrigins: true,
       manufacturer: "Assistant2Display",
-      modelName: "DIAL Server",
+      modelName: "MagicMirror²",
       delegate: {
         getApp: (appName) => {
           var app = this.apps[appName] ? this.apps[appName] : "[unknow protocol]"
@@ -55,8 +55,8 @@ class DialServer {
           if (app) {
             app.pid = "run"
             app.state = "starting"
-            app.state = "running"
             app.launch(data)
+            app.state = "running"
           }
           callback(app.pid)
         },
@@ -80,7 +80,7 @@ class DialServer {
   start() {
     this.initDialServer(this.config.port)
     this.dialServer.friendlyName = this.config.castName
-    this.server.listen(this.config.port, () => {
+    this.server = app.listen(this.config.port, () => {
       this.dialServer.start()
       log(this.config.castName + " is listening on port", this.config.port)
     })

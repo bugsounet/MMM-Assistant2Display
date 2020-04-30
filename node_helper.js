@@ -59,7 +59,7 @@ module.exports = NodeHelper.create({
       this.addons()
       console.log("[A2D] Assistant2Display is initialized.")
     }
-    else console.log("[A2D] Disabled.")
+    else console.log("[A2D] Assistant2Display is disabled.")
   },
 
   callback: function(send,params) {
