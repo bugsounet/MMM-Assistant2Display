@@ -16,7 +16,7 @@ Needed: AMk2 v3.2.0 and more
 ## Update history
 
 
- * xx/04/2020 (v1.4.0)
+ * 30/04/2020 (v1.4.0)
    * **ADD**: Youtube Cast
    * **FIX**: Minor error
    * **ADD**: Integred AMk2 Snowboy detect code
