@@ -3,7 +3,7 @@
 var exec = require('child_process').exec
 var NodeHelper = require("node_helper")
 const Screen = require("./components/screen.js")
-const Pir = require("./components/pir.js")
+const Pir = require("@bugsounet/pir")
 const Governor = require("./components/governor.js")
 const Internet = require("./components/internet.js")
 const DialServer = require("./components/DialServer.js")
@@ -94,6 +94,9 @@ module.exports = NodeHelper.create({
       "governor": (param) => {
         if (this.governor && param == "SLEEPING") this.governor.sleeping()
         if (this.governor && param == "WORKING") this.governor.working()
+      },
+      "pir": (param) => {
+        if (this.screen && this.pir && param == "PIR_DETECTED") this.screen.wakeup()
       }
     }
 
@@ -103,9 +106,8 @@ module.exports = NodeHelper.create({
       this.screen.activate()
     }
     if (this.config.pir.usePir) {
-      this.config.pir.debug = this.config.debug
-      this.pir = new Pir(this.config.pir, callbacks)
-      this.pir.activate()
+      this.pir = new Pir(this.config.pir, callbacks.pir, this.config.debug)
+      this.pir.start()
     }
     if (this.config.governor.useGovernor) {
       this.config.governor.debug = this.config.debug
