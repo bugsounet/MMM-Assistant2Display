@@ -4,7 +4,7 @@ var exec = require('child_process').exec
 var NodeHelper = require("node_helper")
 const Screen = require("./components/screen.js")
 const Pir = require("@bugsounet/pir")
-const Governor = require("./components/governor.js")
+const Governor = require("@bugsounet/governor")
 const Internet = require("./components/internet.js")
 const DialServer = require("./components/DialServer.js")
 
@@ -110,9 +110,8 @@ module.exports = NodeHelper.create({
       this.pir.start()
     }
     if (this.config.governor.useGovernor) {
-      this.config.governor.debug = this.config.debug
-      this.governor = new Governor(this.config.governor)
-      this.governor.init()
+      this.governor = new Governor(this.config.governor, null, this.config.debug)
+      this.governor.start()
     }
     if (this.config.internet.useInternet) {
       this.config.internet.debug = this.config.debug
