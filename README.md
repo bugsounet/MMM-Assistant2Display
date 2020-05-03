@@ -16,7 +16,8 @@ Needed: AMk2 v3.2.0 and more
 
 ## Update history
 
-
+ * 03/05/2020 (v1.4.1)
+   * **FIX**: installer check OS
  * 30/04/2020 (v1.4.0)
    * **ADD**: Youtube Cast
    * **FIX**: Minor error
