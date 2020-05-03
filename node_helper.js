@@ -2,11 +2,11 @@
 
 var exec = require('child_process').exec
 var NodeHelper = require("node_helper")
-const Screen = require("./components/screen.js")
-const Pir = require("./components/pir.js")
-const Governor = require("./components/governor.js")
-const Internet = require("./components/internet.js")
-const DialServer = require("./components/DialServer.js")
+const Screen = require("@bugsounet/screen")
+const Pir = require("@bugsounet/pir")
+const Governor = require("@bugsounet/governor")
+const Internet = require("@bugsounet/internet")
+const DialServer = require("@bugsounet/cast")
 
 var _log = function() {
   var context = "[A2D]"
@@ -94,32 +94,30 @@ module.exports = NodeHelper.create({
       "governor": (param) => {
         if (this.governor && param == "SLEEPING") this.governor.sleeping()
         if (this.governor && param == "WORKING") this.governor.working()
+      },
+      "pir": (param) => {
+        if (this.screen && this.pir && param == "PIR_DETECTED") this.screen.wakeup()
       }
     }
 
     if (this.config.screen.useScreen) {
-      this.config.screen.debug = this.config.debug
-      this.screen = new Screen(this.config.screen, callbacks)
+      this.screen = new Screen(this.config.screen, callbacks.sendSocketNotification, this.config.debug, callbacks.governor )
       this.screen.activate()
     }
     if (this.config.pir.usePir) {
-      this.config.pir.debug = this.config.debug
-      this.pir = new Pir(this.config.pir, callbacks)
-      this.pir.activate()
+      this.pir = new Pir(this.config.pir, callbacks.pir, this.config.debug)
+      this.pir.start()
     }
     if (this.config.governor.useGovernor) {
-      this.config.governor.debug = this.config.debug
-      this.governor = new Governor(this.config.governor)
-      this.governor.init()
+      this.governor = new Governor(this.config.governor, null, this.config.debug)
+      this.governor.start()
     }
     if (this.config.internet.useInternet) {
-      this.config.internet.debug = this.config.debug
-      this.internet = new Internet(this.config.internet, callbacks)
+      this.internet = new Internet(this.config.internet, callbacks.sendSocketNotification, this.config.debug)
       this.internet.activate()
     }
     if (this.config.cast.useCast) {
-      this.config.cast.debug = this.config.debug
-      this.dialServer= new DialServer(this.config.cast, callbacks)
+      this.dialServer= new DialServer(this.config.cast, callbacks.sendSocketNotification, this.config.debug)
       this.dialServer.start()
     }
   },
