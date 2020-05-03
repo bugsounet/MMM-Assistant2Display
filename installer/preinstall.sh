@@ -45,7 +45,14 @@ fi
 # Check platform compatibility
 Installer_info "Checking OS..."
 Installer_checkOS
-Installer_success "OS Detected: $OSTYPE ($os_name $os_version $arch)"
+if  [ "$os_name" == "raspbian" ] && [ "$os_version" -lt 10 ]; then
+  Installer_error "OS Detected: $OSTYPE ($os_name $os_version $arch)"
+  Installer_error "Unfortunately, this program does not work with your OS"
+  Installer_error "Try compiling manually or updating to the lasted version"
+  exit 0
+else
+  Installer_success "OS Detected: $OSTYPE ($os_name $os_version $arch)"
+fi
 
 echo
 
