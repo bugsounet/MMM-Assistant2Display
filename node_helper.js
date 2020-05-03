@@ -6,7 +6,7 @@ const Screen = require("./components/screen.js")
 const Pir = require("@bugsounet/pir")
 const Governor = require("@bugsounet/governor")
 const Internet = require("@bugsounet/internet")
-const DialServer = require("./components/DialServer.js")
+const DialServer = require("@bugsounet/cast")
 
 var _log = function() {
   var context = "[A2D]"
@@ -118,8 +118,7 @@ module.exports = NodeHelper.create({
       this.internet.activate()
     }
     if (this.config.cast.useCast) {
-      this.config.cast.debug = this.config.debug
-      this.dialServer= new DialServer(this.config.cast, callbacks)
+      this.dialServer= new DialServer(this.config.cast, callbacks.sendSocketNotification, this.config.debug)
       this.dialServer.start()
     }
   },
