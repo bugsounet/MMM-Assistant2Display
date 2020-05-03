@@ -2,7 +2,7 @@
 
 var exec = require('child_process').exec
 var NodeHelper = require("node_helper")
-const Screen = require("./components/screen.js")
+const Screen = require("@bugsounet/screen")
 const Pir = require("@bugsounet/pir")
 const Governor = require("@bugsounet/governor")
 const Internet = require("@bugsounet/internet")
@@ -101,8 +101,7 @@ module.exports = NodeHelper.create({
     }
 
     if (this.config.screen.useScreen) {
-      this.config.screen.debug = this.config.debug
-      this.screen = new Screen(this.config.screen, callbacks)
+      this.screen = new Screen(this.config.screen, callbacks.sendSocketNotification, this.config.debug, callbacks.governor )
       this.screen.activate()
     }
     if (this.config.pir.usePir) {

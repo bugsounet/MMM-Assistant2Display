@@ -26,6 +26,7 @@
     "@bugsounet/pir": "^1.0.0",
     "@bugsounet/governor": "^1.0.0",
     "@bugsounet/internet": "^0.0.1",
-    "@bugsounet/cast": "^0.0.1"
+    "@bugsounet/cast": "^0.0.1",
+    "@bugsounet/screen": "^0.0.1"
   }
 }
