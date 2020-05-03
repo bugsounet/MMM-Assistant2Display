@@ -5,7 +5,7 @@ var NodeHelper = require("node_helper")
 const Screen = require("./components/screen.js")
 const Pir = require("@bugsounet/pir")
 const Governor = require("@bugsounet/governor")
-const Internet = require("./components/internet.js")
+const Internet = require("@bugsounet/internet")
 const DialServer = require("./components/DialServer.js")
 
 var _log = function() {
@@ -114,8 +114,7 @@ module.exports = NodeHelper.create({
       this.governor.start()
     }
     if (this.config.internet.useInternet) {
-      this.config.internet.debug = this.config.debug
-      this.internet = new Internet(this.config.internet, callbacks)
+      this.internet = new Internet(this.config.internet, callbacks.sendSocketNotification, this.config.debug)
       this.internet.activate()
     }
     if (this.config.cast.useCast) {

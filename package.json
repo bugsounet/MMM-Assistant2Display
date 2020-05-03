@@ -28,6 +28,7 @@
     "peer-dial": "0.0.8",
     "ping": "^0.2.2",
     "@bugsounet/pir": "^1.0.0",
-    "@bugsounet/governor": "^1.0.0"
+    "@bugsounet/governor": "^1.0.0",
+    "@bugsounet/internet": "^0.0.1"
   }
 }
