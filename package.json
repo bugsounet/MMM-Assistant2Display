@@ -23,10 +23,10 @@
   },
   "homepage": "https://github.com/bugsounet/MMM-Assistant2Display",
   "dependencies": {
-    "@bugsounet/pir": "^1.0.0",
-    "@bugsounet/governor": "^1.0.0",
-    "@bugsounet/internet": "^0.0.1",
-    "@bugsounet/cast": "^0.0.1",
-    "@bugsounet/screen": "^0.0.1"
+    "@bugsounet/cast": "^1.0.0",
+    "@bugsounet/governor": "^1.0.3",
+    "@bugsounet/internet": "^1.0.0",
+    "@bugsounet/pir": "^1.0.4",
+    "@bugsounet/screen": "^1.0.0"
   }
 }

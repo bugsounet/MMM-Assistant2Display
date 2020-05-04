@@ -6,7 +6,7 @@ const Screen = require("@bugsounet/screen")
 const Pir = require("@bugsounet/pir")
 const Governor = require("@bugsounet/governor")
 const Internet = require("@bugsounet/internet")
-const DialServer = require("@bugsounet/cast")
+const CastServer = require("@bugsounet/cast")
 
 var _log = function() {
   var context = "[A2D]"
@@ -92,8 +92,8 @@ module.exports = NodeHelper.create({
         if (this.screen && param == "WAKEUP") this.screen.wakeup()
       },
       "governor": (param) => {
-        if (this.governor && param == "SLEEPING") this.governor.sleeping()
-        if (this.governor && param == "WORKING") this.governor.working()
+        if (this.governor && param == "GOVERNOR_SLEEPING") this.governor.sleeping()
+        if (this.governor && param == "GOVERNOR_WORKING") this.governor.working()
       },
       "pir": (param) => {
         if (this.screen && this.pir && param == "PIR_DETECTED") this.screen.wakeup()
@@ -101,7 +101,7 @@ module.exports = NodeHelper.create({
     }
 
     if (this.config.screen.useScreen) {
-      this.screen = new Screen(this.config.screen, callbacks.sendSocketNotification, this.config.debug, callbacks.governor )
+      this.screen = new Screen(this.config.screen, callbacks.sendSocketNotification, this.config.debug, callbacks.sendSocketNotification, callbacks.governor )
       this.screen.activate()
     }
     if (this.config.pir.usePir) {
@@ -114,11 +114,11 @@ module.exports = NodeHelper.create({
     }
     if (this.config.internet.useInternet) {
       this.internet = new Internet(this.config.internet, callbacks.sendSocketNotification, this.config.debug)
-      this.internet.activate()
+      this.internet.start()
     }
     if (this.config.cast.useCast) {
-      this.dialServer= new DialServer(this.config.cast, callbacks.sendSocketNotification, this.config.debug)
-      this.dialServer.start()
+      this.cast = new CastServer(this.config.cast, callbacks.sendSocketNotification, this.config.debug)
+      this.cast.start()
     }
   },
 });
