@@ -5,7 +5,8 @@
   "main": "MMM-Assistant2Display.js",
   "scripts": {
     "preinstall": "installer/preinstall.sh",
-    "postinstall": "installer/postinstall.sh"
+    "postinstall": "installer/postinstall.sh",
+    "update": "installer/update.sh"
   },
   "keywords": [
     "magic mirror",
