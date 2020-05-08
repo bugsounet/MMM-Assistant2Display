@@ -385,8 +385,8 @@ Module.register("MMM-Assistant2Display",{
         if (value.config.ui && ((value.config.ui === "Classic2") || (value.config.ui === "Classic"))) {
           this.ui = value.config.ui
         }
-        this.useA2D = value.config.useA2D ? value.config.useA2D : false
-        this.Integred = value.config.useSnowboy ? value.config.useSnowboy : false
+        this.useA2D = (value.config.useA2D && !value.disabled) ? value.config.useA2D : false
+        this.Integred = (value.config.useSnowboy && !value.disabled) ? value.config.useSnowboy : false
         if (this.Integred) {
           console.log("[A2D] Integred AMk2 Snowboy detected!")
           this.Detector++
