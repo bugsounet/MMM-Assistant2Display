@@ -18,6 +18,7 @@ Needed: AMk2 v3.2.0 and more
 
  * 08/05/2020 (v1.5.0)
    * **UPD**: update all to my own npm library
+   * **ADD**: add updater script
  * 03/05/2020 (v1.4.1)
    * **FIX**: installer check OS
  * 30/04/2020 (v1.4.0)
@@ -54,8 +55,16 @@ npm install
 ## Configuration
 Read the docs in [wiki](https://github.com/bugsounet/MMM-Assistant2Display/wiki)
 
-## Update from 1.1
+## Update from v1.1
 Remove existence then reinstall fresh.
+
+## Update since v1.5.0
+
+```sh
+cd ~/MagicMirror/modules/MMM-Assistant2Display
+git pull
+npm run update
+```
 
 ### Update History
  * 22/03/2020 (V1.1.1)
