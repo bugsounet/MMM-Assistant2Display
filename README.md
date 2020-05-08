@@ -16,6 +16,8 @@ Needed: AMk2 v3.2.0 and more
 
 ## Update history
 
+ * 08/05/2020 (v1.5.0)
+   * **UPD**: update all to my own npm library
  * 03/05/2020 (v1.4.1)
    * **FIX**: installer check OS
  * 30/04/2020 (v1.4.0)
