@@ -261,6 +261,7 @@ Module.register("MMM-Assistant2Display",{
           break
         case "A2D":
           this.displayResponse.start(payload)
+          this.sendNotification("TV-STOP") // Stop MMM-FreeboxTV
           break
         case "A2D_STOP":
           if (this.A2D.locked) {
@@ -277,6 +278,7 @@ Module.register("MMM-Assistant2Display",{
             }
           }
           if (this.A2D.radio) this.radio.pause()
+          this.sendNotification("TV-STOP") // Stop MMM-FreeboxTV
           break
         case "A2D_AMK2_BUSY":
           if (this.config.screen.useScreen && !this.A2D.locked) this.sendSocketNotification("SCREEN_STOP")
