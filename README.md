@@ -16,6 +16,8 @@ Needed: AMk2 v3.2.0 and more
 
 ## Update history
 
+ * 11/05/2020 (v1.5.1)
+   * **ADD**: send notification for stop MMM-FreeboxTV
  * 08/05/2020 (v1.5.0)
    * **UPD**: update all to my own npm library
    * **ADD**: add updater script
