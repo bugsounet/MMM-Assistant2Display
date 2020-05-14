@@ -296,6 +296,16 @@ Module.register("MMM-Assistant2Display",{
             this.sendSocketNotification("SCREEN_WAKEUP")
           }
           break
+        case "A2D_LOCK": /** screen lock **/
+          if (this.config.screen.useScreen) {
+            this.sendSocketNotification("SCREEN_LOCK", true)
+          }
+          break
+        case "A2D_UNLOCK": /** screen unlock **/
+          if (this.config.screen.useScreen) {
+            this.sendSocketNotification("SCREEN_LOCK", false)
+          }
+          break
         case "A2D_RADIO":
           if (this.A2D.youtube.displayed) this.displayResponse.player.command("stopVideo")
           if (payload.link) {

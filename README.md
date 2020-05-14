@@ -16,34 +16,13 @@ Needed: AMk2 v3.2.0 and more
 
 ## Update history
 
+ * 14/05/2020 (v1.5.2)
+   * **ADD**: notification received `A2D_LOCK` and `A2D_UNLOCK`
  * 11/05/2020 (v1.5.1)
    * **ADD**: send notification for stop MMM-FreeboxTV
  * 08/05/2020 (v1.5.0)
    * **UPD**: update all to my own npm library
    * **ADD**: add updater script
- * 03/05/2020 (v1.4.1)
-   * **FIX**: installer check OS
- * 30/04/2020 (v1.4.0)
-   * **ADD**: Youtube Cast
-   * **FIX**: Minor error
-   * **ADD**: Integred AMk2 Snowboy detect code
-   * **FIX**: Radio volume too high compared to assistant
-   * **CLN**: Cleaning package.json
- * 16/04/2020 (v1.3.0)
-   * **ADD**: Radio player core
-   * **DEL**: Link Proxy script
-   * **ADD**: Use now webview for links displaying
-   * **ADD**: TelegramBot Commands
-   * **ADD**: scrollActivate feature
-   * **ADD**: Telecast sound on incoming message
- * 09/04/2020 (v1.2.0)
-   * **FIX**: A2D core code for new features
-   * **ADD**: Screen feature
-   * **ADD**: PIR Sensor feature
-   * **ADD**: Internet check feature
-   * **ADD**: Governor feature
-   * **ADD**: Brief Today feature
-   * **ADD**: Detector control
 
 ## Installation
 
@@ -69,6 +48,29 @@ npm run update
 ```
 
 ### Update History
+ * 03/05/2020 (v1.4.1)
+   * **FIX**: installer check OS
+ * 30/04/2020 (v1.4.0)
+   * **ADD**: Youtube Cast
+   * **FIX**: Minor error
+   * **ADD**: Integred AMk2 Snowboy detect code
+   * **FIX**: Radio volume too high compared to assistant
+   * **CLN**: Cleaning package.json
+ * 16/04/2020 (v1.3.0)
+   * **ADD**: Radio player core
+   * **DEL**: Link Proxy script
+   * **ADD**: Use now webview for links displaying
+   * **ADD**: TelegramBot Commands
+   * **ADD**: scrollActivate feature
+   * **ADD**: Telecast sound on incoming message
+ * 09/04/2020 (v1.2.0)
+   * **FIX**: A2D core code for new features
+   * **ADD**: Screen feature
+   * **ADD**: PIR Sensor feature
+   * **ADD**: Internet check feature
+   * **ADD**: Governor feature
+   * **ADD**: Brief Today feature
+   * **ADD**: Detector control
  * 22/03/2020 (V1.1.1)
    * **FIX**: Always screen up when YT display and assistant query
    * **FIX**: Always screen up when on next playlist YT
@@ -87,6 +89,5 @@ npm run update
 ## Credits
 - Author :
   - @bugsounet
-  - @eouia
 - License : MIT
   - **By terms of Google Assistant SDK, You are not allowed to use or provide this module for commercial purpose.**
