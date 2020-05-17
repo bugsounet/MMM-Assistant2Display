@@ -35,6 +35,9 @@ class DisplayClass {
         urls: null,
         length: 0,
         running: false
+      },
+      spotify: {
+        playing: false
       }
     }
     console.log("[A2D] DisplayClass Loaded")
@@ -139,26 +142,58 @@ class DisplayClass {
 
   }
 
-/** urls scan : dispatch links and youtube **/
+/** urls scan : dispatch links, youtube, spotify **/
   urlsScan() {
     let tmp = {}
-    var ytL = new RegExp("youtube\.com\/watch\\?v\=([0-9a-zA-Z\-\_]+)", "ig")
-    var ytP = new RegExp("youtube\.com\/playlist\\?list\=([a-zA-Z0-9\-\_]+)", "ig")
-    var ytLink = ytL.exec(this.A2D.links.urls[0])
-    var ytPlayList = ytP.exec(this.A2D.links.urls[0])
+    if (this.config.useYoutube) {
+      /** YouTube RegExp **/
+      var ytL = new RegExp("youtube\.com\/watch\\?v\=([0-9a-zA-Z\-\_]+)", "ig")
+      var ytP = new RegExp("youtube\.com\/playlist\\?list\=([a-zA-Z0-9\-\_]+)", "ig")
 
-    if (ytLink || ytPlayList) {
-      if (this.A2D.radio) this.radioStop()
-      tmp = {
-        id: ytPlayList ?  ytPlayList[1] : ytLink[1],
-        type: ytPlayList ? "playlist" : "id"
-      },
-      this.A2D.youtube = this.objAssign({}, this.A2D.youtube, tmp)
-      if (this.config.useYoutube) {
+      /** Scan Youtube Link **/
+      var ytLink = ytL.exec(this.A2D.links.urls[0])
+      var ytPlayList = ytP.exec(this.A2D.links.urls[0])
+      var YouTube = ytLink || ytPlayList
+
+      if (YouTube) {
+        if (this.A2D.radio) this.radioStop()
+        if (this.A2D.spotify.playing && this.config.useSpotify) this.sendNotification("SPOTIFY_PAUSE")
+        tmp = {
+          id: ytPlayList ?  ytPlayList[1] : ytLink[1],
+          type: ytPlayList ? "playlist" : "id"
+        },
+        this.A2D.youtube = this.objAssign({}, this.A2D.youtube, tmp)
         this.A2DLock()
         this.player.load({id: this.A2D.youtube.id, type : this.A2D.youtube.type})
+        return
       }
-    } else if(this.config.links.useLinks) {
+    }
+    if (this.config.useSpotify) {
+      /** Spotify RegExp **/
+      var spotifyArtist = new RegExp("open\.spotify\.com\/artist\/([0-9a-zA-Z\-\_]+)","ig")
+      var spotifyAlbum = new RegExp("open\.spotify\.com\/album\/([0-9a-zA-Z\-\_]+)","ig")
+      var spotifyTrack = new RegExp("open\.spotify\.com\/track\/([0-9a-zA-Z\-\_]+)","ig")
+      var spotifyPlaylist = new RegExp("open\.spotify\.com\/playlist\/([0-9a-zA-Z\-\_]+)","ig")
+
+      /** Scan Spotify Link **/
+      var SpotifyArtist = spotifyArtist.exec(this.A2D.links.urls[0])
+      var SpotifyAlbum = spotifyAlbum.exec(this.A2D.links.urls[0])
+      var SpotifyTrack= spotifyTrack.exec(this.A2D.links.urls[0])
+      var SpotifyPlaylist = spotifyPlaylist.exec(this.A2D.links.urls[0])
+      var Spotify = SpotifyArtist || SpotifyAlbum || SpotifyTrack || SpotifyPlaylist
+
+      if (Spotify) {
+        let type = SpotifyArtist ? "artist" : (SpotifyAlbum ? "album" : (SpotifyPlaylist ? "playlist" : "track"))
+        let id = SpotifyArtist ? SpotifyArtist[1] : (SpotifyAlbum ? SpotifyAlbum[1] : (SpotifyPlaylist ? SpotifyPlaylist [1] : SpotifyTrack[1]))
+        if (type == "track") {
+          // don't know why tracks works only with uris !?
+          this.sendNotification("SPOTIFY_PLAY", {"uris": ["spotify:track:" + id ]})
+        }
+        else this.sendNotification("SPOTIFY_PLAY", {"context_uri": "spotify:"+ type + ":" + id})
+        return
+      }
+    }
+    if (this.config.links.useLinks) {
       this.A2DLock()
       this.A2D.links.displayed = true
       this.linksDisplay()
@@ -172,7 +207,6 @@ class DisplayClass {
     A2D("Loading", this.A2D.links.urls[0])
     this.showDisplay()
     webView.src= this.A2D.links.urls[0]
-
 
     webView.addEventListener("did-fail-load", () => {
       console.log("[A2D:LINKS] Loading error")
@@ -272,6 +306,7 @@ class DisplayClass {
   castStart(url) {
     /** stop all process before starting cast **/
     if (this.A2D.youtube.displayed) this.player.command("stopVideo")
+    if (this.A2D.spotify.playing && this.config.useSpotify) this.sendNotification("SPOTIFY_PAUSE")
     if (this.A2D.photos.displayed) {
       this.resetPhotos()
       this.hideDisplay()
@@ -356,7 +391,7 @@ class DisplayClass {
     MM.getModules().exceptWithClass("MMM-AssistantMk2").enumerate((module)=> {
       module.show(15, {lockString: "A2D_LOCKED"})
     })
-    if (this.config.screen.useScreen) this.sendSocketNotification("SCREEN_LOCK", false)
+    if (this.config.screen.useScreen && !this.A2D.spotify.playing) this.sendSocketNotification("SCREEN_LOCK", false)
     this.A2D.locked = false
   }
 

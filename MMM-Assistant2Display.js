@@ -15,6 +15,7 @@ Module.register("MMM-Assistant2Display",{
     debug:false,
     useYoutube: true,
     verbose: false,
+    useSpotify: false,
     links: {
       useLinks: true,
       displayDelay: 60 * 1000,
@@ -243,6 +244,7 @@ Module.register("MMM-Assistant2Display",{
           if (this.config.useYoutube && this.displayResponse.player) {
             this.displayResponse.player.command("setVolume", 5)
           }
+          if (this.config.useSpotify && this.A2D.spotify.playing) this.sendNotification("SPOTIFY_VOLUME", 10)
           if (this.A2D.radio) this.radio.volume = 0.1
           if (this.A2D.locked) this.displayResponse.hideDisplay()
           break
@@ -251,6 +253,7 @@ Module.register("MMM-Assistant2Display",{
           if (this.config.useYoutube && this.displayResponse.player) {
             this.displayResponse.player.command("setVolume", 100)
           }
+          if (this.config.useSpotify) this.sendNotification("SPOTIFY_VOLUME", 100)
           if (this.A2D.radio) this.radio.volume = 0.6
           if (this.displayResponse.working()) this.displayResponse.showDisplay()
           else this.displayResponse.hideDisplay()
@@ -277,6 +280,7 @@ Module.register("MMM-Assistant2Display",{
               this.displayResponse.hideDisplay()
             }
           }
+          if (this.A2D.spotify.playing) this.sendNotification("SPOTIFY_PAUSE")
           if (this.A2D.radio) this.radio.pause()
           this.sendNotification("TV-STOP") // Stop MMM-FreeboxTV
           break
@@ -324,6 +328,15 @@ Module.register("MMM-Assistant2Display",{
             this.radioPlayer.link = "modules/MMM-Assistant2Display/components/" + this.config.TelegramBot.TelecastSound
             this.radio.src = this.radioPlayer.link
             this.radio.autoplay = true
+          }
+          break
+        case "SPOTIFY_UPDATE_PLAYING":
+          if (this.config.useSpotify) {
+            this.A2D.spotify.playing = payload ? true : false
+            if (this.config.screen.useScreen && !this.displayResponse.working()) {
+              if (payload) this.sendSocketNotification("SCREEN_WAKEUP")
+              this.sendSocketNotification("SCREEN_LOCK", payload ? true : false)
+            }
           }
           break
       }
