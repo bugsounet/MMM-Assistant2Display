@@ -75,6 +75,11 @@ Module.register("MMM-Assistant2Display",{
       castName: "MagicMirror_A2D",
       port: 8569
     },
+    spotify: {
+      useSpotify: false,
+      connectTo: null,
+      playDelay: 3000
+    }
   },
 
   start: function () {
@@ -244,7 +249,7 @@ Module.register("MMM-Assistant2Display",{
           if (this.config.useYoutube && this.displayResponse.player) {
             this.displayResponse.player.command("setVolume", 5)
           }
-          if (this.config.useSpotify && this.A2D.spotify.playing) this.sendNotification("SPOTIFY_VOLUME", 10)
+          if (this.config.spotify.useSpotify && this.A2D.spotify.playing) this.sendNotification("SPOTIFY_VOLUME", 10)
           if (this.A2D.radio) this.radio.volume = 0.1
           if (this.A2D.locked) this.displayResponse.hideDisplay()
           break
@@ -253,7 +258,7 @@ Module.register("MMM-Assistant2Display",{
           if (this.config.useYoutube && this.displayResponse.player) {
             this.displayResponse.player.command("setVolume", 100)
           }
-          if (this.config.useSpotify) this.sendNotification("SPOTIFY_VOLUME", 100)
+          if (this.config.spotify.useSpotify) this.sendNotification("SPOTIFY_VOLUME", 100)
           if (this.A2D.radio) this.radio.volume = 0.6
           if (this.displayResponse.working()) this.displayResponse.showDisplay()
           else this.displayResponse.hideDisplay()
@@ -331,13 +336,19 @@ Module.register("MMM-Assistant2Display",{
           }
           break
         case "SPOTIFY_UPDATE_PLAYING":
-          if (this.config.useSpotify) {
+          if (this.config.spotify.useSpotify) {
             this.A2D.spotify.playing = payload ? true : false
             if (this.config.screen.useScreen && !this.displayResponse.working()) {
               if (payload) this.sendSocketNotification("SCREEN_WAKEUP")
               this.sendSocketNotification("SCREEN_LOCK", payload ? true : false)
             }
           }
+          break
+        case "SPOTIFY_CONNECTED":
+          if (this.config.spotify.useSpotify) this.A2D.spotify.connected = true
+          break
+        case "SPOTIFY_DISCONNECTED":
+          if (this.config.spotify.useSpotify) this.A2D.spotify.connected = false
           break
       }
     }

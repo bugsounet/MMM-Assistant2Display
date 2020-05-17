@@ -37,7 +37,8 @@ class DisplayClass {
         running: false
       },
       spotify: {
-        playing: false
+        playing: false,
+        connected: false
       }
     }
     console.log("[A2D] DisplayClass Loaded")
@@ -169,7 +170,8 @@ class DisplayClass {
         return
       }
     }
-    if (this.config.useSpotify) {
+    if (this.config.spotify.useSpotify) {
+      if (!this.A2D.spotify.connected && this.config.spotify.connectTo) this.sendNotification("SPOTIFY_TRANSFER", this.config.spotify.connectTo)
       /** Spotify RegExp **/
       var SpotifyLink = new RegExp("open\.spotify\.com\/([a-z]+)\/([0-9a-zA-Z\-\_]+)", "ig")
       /** Scan Spotify Link **/
@@ -180,9 +182,13 @@ class DisplayClass {
         let id = Spotify[2]
         if (type == "track") {
           // don't know why tracks works only with uris !?
-          this.sendNotification("SPOTIFY_PLAY", {"uris": ["spotify:track:" + id ]})
+          setTimeout(() => {
+            this.sendNotification("SPOTIFY_PLAY", {"uris": ["spotify:track:" + id ]})
+          }, this.config.spotify.playDelay)
         }
-        else this.sendNotification("SPOTIFY_PLAY", {"context_uri": "spotify:"+ type + ":" + id})
+        else setTimeout(() => {
+            this.sendNotification("SPOTIFY_PLAY", {"context_uri": "spotify:"+ type + ":" + id})
+          }, this.config.spotify.playDelay)
         return
       }
     }
