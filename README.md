@@ -16,6 +16,9 @@ Needed: AMk2 v3.2.0 and more
 
 ## Update history
 
+ * 17/05/2020 (v1.5.3)
+   * **ADD**: Spotify support with native response
+   * **UPD**: YouTube search RegEx pattern (faster)
  * 14/05/2020 (v1.5.2)
    * **ADD**: notification received `A2D_LOCK` and `A2D_UNLOCK`
  * 11/05/2020 (v1.5.1)

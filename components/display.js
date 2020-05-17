@@ -147,22 +147,23 @@ class DisplayClass {
     let tmp = {}
     if (this.config.useYoutube) {
       /** YouTube RegExp **/
-      var ytL = new RegExp("youtube\.com\/watch\\?v\=([0-9a-zA-Z\-\_]+)", "ig")
-      var ytP = new RegExp("youtube\.com\/playlist\\?list\=([a-zA-Z0-9\-\_]+)", "ig")
-
+      var YouTubeLink = new RegExp("youtube\.com\/([a-z]+)\\?([a-z]+)\=([0-9a-zA-Z\-\_]+)", "ig")
       /** Scan Youtube Link **/
-      var ytLink = ytL.exec(this.A2D.links.urls[0])
-      var ytPlayList = ytP.exec(this.A2D.links.urls[0])
-      var YouTube = ytLink || ytPlayList
+      var YouTube = YouTubeLink.exec(this.A2D.links.urls[0])
 
       if (YouTube) {
+        let Type
+        let YouTubeResponse = {}
         if (this.A2D.radio) this.radioStop()
         if (this.A2D.spotify.playing && this.config.useSpotify) this.sendNotification("SPOTIFY_PAUSE")
-        tmp = {
-          id: ytPlayList ?  ytPlayList[1] : ytLink[1],
-          type: ytPlayList ? "playlist" : "id"
+        if (YouTube[1] == "watch") Type = "id"
+        if (YouTube[1] == "playlist") Type = "playlist"
+        if (!Type) return console.log("[A2D:YouTube] Unknow Type !" , YouTube)
+        YouTubeResponse = {
+          "id": YouTube[3],
+          "type": Type
         },
-        this.A2D.youtube = this.objAssign({}, this.A2D.youtube, tmp)
+        this.A2D.youtube = this.objAssign({}, this.A2D.youtube, YouTubeResponse)
         this.A2DLock()
         this.player.load({id: this.A2D.youtube.id, type : this.A2D.youtube.type})
         return
@@ -170,21 +171,13 @@ class DisplayClass {
     }
     if (this.config.useSpotify) {
       /** Spotify RegExp **/
-      var spotifyArtist = new RegExp("open\.spotify\.com\/artist\/([0-9a-zA-Z\-\_]+)","ig")
-      var spotifyAlbum = new RegExp("open\.spotify\.com\/album\/([0-9a-zA-Z\-\_]+)","ig")
-      var spotifyTrack = new RegExp("open\.spotify\.com\/track\/([0-9a-zA-Z\-\_]+)","ig")
-      var spotifyPlaylist = new RegExp("open\.spotify\.com\/playlist\/([0-9a-zA-Z\-\_]+)","ig")
-
+      var SpotifyLink = new RegExp("open\.spotify\.com\/([a-z]+)\/([0-9a-zA-Z\-\_]+)", "ig")
       /** Scan Spotify Link **/
-      var SpotifyArtist = spotifyArtist.exec(this.A2D.links.urls[0])
-      var SpotifyAlbum = spotifyAlbum.exec(this.A2D.links.urls[0])
-      var SpotifyTrack= spotifyTrack.exec(this.A2D.links.urls[0])
-      var SpotifyPlaylist = spotifyPlaylist.exec(this.A2D.links.urls[0])
-      var Spotify = SpotifyArtist || SpotifyAlbum || SpotifyTrack || SpotifyPlaylist
+      var Spotify = SpotifyLink.exec(this.A2D.links.urls[0])
 
       if (Spotify) {
-        let type = SpotifyArtist ? "artist" : (SpotifyAlbum ? "album" : (SpotifyPlaylist ? "playlist" : "track"))
-        let id = SpotifyArtist ? SpotifyArtist[1] : (SpotifyAlbum ? SpotifyAlbum[1] : (SpotifyPlaylist ? SpotifyPlaylist [1] : SpotifyTrack[1]))
+        let type = Spotify[1]
+        let id = Spotify[2]
         if (type == "track") {
           // don't know why tracks works only with uris !?
           this.sendNotification("SPOTIFY_PLAY", {"uris": ["spotify:track:" + id ]})
