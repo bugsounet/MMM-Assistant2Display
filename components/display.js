@@ -178,17 +178,17 @@ class DisplayClass {
       var Spotify = SpotifyLink.exec(this.A2D.links.urls[0])
 
       if (Spotify) {
-        let type = Spotify[1]
-        let id = Spotify[2]
-        if (type == "track") {
-          // don't know why tracks works only with uris !?
-          setTimeout(() => {
+        setTimeout(() => {
+          let type = Spotify[1]
+          let id = Spotify[2]
+          if (type == "track") {
+            // don't know why tracks works only with uris !?
             this.sendNotification("SPOTIFY_PLAY", {"uris": ["spotify:track:" + id ]})
-          }, this.config.spotify.playDelay)
-        }
-        else setTimeout(() => {
+          }
+          else {
             this.sendNotification("SPOTIFY_PLAY", {"context_uri": "spotify:"+ type + ":" + id})
-          }, this.config.spotify.playDelay)
+          }
+        }, this.config.spotify.playDelay)
         return
       }
     }

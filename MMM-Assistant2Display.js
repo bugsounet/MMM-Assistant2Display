@@ -78,7 +78,9 @@ Module.register("MMM-Assistant2Display",{
     spotify: {
       useSpotify: false,
       connectTo: null,
-      playDelay: 3000
+      playDelay: 3000,
+      minVolume: 10,
+      maxVolume: 100
     }
   },
 
@@ -249,7 +251,7 @@ Module.register("MMM-Assistant2Display",{
           if (this.config.useYoutube && this.displayResponse.player) {
             this.displayResponse.player.command("setVolume", 5)
           }
-          if (this.config.spotify.useSpotify && this.A2D.spotify.playing) this.sendNotification("SPOTIFY_VOLUME", 10)
+          if (this.config.spotify.useSpotify && this.A2D.spotify.playing) this.sendNotification("SPOTIFY_VOLUME", this.config.spotify.minVolume)
           if (this.A2D.radio) this.radio.volume = 0.1
           if (this.A2D.locked) this.displayResponse.hideDisplay()
           break
@@ -258,7 +260,7 @@ Module.register("MMM-Assistant2Display",{
           if (this.config.useYoutube && this.displayResponse.player) {
             this.displayResponse.player.command("setVolume", 100)
           }
-          if (this.config.spotify.useSpotify) this.sendNotification("SPOTIFY_VOLUME", 100)
+          if (this.config.spotify.useSpotify) this.sendNotification("SPOTIFY_VOLUME", this.config.spotify.maxVolume)
           if (this.A2D.radio) this.radio.volume = 0.6
           if (this.displayResponse.working()) this.displayResponse.showDisplay()
           else this.displayResponse.hideDisplay()
