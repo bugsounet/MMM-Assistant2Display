@@ -682,7 +682,7 @@ MMM-Assistant2Display is <b>ACTUALLY DISABLED</b>
 `
       var html = "<div class='A2D_warning'>" + disclaimer + "</div>"
       this.sendNotification("SHOW_ALERT", {
-        type: "alert",
+        type: "notification",
         message: html,
         title: "MMM-Assistant2Display",
         timer: 60 * 1000
