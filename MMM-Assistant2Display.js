@@ -108,7 +108,7 @@ Module.register("MMM-Assistant2Display",{
       governor: this.config.governor,
       internet: this.config.internet,
       cast: this.config.cast,
-      disclamer: this.config.disclamer
+      disclaimer: this.config.disclaimer
     }
 
     this.radioPlayer = {
