@@ -95,6 +95,8 @@ Module.register("MMM-Assistant2Display",{
       "RESPEAKER_PLAYBACK": `amixer -M sset Playback #VOLUME#%`
     }
 
+    if(!this.config.disclamer) this.useA2D = false
+
     this.helperConfig= {
       debug: this.config.debug,
       verbose: this.config.verbose,
@@ -105,7 +107,8 @@ Module.register("MMM-Assistant2Display",{
       pir: this.config.pir,
       governor: this.config.governor,
       internet: this.config.internet,
-      cast: this.config.cast
+      cast: this.config.cast,
+      disclamer: this.config.disclamer
     }
 
     this.radioPlayer = {
