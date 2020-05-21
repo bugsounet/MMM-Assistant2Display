@@ -35,6 +35,10 @@ class DisplayClass {
         urls: null,
         length: 0,
         running: false
+      },
+      spotify: {
+        playing: false,
+        connected: false
       }
     }
     console.log("[A2D] DisplayClass Loaded")
@@ -139,26 +143,56 @@ class DisplayClass {
 
   }
 
-/** urls scan : dispatch links and youtube **/
+/** urls scan : dispatch links, youtube, spotify **/
   urlsScan() {
     let tmp = {}
-    var ytL = new RegExp("youtube\.com\/watch\\?v\=([0-9a-zA-Z\-\_]+)", "ig")
-    var ytP = new RegExp("youtube\.com\/playlist\\?list\=([a-zA-Z0-9\-\_]+)", "ig")
-    var ytLink = ytL.exec(this.A2D.links.urls[0])
-    var ytPlayList = ytP.exec(this.A2D.links.urls[0])
+    if (this.config.useYoutube) {
+      /** YouTube RegExp **/
+      var YouTubeLink = new RegExp("youtube\.com\/([a-z]+)\\?([a-z]+)\=([0-9a-zA-Z\-\_]+)", "ig")
+      /** Scan Youtube Link **/
+      var YouTube = YouTubeLink.exec(this.A2D.links.urls[0])
 
-    if (ytLink || ytPlayList) {
-      if (this.A2D.radio) this.radioStop()
-      tmp = {
-        id: ytPlayList ?  ytPlayList[1] : ytLink[1],
-        type: ytPlayList ? "playlist" : "id"
-      },
-      this.A2D.youtube = this.objAssign({}, this.A2D.youtube, tmp)
-      if (this.config.useYoutube) {
+      if (YouTube) {
+        let Type
+        let YouTubeResponse = {}
+        if (this.A2D.radio) this.radioStop()
+        if (this.A2D.spotify.playing && this.config.useSpotify) this.sendNotification("SPOTIFY_PAUSE")
+        if (YouTube[1] == "watch") Type = "id"
+        if (YouTube[1] == "playlist") Type = "playlist"
+        if (!Type) return console.log("[A2D:YouTube] Unknow Type !" , YouTube)
+        YouTubeResponse = {
+          "id": YouTube[3],
+          "type": Type
+        },
+        this.A2D.youtube = this.objAssign({}, this.A2D.youtube, YouTubeResponse)
         this.A2DLock()
         this.player.load({id: this.A2D.youtube.id, type : this.A2D.youtube.type})
+        return
       }
-    } else if(this.config.links.useLinks) {
+    }
+    if (this.config.spotify.useSpotify) {
+      if (!this.A2D.spotify.connected && this.config.spotify.connectTo) this.sendNotification("SPOTIFY_TRANSFER", this.config.spotify.connectTo)
+      /** Spotify RegExp **/
+      var SpotifyLink = new RegExp("open\.spotify\.com\/([a-z]+)\/([0-9a-zA-Z\-\_]+)", "ig")
+      /** Scan Spotify Link **/
+      var Spotify = SpotifyLink.exec(this.A2D.links.urls[0])
+
+      if (Spotify) {
+        setTimeout(() => {
+          let type = Spotify[1]
+          let id = Spotify[2]
+          if (type == "track") {
+            // don't know why tracks works only with uris !?
+            this.sendNotification("SPOTIFY_PLAY", {"uris": ["spotify:track:" + id ]})
+          }
+          else {
+            this.sendNotification("SPOTIFY_PLAY", {"context_uri": "spotify:"+ type + ":" + id})
+          }
+        }, this.config.spotify.playDelay)
+        return
+      }
+    }
+    if (this.config.links.useLinks) {
       this.A2DLock()
       this.A2D.links.displayed = true
       this.linksDisplay()
@@ -172,7 +206,6 @@ class DisplayClass {
     A2D("Loading", this.A2D.links.urls[0])
     this.showDisplay()
     webView.src= this.A2D.links.urls[0]
-
 
     webView.addEventListener("did-fail-load", () => {
       console.log("[A2D:LINKS] Loading error")
@@ -272,6 +305,7 @@ class DisplayClass {
   castStart(url) {
     /** stop all process before starting cast **/
     if (this.A2D.youtube.displayed) this.player.command("stopVideo")
+    if (this.A2D.spotify.playing && this.config.useSpotify) this.sendNotification("SPOTIFY_PAUSE")
     if (this.A2D.photos.displayed) {
       this.resetPhotos()
       this.hideDisplay()
@@ -356,7 +390,7 @@ class DisplayClass {
     MM.getModules().exceptWithClass("MMM-AssistantMk2").enumerate((module)=> {
       module.show(15, {lockString: "A2D_LOCKED"})
     })
-    if (this.config.screen.useScreen) this.sendSocketNotification("SCREEN_LOCK", false)
+    if (this.config.screen.useScreen && !this.A2D.spotify.playing) this.sendSocketNotification("SCREEN_LOCK", false)
     this.A2D.locked = false
   }
 

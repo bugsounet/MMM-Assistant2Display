@@ -15,6 +15,7 @@ Module.register("MMM-Assistant2Display",{
     debug:false,
     useYoutube: true,
     verbose: false,
+    useSpotify: false,
     links: {
       useLinks: true,
       displayDelay: 60 * 1000,
@@ -74,6 +75,13 @@ Module.register("MMM-Assistant2Display",{
       castName: "MagicMirror_A2D",
       port: 8569
     },
+    spotify: {
+      useSpotify: false,
+      connectTo: null,
+      playDelay: 3000,
+      minVolume: 10,
+      maxVolume: 100
+    }
   },
 
   start: function () {
@@ -87,6 +95,8 @@ Module.register("MMM-Assistant2Display",{
       "RESPEAKER_PLAYBACK": `amixer -M sset Playback #VOLUME#%`
     }
 
+    if(!this.config.disclaimer) this.useA2D = false
+
     this.helperConfig= {
       debug: this.config.debug,
       verbose: this.config.verbose,
@@ -97,7 +107,8 @@ Module.register("MMM-Assistant2Display",{
       pir: this.config.pir,
       governor: this.config.governor,
       internet: this.config.internet,
-      cast: this.config.cast
+      cast: this.config.cast,
+      disclamer: this.config.disclamer
     }
 
     this.radioPlayer = {
@@ -227,6 +238,7 @@ Module.register("MMM-Assistant2Display",{
   notificationReceived: function (notification, payload) {
     if (notification == "DOM_OBJECTS_CREATED") {
       this.sendSocketNotification("INIT", this.helperConfig)
+      this.disclaimer()
     }
     if (this.useA2D) {
       this.A2D = this.displayResponse.A2D
@@ -243,6 +255,7 @@ Module.register("MMM-Assistant2Display",{
           if (this.config.useYoutube && this.displayResponse.player) {
             this.displayResponse.player.command("setVolume", 5)
           }
+          if (this.config.spotify.useSpotify && this.A2D.spotify.playing) this.sendNotification("SPOTIFY_VOLUME", this.config.spotify.minVolume)
           if (this.A2D.radio) this.radio.volume = 0.1
           if (this.A2D.locked) this.displayResponse.hideDisplay()
           break
@@ -251,6 +264,7 @@ Module.register("MMM-Assistant2Display",{
           if (this.config.useYoutube && this.displayResponse.player) {
             this.displayResponse.player.command("setVolume", 100)
           }
+          if (this.config.spotify.useSpotify) this.sendNotification("SPOTIFY_VOLUME", this.config.spotify.maxVolume)
           if (this.A2D.radio) this.radio.volume = 0.6
           if (this.displayResponse.working()) this.displayResponse.showDisplay()
           else this.displayResponse.hideDisplay()
@@ -277,6 +291,7 @@ Module.register("MMM-Assistant2Display",{
               this.displayResponse.hideDisplay()
             }
           }
+          if (this.A2D.spotify.playing) this.sendNotification("SPOTIFY_PAUSE")
           if (this.A2D.radio) this.radio.pause()
           this.sendNotification("TV-STOP") // Stop MMM-FreeboxTV
           break
@@ -325,6 +340,21 @@ Module.register("MMM-Assistant2Display",{
             this.radio.src = this.radioPlayer.link
             this.radio.autoplay = true
           }
+          break
+        case "SPOTIFY_UPDATE_PLAYING":
+          if (this.config.spotify.useSpotify) {
+            this.A2D.spotify.playing = payload ? true : false
+            if (this.config.screen.useScreen && !this.displayResponse.working()) {
+              if (payload) this.sendSocketNotification("SCREEN_WAKEUP")
+              this.sendSocketNotification("SCREEN_LOCK", payload ? true : false)
+            }
+          }
+          break
+        case "SPOTIFY_CONNECTED":
+          if (this.config.spotify.useSpotify) this.A2D.spotify.connected = true
+          break
+        case "SPOTIFY_DISCONNECTED":
+          if (this.config.spotify.useSpotify) this.A2D.spotify.connected = false
           break
       }
     }
@@ -632,6 +662,32 @@ Module.register("MMM-Assistant2Display",{
       handler.reply("TEXT", "Volume " + value+"%")
     }
     else handler.reply("TEXT", "/volume [0-100]")
+  },
+
+  /** disclaimer **/
+  disclaimer: function() {
+    if(!this.config.disclaimer) {
+      var disclaimer = `<br>
+* I do this module for <b>MY SELF</b> and i force <b>NO ONE</b> to use it !!!<br>
+* I <b>SHARE</b> this module with pleasure and ... I don't ask any <b>MONEY</b> !<br>
+* I am not sponsored by google and others<br>
+* If you think there is too much update ... <b>**just go your way**</b> !<br>
+* So ... you can just try this: coding an equivalent by your self (without bugs of course ...)<br>
+<br>
+If you agree this disclaimer:<br><br>
+Add '<i><b>disclaimer: true,</b></i>' in your MMM-Assistant2Display configuration file<br>
+And restart MagicMirror.<br><br>
+@bugsounet<br><br>
+MMM-Assistant2Display is <b>ACTUALLY DISABLED</b>
+`
+      var html = "<div class='A2D_warning'>" + disclaimer + "</div>"
+      this.sendNotification("SHOW_ALERT", {
+        type: "alert",
+        message: html,
+        title: "MMM-Assistant2Display",
+        timer: 60 * 1000
+      })
+    }
   }
 
 });

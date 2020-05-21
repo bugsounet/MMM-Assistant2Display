@@ -8,6 +8,13 @@ You can control MagicMirror sound volume, screen, detector, pir sensor, and more
 
 Needed: AMk2 v3.2.0 and more
 
+## **Notes**: 
+* I do this module for **MY SELF** and i force **NO ONE** to use it !!!
+* I **SHARE** this module with pleasure and ... I don't ask any **MONEY** !
+* I am not **sponsored** by **google** and others
+* If you think there is too much update ... **just go your way** !
+* So ... you can just try this: coding an equivalent by your self (without bugs of course ...)
+
 ## Screenshoot
 
  ![](https://raw.githubusercontent.com/bugsounet/MMM-Assistant2Display/dev/screenshoot2.jpeg)
@@ -16,6 +23,9 @@ Needed: AMk2 v3.2.0 and more
 
 ## Update history
 
+ * 17/05/2020 (v1.5.3)
+   * **ADD**: Spotify support with native response
+   * **UPD**: YouTube search RegEx pattern (faster)
  * 14/05/2020 (v1.5.2)
    * **ADD**: notification received `A2D_LOCK` and `A2D_UNLOCK`
  * 11/05/2020 (v1.5.1)
