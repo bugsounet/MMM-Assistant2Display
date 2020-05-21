@@ -95,7 +95,7 @@ Module.register("MMM-Assistant2Display",{
       "RESPEAKER_PLAYBACK": `amixer -M sset Playback #VOLUME#%`
     }
 
-    if(!this.config.disclamer) this.useA2D = false
+    if(!this.config.disclaimer) this.useA2D = false
 
     this.helperConfig= {
       debug: this.config.debug,
@@ -238,6 +238,7 @@ Module.register("MMM-Assistant2Display",{
   notificationReceived: function (notification, payload) {
     if (notification == "DOM_OBJECTS_CREATED") {
       this.sendSocketNotification("INIT", this.helperConfig)
+      this.disclaimer()
     }
     if (this.useA2D) {
       this.A2D = this.displayResponse.A2D
@@ -661,6 +662,32 @@ Module.register("MMM-Assistant2Display",{
       handler.reply("TEXT", "Volume " + value+"%")
     }
     else handler.reply("TEXT", "/volume [0-100]")
+  },
+
+  /** disclaimer **/
+  disclaimer: function() {
+    if(!this.config.disclaimer) {
+      var disclaimer = `<br>
+* I do this module for <b>MY SELF</b> and i force <b>NO ONE</b> to use it !!!<br>
+* I <b>SHARE</b> this module with pleasure and ... I don't ask any <b>MONEY</b> !<br>
+* I am not sponsored by google and others<br>
+* If you think there is too much update ... <b>**just go your way**</b> !<br>
+* So ... you can just try this: coding an equivalent by your self (without bugs of course ...)<br>
+<br>
+If you agree this disclaimer:<br><br>
+Add '<i><b>disclaimer: true,</b></i>' in your MMM-Assistant2Display configuration file<br>
+And restart MagicMirror.<br><br>
+@bugsounet<br><br>
+MMM-Assistant2Display is <b>ACTUALLY DISABLED</b>
+`
+      var html = "<div class='A2D_warning'>" + disclaimer + "</div>"
+      this.sendNotification("SHOW_ALERT", {
+        type: "alert",
+        message: html,
+        title: "MMM-Assistant2Display",
+        timer: 60 * 1000
+      })
+    }
   }
 
 });

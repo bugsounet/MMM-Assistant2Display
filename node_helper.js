@@ -51,23 +51,23 @@ module.exports = NodeHelper.create({
   },
 
   initialize: function(config) {
-    var disclamer = `\n
+    var disclaimer = `\n
 * I do this module for MY SELF and i force NO ONE to use it !!!
 * I SHARE this module with pleasure and ... I don't ask any MONEY !
 * I am not sponsored by google and others
 * If you think there is too much update ... **just go your way** !
 * So ... you can just try this: coding an equivalent by your self (without bugs of course ...)
 
-If you agree this disclamer: add 'disclamer: true,' in your configuration file and restart MagicMirror
+If you agree this disclaimer: add 'disclaimer: true,' in your MMM-Assistant2Display configuration file
+and restart MagicMirror.
 @bugsounet\n
 `
     console.log("[A2D] MMM-Assistant2Display Version:",  require('./package.json').version)
     this.config = config
     var debug = (this.config.debug) ? this.config.debug : false
     if (debug == true) log = _log
-    if (!this.config.disclamer) console.log("[A2D:DISCLAMER]", disclamer)
-    else console.log("[A2D:DISCLAMER] Approuved, thank you ! @bugsounet")
-
+    if (!this.config.disclaimer) console.log("[A2D:DISCLAIMER]", disclaimer)
+    else console.log("[A2D:DISCLAIMER] Approuved, thank you ! @bugsounet")
     if (this.config.useA2D) {
       this.addons()
       console.log("[A2D] Assistant2Display is initialized.")
