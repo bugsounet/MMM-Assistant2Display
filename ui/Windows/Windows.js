@@ -1,7 +1,7 @@
 class Display extends DisplayClass {
   constructor (Config, callback) {
     super(Config, callback)
-    console.log("[A2D] Extends Display with Classic2 ui Loaded")
+    console.log("[A2D] Extends Display with Classic ui Loaded")
   }
 
   prepare() {
@@ -13,7 +13,7 @@ class Display extends DisplayClass {
     scoutpan.id = "A2D_WINDOW"
     var scoutphoto = document.createElement("img")
     scoutphoto.id = "A2D_PHOTO"
-    scoutphoto.classList.add("hidden") 
+    scoutphoto.classList.add("hidden")    
     var scout = document.createElement("webview")
     scout.useragent= "Mozilla/5.0 (SMART-TV; Linux; Tizen 2.4.0) AppleWebkit/538.1 (KHTML, like Gecko) SamsungBrowser/1.1 TV Safari/538.1"
     scout.id = "A2D_OUTPUT"
@@ -51,34 +51,12 @@ class Display extends DisplayClass {
     var contener = document.createElement("div")
     contener.id = "A2D_CONTENER"
 
-    var contener2 = document.createElement("div")
-    contener2.id = "A2D_CONTENER2"   
-
     var logo = document.createElement("div")
     logo.id = "A2D_LOGO"
-
-    contener2.appendChild(logo)
+    contener.appendChild(logo)
     var transcription = document.createElement("div")
     transcription.id = "A2D_TRANSCRIPTION"
-    contener2.appendChild(transcription)
-
-    var help = document.createElement("div")
-    help.id = "A2D_HELP"
-
-    var helpbox = document.createElement("div")
-    helpbox.id = "A2D_HELPBOX"
-    help.appendChild(helpbox)
-
-    var trysay = document.createElement("div")
-    trysay.id = "A2D_TRYSAY"
-    helpbox.appendChild(trysay)
-
-    var wordbox = document.createElement("div")
-    wordbox.id = "A2D_WORDBOX"
-    helpbox.appendChild(wordbox)
-
-    contener2.appendChild(help)
-    contener.appendChild(contener2)
+    contener.appendChild(transcription)
 
     scoutpan.appendChild(contener)
     dom.appendChild(scoutpan)
@@ -89,35 +67,14 @@ class Display extends DisplayClass {
   }
 
   prepareDisplay() {
-    A2D("Prepare Display with:", this.A2D.AMk2)
-    var iframe = document.getElementById("A2D_OUTPUT")
+    A2D("Prepare Display with:", this.A2D.GA)
     var tr = document.getElementById("A2D_TRANSCRIPTION")
     tr.innerHTML = ""
     var t = document.createElement("p")
     t.className = "transcription"
-    t.innerHTML = this.A2D.AMk2.transcription
+    t.innerHTML = this.A2D.GA.transcription
     tr.appendChild(t)
-    var wordbox = document.getElementById("A2D_WORDBOX")
-    var trysay = document.getElementById("A2D_TRYSAY")
-    trysay.textContent = ""
-    wordbox.innerHTML = ""
-    if(this.A2D.AMk2.trysay) {
-      trysay.textContent = this.A2D.AMk2.trysay
-      var word = []
-      for (let [item, value] of Object.entries(this.A2D.AMk2.help)) {
-        word[item] = document.createElement("div")
-        word[item].id = "A2D_WORD"
-        word[item].textContent = value
-        word[item].addEventListener("click", ()=> {
-          log("Clicked", value)
-          this.resetLinks()
-          this.hideDisplay()
-          iframe.src = "http://localhost:8080/activatebytext/?query=" + value
-        })
-        wordbox.appendChild(word[item])
-      }
-    }
     A2D("Prepare ok")
     super.prepareDisplay()
   }
-}
+} 

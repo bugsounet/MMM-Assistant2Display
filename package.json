@@ -1,7 +1,7 @@
 {
   "name": "MMM-Assistant2Display",
-  "version": "1.5.3",
-  "description": "AMk2 Display",
+  "version": "2.0.0",
+  "description": "GoogleAssistant Display module",
   "main": "MMM-Assistant2Display.js",
   "scripts": {
     "preinstall": "installer/preinstall.sh",
@@ -10,7 +10,7 @@
   },
   "keywords": [
     "magic mirror",
-    "MMM-AssistantMk2",
+    "MMM-GoogleAssistant",
     "YouTube"
   ],
   "repository": {

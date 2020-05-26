@@ -12,11 +12,9 @@ class DisplayClass {
       radio: false,
       speak: false,
       locked: false,
-      AMk2: {
+      GA: {
         transcription: null,
         done: null,
-        trysay: null,
-        help: null
       },
       youtube: {
         displayed: false,
@@ -61,11 +59,9 @@ class DisplayClass {
     A2D("Response Scan")
 
     tmp = {
-      AMk2: {
+      GA: {
         transcription: response.transcription.transcription,
         done: response.transcription.done,
-        trysay: response.trysay,
-        help: response.help
       },
       photos: {
         position: 0,
@@ -317,7 +313,7 @@ class DisplayClass {
     if (this.A2D.radio) this.radioStop()
 
     /** emulation of displaying links **/
-    this.A2D.AMk2.transcription = "YouTube Cast"
+    this.A2D.GA.transcription = "YouTube Cast"
     this.prepareDisplay()
     this.A2D.links.running = false
     var webView = document.getElementById("A2D_OUTPUT")
@@ -377,7 +373,7 @@ class DisplayClass {
   A2DLock() {
     if (this.A2D.locked) return
     A2D("Lock Screen")
-    MM.getModules().exceptWithClass("MMM-AssistantMk2").enumerate((module)=> {
+    MM.getModules().exceptWithClass("MMM-GoogleAssistant").enumerate((module)=> {
       module.hide(15, {lockString: "A2D_LOCKED"})
     })
     if (this.config.screen.useScreen) this.sendSocketNotification("SCREEN_LOCK", true)
@@ -387,7 +383,7 @@ class DisplayClass {
   A2DUnlock () {
     if (!this.A2D.locked || this.working()) return
     A2D("Unlock Screen")
-    MM.getModules().exceptWithClass("MMM-AssistantMk2").enumerate((module)=> {
+    MM.getModules().exceptWithClass("MMM-GoogleAssistant").enumerate((module)=> {
       module.show(15, {lockString: "A2D_LOCKED"})
     })
     if (this.config.screen.useScreen && !this.A2D.spotify.playing) this.sendSocketNotification("SCREEN_LOCK", false)

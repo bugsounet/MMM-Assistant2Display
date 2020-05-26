@@ -1,19 +1,12 @@
 # MMM-Assistant2Display
 
-This module is an addons for MMM-AssistantMk2.
+This module is an addons for MMM-GoogleAssistant.
 
 It allows to display the links, photos and YouTube video found by your assistant.
 
 You can control MagicMirror sound volume, screen, detector, pir sensor, and more
 
-Needed: AMk2 v3.2.0 and more
-
-## **Notes**: 
-* I do this module for **MY SELF** and i force **NO ONE** to use it !!!
-* I **SHARE** this module with pleasure and ... I don't ask any **MONEY** !
-* I am not **sponsored** by **google** and others
-* If you think there is too much update ... **just go your way** !
-* So ... you can just try this: coding an equivalent by your self (without bugs of course ...)
+Needed: MMM-GoogleAssistant v2.0.0 and more
 
 ## Screenshoot
 
@@ -23,6 +16,28 @@ Needed: AMk2 v3.2.0 and more
 
 ## Update history
 
+ * 26/05/2020 (v2.0.0)
+   * Initial Commit
+
+## Installation
+
+No Installation Needed at this moment !
+
+## Configuration
+Read the docs in [wiki](https://github.com/bugsounet/MMM-Assistant2Display/wiki)
+
+## Update from v1.5.3
+Don't use it, i think, it's the better way for you...
+
+## Update since v2.0.0
+
+```sh
+cd ~/MagicMirror/modules/MMM-Assistant2Display
+git pull
+npm run update
+```
+
+### Update History
  * 17/05/2020 (v1.5.3)
    * **ADD**: Spotify support with native response
    * **UPD**: YouTube search RegEx pattern (faster)
@@ -33,31 +48,6 @@ Needed: AMk2 v3.2.0 and more
  * 08/05/2020 (v1.5.0)
    * **UPD**: update all to my own npm library
    * **ADD**: add updater script
-
-## Installation
-
-```sh
-cd ~/MagicMirror/modules
-git clone https://github.com/bugsounet/MMM-Assistant2Display.git
-cd MMM-Assistant2Display
-npm install
-```
-
-## Configuration
-Read the docs in [wiki](https://github.com/bugsounet/MMM-Assistant2Display/wiki)
-
-## Update from v1.1
-Remove existence then reinstall fresh.
-
-## Update since v1.5.0
-
-```sh
-cd ~/MagicMirror/modules/MMM-Assistant2Display
-git pull
-npm run update
-```
-
-### Update History
  * 03/05/2020 (v1.4.1)
    * **FIX**: installer check OS
  * 30/04/2020 (v1.4.0)
