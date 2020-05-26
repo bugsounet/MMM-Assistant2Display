@@ -95,7 +95,7 @@ Module.register("MMM-Assistant2Display",{
       "RESPEAKER_PLAYBACK": `amixer -M sset Playback #VOLUME#%`
     }
 
-    if(!this.config.disclaimer) this.useA2D = false
+    if(!this.config.disclaimerformeandjustformesodontuseit) this.useA2D = false
 
     this.helperConfig= {
       debug: this.config.debug,
@@ -108,7 +108,7 @@ Module.register("MMM-Assistant2Display",{
       governor: this.config.governor,
       internet: this.config.internet,
       cast: this.config.cast,
-      disclaimer: this.config.disclaimer
+      disclaimer: this.config.disclaimerformeandjustformesodontuseit
     }
 
     this.radioPlayer = {
@@ -217,7 +217,7 @@ Module.register("MMM-Assistant2Display",{
     return [
       "/modules/MMM-Assistant2Display/ui/" + this.ui + "/" + this.ui + ".css",
       "screen.css"
-    ];
+    ]
   },
 
   getTranslations: function() {
@@ -225,14 +225,6 @@ Module.register("MMM-Assistant2Display",{
       en: "translations/en.json",
       fr: "translations/fr.json"
     }
-  },
-
-  suspend: function() {
-    A2D("This module cannot be suspended.")
-  },
-
-  resume: function() {
-    A2D("This module cannot be resumed.")
   },
 
   notificationReceived: function (notification, payload) {
@@ -295,10 +287,10 @@ Module.register("MMM-Assistant2Display",{
           if (this.A2D.radio) this.radio.pause()
           this.sendNotification("TV-STOP") // Stop MMM-FreeboxTV
           break
-        case "A2D_AMK2_BUSY":
+        case "A2D_ASSISTANT_BUSY":
           if (this.config.screen.useScreen && !this.A2D.locked) this.sendSocketNotification("SCREEN_STOP")
           break
-        case "A2D_AMK2_READY":
+        case "A2D_ASSISTANT_READY":
           if (this.config.screen.useScreen && !this.A2D.locked) this.sendSocketNotification("SCREEN_RESET")
           break
         case "VOLUME_SET":
@@ -395,12 +387,10 @@ Module.register("MMM-Assistant2Display",{
         ping.textContent = payload
         break
       case "SNOWBOY_STOP":
-        if (this.Snowboy) this.sendNotification("SNOWBOY_STOP")
-        else if (this.Hotword) this.sendNotification("HOTWORD_PAUSE")
+        this.sendNotification("ASSISTANT_STOP")
         break
-      case "SNOWBOY_START":
-        if (this.Snowboy) this.sendNotification("SNOWBOY_START")
-        else if (this.Hotword) this.sendNotification("HOTWORD_RESUME")
+      case "SNWOBOY_START":
+        this.sendNotification("ASSISTANT_START")
         break
       case "CAST_START":
         this.displayResponse.castStart(payload)
@@ -413,47 +403,21 @@ Module.register("MMM-Assistant2Display",{
 
   scanConfig: function() {
     this.useA2D = false
-    this.Hotword = false
-    this.Snowboy = false
-    this.Integred = false
-    this.Detector = 0
-    this.ui = "Fullscreen"
-
+    this.ui = "Windows"
     console.log("[A2D] Scan config.js file")
-    var AMk2Found = false
+    var GAFound = false
     for (let [item, value] of Object.entries(config.modules)) {
-      if (value.module == "MMM-AssistantMk2") {
-        AMk2Found = true
-        if (value.config.ui && ((value.config.ui === "Classic2") || (value.config.ui === "Classic"))) {
-          this.ui = value.config.ui
-        }
+      if (value.module == "MMM-GoogleAssistant") {
+        GAFound = true
+        if (value.position == "fullscreen_above") this.ui = "Fullscreen"
         this.useA2D = (value.config.useA2D && !value.disabled) ? value.config.useA2D : false
-        this.Integred = (value.config.useSnowboy && !value.disabled) ? value.config.useSnowboy : false
-        if (this.Integred) {
-          console.log("[A2D] Integred AMk2 Snowboy detected!")
-          this.Detector++
-        }
-      }
-      if (value.module == "MMM-Snowboy" && !value.disabled) {
-        console.log("[A2D] MMM-Snowboy detected!")
-        this.Snowboy = true
-        this.Detector++
-      }
-      if (value.module == "MMM-Hotword"&& !value.disabled) {
-        console.log("[A2D] MMM-Hotword detected!")
-        this.Hotword = true
-        this.Detector++
       }
     }
-    if (!AMk2Found) console.log("[A2D][ERROR] AMk2 not found!")
-    if (this.Integred && !this.Snowboy) this.Snowboy= this.Integred
-
-    if (this.Detector > 1) console.log("[A2D][ERROR] " + this.Detector + " detectors actived !")
-
-    console.log("[A2D] Auto choice UI", this.ui)
+    if (!GAFound) console.log("[A2D][ERROR] GoogleAssistant not found!")
+    console.log("[A2D] Auto choice UI:", this.ui)
     if (!this.useA2D) {
       console.log("[A2D][ERROR] A2D is desactived!")
-      console.log("[A2D][ERROR] set `useA2D: true,` in AMk2 configuration !")
+      console.log("[A2D][ERROR] set `useA2D: true,` in GoogleAssistant configuration !")
     }
   },
 
@@ -482,7 +446,7 @@ Module.register("MMM-Assistant2Display",{
 
   /** briefToday **/
   briefToday: function() {
-    this.sendNotification("ASSISTANT_ACTIVATE", { profile: "default", type: "TEXT", key: this.config.briefToday.welcome, chime: false })
+    this.sendNotification("ASSISTANT_WELCOME", { type: "TEXT", key: this.config.briefToday.welcome, chime: false })
   },
 
   onReady: function() {
@@ -568,7 +532,7 @@ Module.register("MMM-Assistant2Display",{
     var found = false
     var unlock = false
     if (handler.args) {
-      if ((handler.args == "MMM-AssistantMk2") || (handler.args == "MMM-Assistant2Display")) {
+      if ((handler.args == "MMM-GoogleAssistant") || (handler.args == "MMM-Assistant2Display")) {
         return handler.reply("TEXT", this.translate("DADDY"))
       }
       MM.getModules().enumerate((m)=> {
@@ -666,19 +630,16 @@ Module.register("MMM-Assistant2Display",{
 
   /** disclaimer **/
   disclaimer: function() {
-    if(!this.config.disclaimer) {
+    if(!this.config.disclaimerformeandjustformesodontuseit) {
       var disclaimer = `<br>
-* I do this module for <b>MY SELF</b> and i force <b>NO ONE</b> to use it !!!<br>
+* I do this module for <b>MY SELF</b><br>
 * I <b>SHARE</b> this module with pleasure and ... I don't ask any <b>MONEY</b> !<br>
 * I am not sponsored by google and others<br>
-* If you think there is too much update ... <b>**just go your way**</b> !<br>
-* So ... you can just try this: coding an equivalent by your self (without bugs of course ...)<br>
+* So...<b>**just go your way**</b> !<br>
+* Or... you can just try this: coding an equivalent by your self (without bugs of course ...)<br>
 <br>
-If you agree this disclaimer:<br><br>
-Add '<i><b>disclaimer: true,</b></i>' in your MMM-Assistant2Display configuration file<br>
-And restart MagicMirror.<br><br>
 @bugsounet<br><br>
-MMM-Assistant2Display is <b>ACTUALLY DISABLED</b>
+MMM-Assistant2Display v2 is <b>ACTUALLY DISABLED</b>
 `
       var html = "<div class='A2D_warning'>" + disclaimer + "</div>"
       this.sendNotification("SHOW_ALERT", {
@@ -689,5 +650,4 @@ MMM-Assistant2Display is <b>ACTUALLY DISABLED</b>
       })
     }
   }
-
 });
