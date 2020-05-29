@@ -12,18 +12,15 @@ var A2D = function() {
 
 Module.register("MMM-Assistant2Display",{
   defaults: {
-    debug:false,
+    debug: false,
     useYoutube: true,
-    verbose: false,
-    useSpotify: false,
     links: {
       useLinks: true,
       displayDelay: 60 * 1000,
       scrollActivate: false,
       scrollStep: 25,
       scrollInterval: 1000,
-      scrollStart: 5000,
-      verbose: false
+      scrollStart: 5000
     },
     photos: {
       usePhotos: true,
@@ -99,7 +96,6 @@ Module.register("MMM-Assistant2Display",{
 
     this.helperConfig= {
       debug: this.config.debug,
-      verbose: this.config.verbose,
       volumeScript: this.volumeScript[this.config.volume.volumePreset],
       useA2D: this.useA2D,
       links: this.config.links,
