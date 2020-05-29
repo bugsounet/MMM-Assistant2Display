@@ -1,8 +1,7 @@
 #!/bin/bash
-# +--------------------------------+
-# | A2D updater                    |
-# | Rev 1.0.1                      |
-# +--------------------------------+
+# +-------------+
+# | A2D updater |
+# +-------------+
 # get the installer directory
 Installer_get_current_dir () {
   SOURCE="${BASH_SOURCE[0]}"
@@ -24,11 +23,15 @@ echo
 
 cd ~/MagicMirror/modules/MMM-Assistant2Display
 # deleting package.json because npm install add/update package
-rm -rf package.json package-lock.json node_modules
+rm -f package.json package-lock.json
 Installer_info "Updating..."
 git pull
 #fresh package.json
 git checkout package.json
-Installer_info "Installing..."
+cd node_modules
+Installer_info "Deleting ALL @bugsounet libraries..."
+rm -rf @bugsounet
+cd ~/MagicMirror/modules/MMM-Assistant2Display
+Installer_info "Ready for Installing..."
 # launch installer
 npm install
