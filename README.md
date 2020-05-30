@@ -6,14 +6,6 @@ It allows to display the links, photos and YouTube video found by your assistant
 
 You can control MagicMirror sound volume, screen, detector, pir sensor, and more
 
-Needed: MMM-GoogleAssistant v2.0.0 and more
-
-## Screenshoot
-
- ![](https://raw.githubusercontent.com/bugsounet/MMM-Assistant2Display/dev/screenshoot2.jpeg)
- ![](https://raw.githubusercontent.com/bugsounet/MMM-Assistant2Display/dev/screenshoot1.jpg)
- ![](https://raw.githubusercontent.com/bugsounet/MMM-Assistant2Display/dev/YouTube_Cast.png)
-
 ## Update history
 
  * 26/05/2020 (v2.0.0)
@@ -22,9 +14,6 @@ Needed: MMM-GoogleAssistant v2.0.0 and more
 ## Installation
 
 No Installation Needed at this moment !
-
-## Configuration
-Read the docs in [wiki](https://github.com/bugsounet/MMM-Assistant2Display/wiki)
 
 ## Update from v1.5.3
 Don't use it, i think, it's the better way for you...
