@@ -51,21 +51,10 @@ module.exports = NodeHelper.create({
   },
 
   initialize: function(config) {
-    var disclaimer = `\n
-* I do this module for MY SELF !!!
-* I SHARE this module with pleasure and ... I don't ask any MONEY !
-* I am not sponsored by google and others
-* So... **just go your way** !
-* Or... you can just try this: coding an equivalent by your self (without bugs of course ...)
-\n
-@bugsounet\n
-`
     console.log("[A2D] MMM-Assistant2Display Version:",  require('./package.json').version)
     this.config = config
     var debug = (this.config.debug) ? this.config.debug : false
     if (debug == true) log = _log
-    if (!this.config.disclaimer) console.log("[A2D:DISCLAIMER]", disclaimer)
-    else console.log("[A2D:DISCLAIMER] Approuved, thank you ! @bugsounet")
     if (this.config.useA2D) {
       this.addons()
       console.log("[A2D] Assistant2Display is initialized.")
@@ -131,5 +120,5 @@ module.exports = NodeHelper.create({
       this.cast = new CastServer(this.config.cast, callbacks.sendSocketNotification, this.config.debug)
       this.cast.start()
     }
-  },
+  }
 });

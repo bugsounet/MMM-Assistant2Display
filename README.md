@@ -29,14 +29,6 @@ Read the docs in [wiki](https://github.com/bugsounet/MMM-Assistant2Display/wiki)
 ## Update from v1.5.3
 Don't use it, i think, it's the better way for you...
 
-## Update since v2.0.0
-
-```sh
-cd ~/MagicMirror/modules/MMM-Assistant2Display
-git pull
-npm run update
-```
-
 ### Update History
  * 17/05/2020 (v1.5.3)
    * **ADD**: Spotify support with native response

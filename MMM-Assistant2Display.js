@@ -15,7 +15,7 @@ Module.register("MMM-Assistant2Display",{
     debug: false,
     useYoutube: true,
     links: {
-      useLinks: true,
+      useLinks: false,
       displayDelay: 60 * 1000,
       scrollActivate: false,
       scrollStep: 25,
@@ -23,11 +23,11 @@ Module.register("MMM-Assistant2Display",{
       scrollStart: 5000
     },
     photos: {
-      usePhotos: true,
+      usePhotos: false,
       displayDelay: 10 * 1000,
     },
     volume: {
-      useVolume: true,
+      useVolume: false,
       volumePreset: "ALSA"
     },
     briefToday: {
@@ -226,7 +226,6 @@ Module.register("MMM-Assistant2Display",{
   notificationReceived: function (notification, payload) {
     if (notification == "DOM_OBJECTS_CREATED") {
       this.sendSocketNotification("INIT", this.helperConfig)
-      this.disclaimer()
     }
     if (this.useA2D) {
       this.A2D = this.displayResponse.A2D
@@ -256,10 +255,6 @@ Module.register("MMM-Assistant2Display",{
           if (this.A2D.radio) this.radio.volume = 0.6
           if (this.displayResponse.working()) this.displayResponse.showDisplay()
           else this.displayResponse.hideDisplay()
-          break
-        case "ASSISTANT_HOOK":
-        case "ASSISTANT_CONFIRMATION":
-          /** Hooked **/
           break
         case "A2D":
           this.displayResponse.start(payload)
@@ -406,14 +401,13 @@ Module.register("MMM-Assistant2Display",{
       if (value.module == "MMM-GoogleAssistant") {
         GAFound = true
         if (value.position == "fullscreen_above") this.ui = "Fullscreen"
-        this.useA2D = (value.config.useA2D && !value.disabled) ? value.config.useA2D : false
+        this.useA2D = (value.config.A2DServer && value.config.A2DServer.useA2D && !value.disabled) ? value.config.A2DServer.useA2D : false
       }
     }
     if (!GAFound) console.log("[A2D][ERROR] GoogleAssistant not found!")
     console.log("[A2D] Auto choice UI:", this.ui)
     if (!this.useA2D) {
       console.log("[A2D][ERROR] A2D is desactived!")
-      console.log("[A2D][ERROR] set `useA2D: true,` in GoogleAssistant configuration !")
     }
   },
 
@@ -442,7 +436,7 @@ Module.register("MMM-Assistant2Display",{
 
   /** briefToday **/
   briefToday: function() {
-    this.sendNotification("ASSISTANT_WELCOME", { type: "TEXT", key: this.config.briefToday.welcome, chime: false })
+    this.sendNotification("ASSISTANT_WELCOME", { key: this.config.briefToday.welcome })
   },
 
   onReady: function() {
@@ -520,10 +514,12 @@ Module.register("MMM-Assistant2Display",{
       handler.reply("TEXT", this.translate("RESTART_DONE"))
     } else handler.reply("TEXT", this.translate("RESTART_ERROR"))
   },
+
   tbWakeup: function(command, handler) {
     this.sendSocketNotification("SCREEN_WAKEUP")
     handler.reply("TEXT", this.translate("WAKEUP_REPLY"))
   },
+
   tbHide: function(command, handler) {
     var found = false
     var unlock = false
@@ -556,6 +552,7 @@ Module.register("MMM-Assistant2Display",{
       if (!found) handler.reply("TEXT", this.translate("MODULE_NOTFOUND") + handler.args)
     } else return handler.reply("TEXT", this.translate("MODULE_NAME"))
   },
+
   tbShow: function(command, handler) {
     var found = false
     var unlock = false
@@ -585,10 +582,12 @@ Module.register("MMM-Assistant2Display",{
       if (!found) handler.reply("TEXT", this.translate("MODULE_NOTFOUND") + handler.args)
     } else return handler.reply("TEXT", this.translate("MODULE_NAME"))
   },
+
   tbStopA2D: function(command, handler) {
     this.notificationReceived("A2D_STOP")
     handler.reply("TEXT", this.translate("STOP_A2D"))
   },
+
   tbA2D: function (command, handler) {
     if (handler.args) {
       var responseEmulate = {
@@ -622,28 +621,5 @@ Module.register("MMM-Assistant2Display",{
       handler.reply("TEXT", "Volume " + value+"%")
     }
     else handler.reply("TEXT", "/volume [0-100]")
-  },
-
-  /** disclaimer **/
-  disclaimer: function() {
-    if(!this.config.disclaimerformeandjustformesodontuseit) {
-      var disclaimer = `<br>
-* I do this module for <b>MY SELF</b><br>
-* I <b>SHARE</b> this module with pleasure and ... I don't ask any <b>MONEY</b> !<br>
-* I am not sponsored by google and others<br>
-* So...<b>**just go your way**</b> !<br>
-* Or... you can just try this: coding an equivalent by your self (without bugs of course ...)<br>
-<br>
-@bugsounet<br><br>
-MMM-Assistant2Display v2 is <b>ACTUALLY DISABLED</b>
-`
-      var html = "<div class='A2D_warning'>" + disclaimer + "</div>"
-      this.sendNotification("SHOW_ALERT", {
-        type: "notification",
-        message: html,
-        title: "MMM-Assistant2Display",
-        timer: 60 * 1000
-      })
-    }
   }
 });
