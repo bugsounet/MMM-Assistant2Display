@@ -1,12 +1,8 @@
 {
   "name": "MMM-Assistant2Display",
-  "version": "2.0.0",
   "description": "GoogleAssistant Display module",
-  "main": "MMM-Assistant2Display.js",
   "scripts": {
-    "preinstall": "installer/preinstall.sh",
-    "postinstall": "installer/postinstall.sh",
-    "update": "installer/update.sh"
+    "preinstall": "installer/preinstall.sh"
   },
   "keywords": [
     "magic mirror",
@@ -22,12 +18,5 @@
   "bugs": {
     "url": "https://github.com/bugsounet/MMM-Assistant2Display/issues"
   },
-  "homepage": "https://github.com/bugsounet/MMM-Assistant2Display",
-  "dependencies": {
-    "@bugsounet/cast": "^1.0.0",
-    "@bugsounet/governor": "^1.0.3",
-    "@bugsounet/internet": "^1.0.0",
-    "@bugsounet/pir": "^1.0.4",
-    "@bugsounet/screen": "^1.0.0"
-  }
+  "homepage": "https://github.com/bugsounet/MMM-Assistant2Display"
 }

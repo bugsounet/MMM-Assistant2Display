@@ -25,14 +25,8 @@ source utils.sh
 # module name
 Installer_module="Assistant2Display"
 
-# use beep request questions ?
-Installer_beep=false
-
-# check version in package.json file
-Installer_version="$(cat ../package.json | grep version | cut -c14-30 2>/dev/null)"
-
 # Let's start !
-Installer_info "Welcome to $Installer_module $Installer_version"
+Installer_info "Welcome to $Installer_module"
 
 echo
 
