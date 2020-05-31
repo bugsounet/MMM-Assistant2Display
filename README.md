@@ -17,8 +17,9 @@ Read the docs in [wiki](https://github.com/bugsounet/MMM-Assistant2Display/wiki)
 
 ## Last Tested
 - MagicMirror : 2.11.0
-- RPI 3B+ / raspbian 10 / nodeJS v10.x / npm 6.x
-- debian 10 / nodeJS v10.19.0 / npm v6.14.1
+- RPI 3B+ / raspbian 10
+- RPI 4 / raspbian 10
+- debian 10
 
 ## Credits
 - Author :
