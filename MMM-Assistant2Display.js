@@ -28,7 +28,8 @@ Module.register("MMM-Assistant2Display",{
     },
     volume: {
       useVolume: false,
-      volumePreset: "ALSA"
+      volumePreset: "ALSA",
+      myScript: ""
     },
     briefToday: {
       useBriefToday: false,
@@ -84,13 +85,15 @@ Module.register("MMM-Assistant2Display",{
   start: function () {
     this.config = this.configAssignment({}, this.defaults, this.config)
     this.volumeScript= {
-      "OSX": `osascript -e 'set volume output volume #VOLUME#'`,
-      "ALSA": `amixer sset -M 'PCM' #VOLUME#%`,
-      "HIFIBERRY-DAC": `amixer sset -M 'Digital' #VOLUME#%`,
-      "PULSE": `amixer set Master #VOLUME#% -q`,
-      "RESPEAKER_SPEAKER": `amixer -M sset Speaker #VOLUME#%`,
-      "RESPEAKER_PLAYBACK": `amixer -M sset Playback #VOLUME#%`
+      "OSX": "osascript -e 'set volume output volume #VOLUME#'",
+      "ALSA": "amixer sset -M 'PCM' #VOLUME#%",
+      "HIFIBERRY-DAC": "amixer sset -M 'Digital' #VOLUME#%",
+      "PULSE": "amixer set Master #VOLUME#% -q",
+      "RESPEAKER_SPEAKER": "amixer -M sset Speaker #VOLUME#%",
+      "RESPEAKER_PLAYBACK": "amixer -M sset Playback #VOLUME#%",
+      "MY": ""
     }
+    this.volumeScript.MY= this.config.volume.myScript
 
     this.helperConfig= {
       debug: this.config.debug,
@@ -440,13 +443,13 @@ Module.register("MMM-Assistant2Display",{
     if (this.config.briefToday.useBriefToday) this.briefToday()
   },
 
-  screenShowing: function () {
+  screenShowing: function() {
     MM.getModules().enumerate((module)=> {
       module.show(1000, {lockString: "A2D_SCREEN"})
     })
   },
 
-  screenHiding: function () {
+  screenHiding: function() {
     MM.getModules().enumerate((module)=> {
       module.hide(1000, {lockString: "A2D_SCREEN"})
     })
@@ -600,7 +603,7 @@ Module.register("MMM-Assistant2Display",{
       if (isLink || retryWithHttp) {
         handler.reply("TEXT", this.translate("A2D_OPEN") + handler.args)
         console.log(handler)
-        responseEmulate.transcription.transcription = " Telegram @"+ handler.message.from.username + ": " + handler.args
+        responseEmulate.transcription.transcription = " Telegram @" + handler.message.from.username + ": " + handler.args
         responseEmulate.transcription.done = true
         responseEmulate.urls[0] = isLink ? handler.args : ("http://" + handler.args)
         this.displayResponse.start(responseEmulate)

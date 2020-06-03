@@ -174,6 +174,7 @@ class DisplayClass {
       var Spotify = SpotifyLink.exec(this.A2D.links.urls[0])
 
       if (Spotify) {
+        if (this.A2D.radio) this.radioStop()
         setTimeout(() => {
           let type = Spotify[1]
           let id = Spotify[2]
@@ -301,7 +302,7 @@ class DisplayClass {
   castStart(url) {
     /** stop all process before starting cast **/
     if (this.A2D.youtube.displayed) this.player.command("stopVideo")
-    if (this.A2D.spotify.playing && this.config.useSpotify) this.sendNotification("SPOTIFY_PAUSE")
+    if (this.A2D.spotify.playing) this.sendNotification("SPOTIFY_PAUSE")
     if (this.A2D.photos.displayed) {
       this.resetPhotos()
       this.hideDisplay()
