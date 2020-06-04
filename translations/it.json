@@ -1,0 +1,32 @@
+{
+  "RESTART_HELP" : "riavvia MagicMirror con pm2",
+  "RESTART_DONE" : "riavvio il MagicMirror!",
+  "RESTART_ERROR" : "<id> mancante!",
+
+  "WAKEUP_HELP": "riaccendi lo schermo e reinizializza il contatore",
+  "WAKEUP_REPLY": "Riaccensione schermo !",
+
+  "HIDE_HELP": "nascondi il modulo indicato",
+  "HIDE_ALREADY": " è già nascosto",
+  "HIDE_DONE": " è ora nascosto",
+  "HIDE_LOCKED": " è bloccato da un altro programma, non lo posso nascondere",
+
+  "SHOW_HELP": "mostra il modulo indicato",
+  "SHOW_ALREADY": " è già mostrato",
+  "SHOW_DONE": " è ora mostrato",
+  "SHOW_LOCKED": " è già bloccato da un altro programma, non lo posso mostrare",
+
+  "MODULE_NOTFOUND": "modulo non trovato: ",
+  "MODULE_NAME": "nome del modulo mancante",
+
+  "STOP_HELP": "Arresata A2D se in funzione",
+  "STOP_A2D": "Arresto A2D",
+
+  "A2D_OPEN": "Apro il collegamento: ",
+  "A2D_INVALID": "Il collegamento non è valido!",
+  "A2D_HELP": "Attiva Assisant2Display con collegamento",
+
+  "VOLUME_HELP": "Imposta il volume del tuo dispositivo",
+
+  "DADDY": "daddy @bugsounet says... NO,NO AND NO !!!"
+}
