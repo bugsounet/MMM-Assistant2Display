@@ -87,7 +87,7 @@ Module.register("MMM-Assistant2Display",{
     this.volumeScript= {
       "OSX": "osascript -e 'set volume output volume #VOLUME#'",
       "ALSA": "amixer sset -M 'PCM' #VOLUME#%",
-      "ALSA_HEADPHONE": "amixer sset -M 'HEADPHONE' #VOLUME#%",
+      "ALSA_HEADPHONE": "amixer sset -M 'Headphone' #VOLUME#%",
       "ALSA_HDMI": "amixer sset -M 'HDMI' #VOLUME#%",
       "HIFIBERRY-DAC": "amixer sset -M 'Digital' #VOLUME#%",
       "PULSE": "amixer set Master #VOLUME#% -q",
