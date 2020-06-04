@@ -29,7 +29,7 @@ Module.register("MMM-Assistant2Display",{
     volume: {
       useVolume: false,
       volumePreset: "ALSA",
-      myScript: ""
+      myScript: null,
     },
     briefToday: {
       useBriefToday: false,
@@ -87,17 +87,17 @@ Module.register("MMM-Assistant2Display",{
     this.volumeScript= {
       "OSX": "osascript -e 'set volume output volume #VOLUME#'",
       "ALSA": "amixer sset -M 'PCM' #VOLUME#%",
+      "ALSA_HEADPHONE": "amixer sset -M 'HEADPHONE' #VOLUME#%",
+      "ALSA_HDMI": "amixer sset -M 'HDMI' #VOLUME#%",
       "HIFIBERRY-DAC": "amixer sset -M 'Digital' #VOLUME#%",
       "PULSE": "amixer set Master #VOLUME#% -q",
       "RESPEAKER_SPEAKER": "amixer -M sset Speaker #VOLUME#%",
-      "RESPEAKER_PLAYBACK": "amixer -M sset Playback #VOLUME#%",
-      "MY": ""
+      "RESPEAKER_PLAYBACK": "amixer -M sset Playback #VOLUME#%"
     }
-    this.volumeScript.MY= this.config.volume.myScript
 
     this.helperConfig= {
       debug: this.config.debug,
-      volumeScript: this.volumeScript[this.config.volume.volumePreset],
+      volumeScript: this.config.volume.myScript ? this.config.volume.myScript : this.volumeScript[this.config.volume.volumePreset],
       useA2D: this.useA2D,
       links: this.config.links,
       screen: this.config.screen,
@@ -284,7 +284,7 @@ Module.register("MMM-Assistant2Display",{
         case "A2D_ASSISTANT_READY":
           if (this.config.screen.useScreen && !this.A2D.locked) this.sendSocketNotification("SCREEN_RESET")
           break
-        case "VOLUME_SET":
+        case "A2D_VOLUME":
           if (this.config.volume.useVolume) {
             this.sendSocketNotification("SET_VOLUME", payload)
           }
