@@ -179,7 +179,6 @@ Module.register("MMM-Assistant2Display",{
     if (!this.config.screen.useScreen || !this.config.screen.displayBar) bar.className = "hidden"
     var screenBar = document.createElement("meter")
     screenBar.id = "A2D_SCREEN_BAR"
-    //screenBar.classList.add("progress")
     screenBar.value = 0
     screenBar.max= this.config.screen.delay
     bar.appendChild(screenBar)
@@ -370,7 +369,7 @@ Module.register("MMM-Assistant2Display",{
         break
       case "SCREEN_BAR":
         var bar = document.getElementById("A2D_SCREEN_BAR")
-        bar.value= payload
+        bar.value= this.config.screen.delay - payload
         break
       case "INTERNET_DOWN":
         this.sendNotification("SHOW_ALERT", {
