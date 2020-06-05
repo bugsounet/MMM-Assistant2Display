@@ -87,6 +87,7 @@ module.exports = NodeHelper.create({
     var callbacks= {
       "sendSocketNotification": (noti, params) => {
         this.sendSocketNotification(noti, params)
+        //log("Addons Notification:", noti,params)
       },
       "screen": (param) => {
         if (this.screen && param == "WAKEUP") this.screen.wakeup()

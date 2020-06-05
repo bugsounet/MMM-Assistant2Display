@@ -41,6 +41,7 @@ Module.register("MMM-Assistant2Display",{
       turnOffDisplay: true,
       ecoMode: true,
       displayCounter: true,
+      displayBar: false,
       text: "Auto Turn Off Screen:",
       detectorSleeping: false,
       governorSleeping: false,
@@ -161,41 +162,52 @@ Module.register("MMM-Assistant2Display",{
     dom.id = "A2D_DISPLAY"
 
     var screen = document.createElement("div")
-    screen.id = "SCREEN"
+    screen.id = "A2D_SCREEN"
     if (!this.config.screen.useScreen || !this.config.screen.displayCounter) screen.className = "hidden"
     var screenText = document.createElement("div")
-    screenText.id = "SCREEN_TEXT"
+    screenText.id = "A2D_SCREEN_TEXT"
     screenText.textContent = this.config.screen.text
     screen.appendChild(screenText)
     var screenCounter = document.createElement("div")
-    screenCounter.id = "SCREEN_COUNTER"
+    screenCounter.id = "A2D_SCREEN_COUNTER"
     screenCounter.classList.add("counter")
-    screenCounter.textContent = "--:--:--"
+    screenCounter.textContent = "--:--"
     screen.appendChild(screenCounter)
 
+    var bar = document.createElement("div")
+    bar.id = "A2D_BAR"
+    if (!this.config.screen.useScreen || !this.config.screen.displayBar) bar.className = "hidden"
+    var screenBar = document.createElement("meter")
+    screenBar.id = "A2D_SCREEN_BAR"
+    //screenBar.classList.add("progress")
+    screenBar.value = 0
+    screenBar.max= this.config.screen.delay
+    bar.appendChild(screenBar)
+
     var internet = document.createElement("div")
-    internet.id = "INTERNET"
+    internet.id = "A2D_INTERNET"
     if (!this.config.internet.useInternet || !this.config.internet.displayPing) internet.className = "hidden"
     var internetText = document.createElement("div")
-    internetText.id = "INTERNET_TEXT"
+    internetText.id = "A2D_INTERNET_TEXT"
     internetText.textContent = "Ping: "
     internet.appendChild(internetText)
     var internetPing = document.createElement("div")
-    internetPing.id = "INTERNET_PING"
+    internetPing.id = "A2D_INTERNET_PING"
     internetPing.classList.add("ping")
     internetPing.textContent = "Loading ..."
     internet.appendChild(internetPing)
 
     var radio = document.createElement("div")
-    radio.id = "RADIO"
+    radio.id = "A2D_RADIO"
     radio.className = "hidden"
     var radioImg = document.createElement("img")
-    radioImg.id = "RADIO_IMG"
+    radioImg.id = "A2D_RADIO_IMG"
     radio.appendChild(radioImg)
 
     dom.appendChild(radio)
     dom.appendChild(screen)
     dom.appendChild(internet)
+    dom.appendChild(bar)
     return dom
   },
 
@@ -309,7 +321,7 @@ Module.register("MMM-Assistant2Display",{
           if (this.A2D.youtube.displayed) this.displayResponse.player.command("stopVideo")
           if (payload.link) {
             if (payload.img) {
-              var radioImg = document.getElementById("RADIO_IMG")
+              var radioImg = document.getElementById("A2D_RADIO_IMG")
               this.radioPlayer.img = payload.img
               radioImg.src = this.radioPlayer.img
             }
@@ -353,8 +365,12 @@ Module.register("MMM-Assistant2Display",{
         this.screenHiding()
         break
       case "SCREEN_TIMER":
-        var counter = document.getElementById("SCREEN_COUNTER")
+        var counter = document.getElementById("A2D_SCREEN_COUNTER")
         counter.textContent = payload
+        break
+      case "SCREEN_BAR":
+        var bar = document.getElementById("A2D_SCREEN_BAR")
+        bar.value= payload
         break
       case "INTERNET_DOWN":
         this.sendNotification("SHOW_ALERT", {
@@ -375,7 +391,7 @@ Module.register("MMM-Assistant2Display",{
         this.sendSocketNotification("SCREEN_WAKEUP")
         break
       case "INTERNET_PING":
-        var ping = document.getElementById("INTERNET_PING")
+        var ping = document.getElementById("A2D_INTERNET_PING")
         ping.textContent = payload
         break
       case "SNOWBOY_STOP":
@@ -460,7 +476,7 @@ Module.register("MMM-Assistant2Display",{
     this.A2D = this.displayResponse.A2D
     this.A2D.radio = this.radioPlayer.play
     if (this.radioPlayer.img) {
-      var radio = document.getElementById("RADIO")
+      var radio = document.getElementById("A2D_RADIO")
       if (this.radioPlayer.play) radio.classList.remove("hidden")
       else radio.classList.add("hidden")
     }

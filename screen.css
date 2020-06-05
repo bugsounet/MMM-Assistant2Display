@@ -1,25 +1,33 @@
-#RADIO,
-#SCREEN,
-#INTERNET {
+#A2D_RADIO,
+#A2D_SCREEN,
+#A2D_INTERNET {
   font-size: large;
   display: flex;
 }
 
-#RADIO.hidden,
-#SCREEN.hidden,
-#INTERNET.hidden {
+#A2D_BAR.hidden,
+#A2D_RADIO.hidden,
+#A2D_SCREEN.hidden,
+#A2D_INTERNET.hidden {
   display: none;
 }
 
-#SCREEN_TEXT,
-#INTERNET_TEXT {
+#A2D_SCREEN_TEXT,
+#A2D_INTERNET_TEXT {
   margin-right: 10px;
 }
 
-#RADIO_IMG {
+#A2D_RADIO_IMG {
   height: 100px;
   width: auto;
   background-size: 100%;
   background-repeat: no-repeat;
   background-position: 0;
+}
+
+#A2D_SCREEN_BAR {
+  margin-bottom:10px;
+  height: 3px;
+  width: 100%;
+  position:relative;
 }
