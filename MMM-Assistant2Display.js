@@ -181,8 +181,13 @@ Module.register("MMM-Assistant2Display",{
     var bar = document.createElement("div")
     bar.id = "A2D_BAR"
     if (!this.config.screen.useScreen || (this.config.screen.displayStyle == "Text") || !this.config.screen.displayBar) bar.className = "hidden"
-    var screenBar = document.createElement("div")
+    var screenBar = document.createElement(this.config.screen.displayStyle == "Bar" ? "meter" : "div")
     screenBar.id = "A2D_SCREEN_BAR"
+    if (this.config.screen.displayStyle == "Bar") {
+      screenBar.classList.add("bar")
+      screenBar.value = 0
+      screenBar.max= this.config.screen.delay
+    }
     if (this.config.screen.displayStyle == "Line") screenBar.classList.add("line")
     if (this.config.screen.displayStyle == "Circle") screenBar.classList.add("circle")
     if (this.config.screen.displayStyle == "SemiCircle") screenBar.classList.add("semicircle")
@@ -377,16 +382,22 @@ Module.register("MMM-Assistant2Display",{
         }
         break
       case "SCREEN_BAR":
-        if (this.config.screen.useScreen && (this.config.screen.displayStyle != "Text")) {
-          let value = (100 - ((payload * 100) / this.config.screen.delay))/100
-          let timeOut = moment(new Date(this.config.screen.delay-payload)).format("mm:ss")
-          this.bar.animate(value, {
-            step: (state, bar) => {
-              bar.path.setAttribute('stroke', state.color)
-              bar.setText(this.config.screen.displayCounter ? timeOut : "")
-              bar.text.style.color = state.color
-            }
-          })
+        if (this.config.screen.useScreen) {
+          if (this.config.screen.displayStyle == "Bar") {
+            let bar = document.getElementById("A2D_SCREEN_BAR")
+            bar.value= this.config.screen.delay - payload
+          }
+          else if (this.config.screen.displayStyle != "Text") {
+            let value = (100 - ((payload * 100) / this.config.screen.delay))/100
+            let timeOut = moment(new Date(this.config.screen.delay-payload)).format("mm:ss")
+            this.bar.animate(value, {
+              step: (state, bar) => {
+                bar.path.setAttribute('stroke', state.color)
+                bar.setText(this.config.screen.displayCounter ? timeOut : "")
+                bar.text.style.color = state.color
+              }
+            })
+          }
         }
         break
       case "INTERNET_DOWN":
@@ -447,6 +458,7 @@ Module.register("MMM-Assistant2Display",{
 
   prepareBar: function () {
     /** Prepare TimeOut Bar **/
+    if (this.config.screen.displayStyle == "Bar") return
     this.bar = new ProgressBar[this.config.screen.displayStyle](document.getElementById('A2D_SCREEN_BAR'), {
       strokeWidth: this.config.screen.displayStyle == "Line" ? 2 : 5,
       trailColor: '#1B1B1B',
@@ -475,7 +487,7 @@ Module.register("MMM-Assistant2Display",{
   checkStyle: function () {
     /** Crash prevent on Time Out Style Displaying **/
     /** --> Set to "Text" if not found */
-    let Style = [ "Text", "Line", "SemiCircle", "Circle" ]
+    let Style = [ "Text", "Line", "SemiCircle", "Circle", "Bar" ]
     let found = Style.find((style) => {
       return style == this.config.screen.displayStyle
     })

@@ -43,3 +43,10 @@
   width: 100px;
   top: 10px;
 }
+
+#A2D_SCREEN_BAR.bar {
+  margin-bottom:4px;
+  height: 4px;
+  width: 100%;
+  position:relative;
+}
