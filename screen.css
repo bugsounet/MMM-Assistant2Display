@@ -25,20 +25,21 @@
   background-position: 0;
 }
 
+#A2D_SCREEN_BAR {
+  font-size: large;
+}
+
 #A2D_SCREEN_BAR.line {
   height: 40px;
-  font-size: large;
 }
 
 #A2D_SCREEN_BAR.circle {
-  margin: 20px;
   width: 100px;
   height: 93px;
-  font-size: large;
+  top: 10px;
 }
 
 #A2D_SCREEN_BAR.semicircle {
-  margin: 20px;
   width: 100px;
-  font-size: large;
+  top: 10px;
 }
