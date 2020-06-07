@@ -41,8 +41,9 @@ Module.register("MMM-Assistant2Display",{
       turnOffDisplay: true,
       ecoMode: true,
       displayCounter: true,
-      displayBar: false,
       text: "Auto Turn Off Screen:",
+      displayBar: true,
+      displayStyle: "Text",
       detectorSleeping: false,
       governorSleeping: false,
       rpi4: false
@@ -154,6 +155,9 @@ Module.register("MMM-Assistant2Display",{
     }
     this.displayResponse = new Display(this.config, callbacks)
     this.A2D = this.displayResponse.A2D
+
+    this.bar= null
+    this.checkStyle()
     if (this.useA2D) console.log("[A2D] initialized.")
   },
 
@@ -163,7 +167,7 @@ Module.register("MMM-Assistant2Display",{
 
     var screen = document.createElement("div")
     screen.id = "A2D_SCREEN"
-    if (!this.config.screen.useScreen || !this.config.screen.displayCounter) screen.className = "hidden"
+    if (!this.config.screen.useScreen || (this.config.screen.displayStyle != "Text")) screen.className = "hidden"
     var screenText = document.createElement("div")
     screenText.id = "A2D_SCREEN_TEXT"
     screenText.textContent = this.config.screen.text
@@ -176,11 +180,12 @@ Module.register("MMM-Assistant2Display",{
 
     var bar = document.createElement("div")
     bar.id = "A2D_BAR"
-    if (!this.config.screen.useScreen || !this.config.screen.displayBar) bar.className = "hidden"
-    var screenBar = document.createElement("meter")
+    if (!this.config.screen.useScreen || (this.config.screen.displayStyle == "Text") || !this.config.screen.displayBar) bar.className = "hidden"
+    var screenBar = document.createElement("div")
     screenBar.id = "A2D_SCREEN_BAR"
-    screenBar.value = 0
-    screenBar.max= this.config.screen.delay
+    if (this.config.screen.displayStyle == "Line") screenBar.classList.add("line")
+    if (this.config.screen.displayStyle == "Circle") screenBar.classList.add("circle")
+    if (this.config.screen.displayStyle == "SemiCircle") screenBar.classList.add("semicircle")
     bar.appendChild(screenBar)
 
     var internet = document.createElement("div")
@@ -216,7 +221,8 @@ Module.register("MMM-Assistant2Display",{
     return [
        "/modules/MMM-Assistant2Display/components/display.js",
        "/modules/MMM-Assistant2Display/ui/" + ui,
-       "/modules/MMM-Assistant2Display/components/youtube.js"
+       "/modules/MMM-Assistant2Display/components/youtube.js",
+       "/modules/MMM-Assistant2Display/components/progressbar.js"
     ]
   },
 
@@ -244,6 +250,7 @@ Module.register("MMM-Assistant2Display",{
       switch(notification) {
         case "DOM_OBJECTS_CREATED":
           this.displayResponse.prepare()
+          if (this.config.screen.useScreen && (this.config.screen.displayStyle != "Text")) this.prepareBar()
           break
         case "ASSISTANT_READY":
           this.onReady()
@@ -364,12 +371,23 @@ Module.register("MMM-Assistant2Display",{
         this.screenHiding()
         break
       case "SCREEN_TIMER":
-        var counter = document.getElementById("A2D_SCREEN_COUNTER")
-        counter.textContent = payload
+        if (this.config.screen.useScreen && (this.config.screen.displayStyle == "Text")) {
+          let counter = document.getElementById("A2D_SCREEN_COUNTER")
+          counter.textContent = payload
+        }
         break
       case "SCREEN_BAR":
-        var bar = document.getElementById("A2D_SCREEN_BAR")
-        bar.value= this.config.screen.delay - payload
+        if (this.config.screen.useScreen && (this.config.screen.displayStyle != "Text")) {
+          let value = (100 - ((payload * 100) / this.config.screen.delay))/100
+          let timeOut = moment(new Date(this.config.screen.delay-payload)).format("mm:ss")
+          this.bar.animate(value, {
+            step: (state, bar) => {
+              bar.path.setAttribute('stroke', state.color)
+              bar.setText(this.config.screen.displayCounter ? timeOut : "")
+              bar.text.style.color = state.color
+            }
+          })
+        }
         break
       case "INTERNET_DOWN":
         this.sendNotification("SHOW_ALERT", {
@@ -424,6 +442,46 @@ Module.register("MMM-Assistant2Display",{
     console.log("[A2D] Auto choice UI:", this.ui)
     if (!this.useA2D) {
       console.log("[A2D][ERROR] A2D is desactived!")
+    }
+  },
+
+  prepareBar: function () {
+    /** Prepare TimeOut Bar **/
+    this.bar = new ProgressBar[this.config.screen.displayStyle](document.getElementById('A2D_SCREEN_BAR'), {
+      strokeWidth: this.config.screen.displayStyle == "Line" ? 2 : 5,
+      trailColor: '#1B1B1B',
+      trailWidth: 1,
+      easing: 'easeInOut',
+      duration: 500,
+      svgStyle: null,
+      from: {color: '#FF0000'},
+      to: {color: '#00FF00'},
+      text: {
+        style: {
+          position: 'absolute',
+          left: '50%',
+          top: this.config.screen.displayStyle == "Line" ? "0" : "50%",
+          padding: 0,
+          margin: 0,
+          transform: {
+              prefix: true,
+              value: 'translate(-50%, -50%)'
+          }
+        }
+      }
+    })
+  },
+
+  checkStyle: function () {
+    /** Crash prevent on Time Out Style Displaying **/
+    /** --> Set to "Text" if not found */
+    let Style = [ "Text", "Line", "SemiCircle", "Circle" ]
+    let found = Style.find((style) => {
+      return style == this.config.screen.displayStyle
+    })
+    if (!found) {
+      console.log("[A2D] displayStyle Error ! ["+ this.config.screen.displayStyle + "]")
+      this.config.screen= Object.assign({}, this.config.screen, {displayStyle : "Text"} )
     }
   },
 
