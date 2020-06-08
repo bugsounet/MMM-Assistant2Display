@@ -29,22 +29,22 @@
   font-size: large;
 }
 
-#A2D_SCREEN_BAR.line {
+#A2D_SCREEN_BAR.Line {
   height: 40px;
 }
 
-#A2D_SCREEN_BAR.circle {
+#A2D_SCREEN_BAR.Circle {
   width: 100px;
   height: 93px;
   top: 10px;
 }
 
-#A2D_SCREEN_BAR.semicircle {
+#A2D_SCREEN_BAR.SemiCircle {
   width: 100px;
   top: 10px;
 }
 
-#A2D_SCREEN_BAR.bar {
+#A2D_SCREEN_BAR.Bar {
   margin-bottom:4px;
   height: 4px;
   width: 100%;

@@ -165,6 +165,7 @@ Module.register("MMM-Assistant2Display",{
     var dom = document.createElement("div")
     dom.id = "A2D_DISPLAY"
 
+    /** Screen TimeOut Text **/
     var screen = document.createElement("div")
     screen.id = "A2D_SCREEN"
     if (!this.config.screen.useScreen || (this.config.screen.displayStyle != "Text")) screen.className = "hidden"
@@ -178,21 +179,20 @@ Module.register("MMM-Assistant2Display",{
     screenCounter.textContent = "--:--"
     screen.appendChild(screenCounter)
 
+    /** Screen TimeOut Bar **/
     var bar = document.createElement("div")
     bar.id = "A2D_BAR"
     if (!this.config.screen.useScreen || (this.config.screen.displayStyle == "Text") || !this.config.screen.displayBar) bar.className = "hidden"
     var screenBar = document.createElement(this.config.screen.displayStyle == "Bar" ? "meter" : "div")
     screenBar.id = "A2D_SCREEN_BAR"
+    screenBar.classList.add(this.config.screen.displayStyle)
     if (this.config.screen.displayStyle == "Bar") {
-      screenBar.classList.add("bar")
       screenBar.value = 0
       screenBar.max= this.config.screen.delay
     }
-    if (this.config.screen.displayStyle == "Line") screenBar.classList.add("line")
-    if (this.config.screen.displayStyle == "Circle") screenBar.classList.add("circle")
-    if (this.config.screen.displayStyle == "SemiCircle") screenBar.classList.add("semicircle")
     bar.appendChild(screenBar)
 
+    /** internet Ping **/
     var internet = document.createElement("div")
     internet.id = "A2D_INTERNET"
     if (!this.config.internet.useInternet || !this.config.internet.displayPing) internet.className = "hidden"
@@ -206,6 +206,7 @@ Module.register("MMM-Assistant2Display",{
     internetPing.textContent = "Loading ..."
     internet.appendChild(internetPing)
 
+    /** Radio **/
     var radio = document.createElement("div")
     radio.id = "A2D_RADIO"
     radio.className = "hidden"
