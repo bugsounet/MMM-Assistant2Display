@@ -6,66 +6,16 @@ It allows to display the links, photos and YouTube video found by your assistant
 
 You can control MagicMirror sound volume, screen, detector, pir sensor, and more
 
-## Update history
+Needed: MMM-GoogleAssistant v2.0.0 and more
 
- * 26/05/2020 (v2.0.0)
-   * Initial Commit
-
-## Installation
-
-No Installation Needed at this moment !
-
-## Update from v1.5.3
-Don't use it, i think, it's the better way for you...
-
-### Update History
- * 17/05/2020 (v1.5.3)
-   * **ADD**: Spotify support with native response
-   * **UPD**: YouTube search RegEx pattern (faster)
- * 14/05/2020 (v1.5.2)
-   * **ADD**: notification received `A2D_LOCK` and `A2D_UNLOCK`
- * 11/05/2020 (v1.5.1)
-   * **ADD**: send notification for stop MMM-FreeboxTV
- * 08/05/2020 (v1.5.0)
-   * **UPD**: update all to my own npm library
-   * **ADD**: add updater script
- * 03/05/2020 (v1.4.1)
-   * **FIX**: installer check OS
- * 30/04/2020 (v1.4.0)
-   * **ADD**: Youtube Cast
-   * **FIX**: Minor error
-   * **ADD**: Integred AMk2 Snowboy detect code
-   * **FIX**: Radio volume too high compared to assistant
-   * **CLN**: Cleaning package.json
- * 16/04/2020 (v1.3.0)
-   * **ADD**: Radio player core
-   * **DEL**: Link Proxy script
-   * **ADD**: Use now webview for links displaying
-   * **ADD**: TelegramBot Commands
-   * **ADD**: scrollActivate feature
-   * **ADD**: Telecast sound on incoming message
- * 09/04/2020 (v1.2.0)
-   * **FIX**: A2D core code for new features
-   * **ADD**: Screen feature
-   * **ADD**: PIR Sensor feature
-   * **ADD**: Internet check feature
-   * **ADD**: Governor feature
-   * **ADD**: Brief Today feature
-   * **ADD**: Detector control
- * 22/03/2020 (V1.1.1)
-   * **FIX**: Always screen up when YT display and assistant query
-   * **FIX**: Always screen up when on next playlist YT
- * 19/03/2020 (V1.1.0)
-   * **ADD**: YouTube support with all AMk2 ui
-   * **ADD**: Title display in Classic / Classic2 ui (beta)
-   * **ADD**: vocal sound control
-   * **ADD**: screen addon control (screen addon v1.0.4 needed)
-   * **ADD**: feature activation sub modules choice 
+## Installation, Configuration & Guides
+Read the docs in [wiki](https://github.com/bugsounet/MMM-Assistant2Display/wiki)
 
 ## Last Tested
 - MagicMirror : 2.11.0
-- RPI 3B+ / raspbian 10 / nodeJS v10.x / npm 6.x
-- debian 10 / nodeJS v10.19.0 / npm v6.14.1
+- RPI 3B+ / raspbian 10
+- RPI 4 / raspbian 10
+- debian 10
 
 ## Credits
 - Author :

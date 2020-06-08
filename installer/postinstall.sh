@@ -30,4 +30,7 @@ sudo usermod -a -G gpio pi || echo "Error command: sudo usermod -a -G gpio pi"
 Installer_info "Copy recipe 'with-radio_fr.js' to MMM-GoogleAssistant recipe directory"
 cp -f ../components/with-radio_fr.js ../../MMM-GoogleAssistant/recipes && Installer_success "Done"
 
+Installer_info "Copy recipe 'with-radio_it.js' to MMM-GoogleAssistant recipe directory"
+cp -f ../components/with-radio_it.js ../../MMM-GoogleAssistant/recipes && Installer_success "Done"
+
 Installer_exit "$Installer_module is now installed !"

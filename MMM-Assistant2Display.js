@@ -28,7 +28,8 @@ Module.register("MMM-Assistant2Display",{
     },
     volume: {
       useVolume: false,
-      volumePreset: "ALSA"
+      volumePreset: "ALSA",
+      myScript: null,
     },
     briefToday: {
       useBriefToday: false,
@@ -41,6 +42,8 @@ Module.register("MMM-Assistant2Display",{
       ecoMode: true,
       displayCounter: true,
       text: "Auto Turn Off Screen:",
+      displayBar: true,
+      displayStyle: "Text",
       detectorSleeping: false,
       governorSleeping: false,
       rpi4: false
@@ -84,17 +87,19 @@ Module.register("MMM-Assistant2Display",{
   start: function () {
     this.config = this.configAssignment({}, this.defaults, this.config)
     this.volumeScript= {
-      "OSX": `osascript -e 'set volume output volume #VOLUME#'`,
-      "ALSA": `amixer sset -M 'PCM' #VOLUME#%`,
-      "HIFIBERRY-DAC": `amixer sset -M 'Digital' #VOLUME#%`,
-      "PULSE": `amixer set Master #VOLUME#% -q`,
-      "RESPEAKER_SPEAKER": `amixer -M sset Speaker #VOLUME#%`,
-      "RESPEAKER_PLAYBACK": `amixer -M sset Playback #VOLUME#%`
+      "OSX": "osascript -e 'set volume output volume #VOLUME#'",
+      "ALSA": "amixer sset -M 'PCM' #VOLUME#%",
+      "ALSA_HEADPHONE": "amixer sset -M 'Headphone' #VOLUME#%",
+      "ALSA_HDMI": "amixer sset -M 'HDMI' #VOLUME#%",
+      "HIFIBERRY-DAC": "amixer sset -M 'Digital' #VOLUME#%",
+      "PULSE": "amixer set Master #VOLUME#% -q",
+      "RESPEAKER_SPEAKER": "amixer -M sset Speaker #VOLUME#%",
+      "RESPEAKER_PLAYBACK": "amixer -M sset Playback #VOLUME#%"
     }
 
     this.helperConfig= {
       debug: this.config.debug,
-      volumeScript: this.volumeScript[this.config.volume.volumePreset],
+      volumeScript: this.config.volume.myScript ? this.config.volume.myScript : this.volumeScript[this.config.volume.volumePreset],
       useA2D: this.useA2D,
       links: this.config.links,
       screen: this.config.screen,
@@ -150,6 +155,9 @@ Module.register("MMM-Assistant2Display",{
     }
     this.displayResponse = new Display(this.config, callbacks)
     this.A2D = this.displayResponse.A2D
+
+    this.bar= null
+    this.checkStyle()
     if (this.useA2D) console.log("[A2D] initialized.")
   },
 
@@ -157,42 +165,59 @@ Module.register("MMM-Assistant2Display",{
     var dom = document.createElement("div")
     dom.id = "A2D_DISPLAY"
 
+    /** Screen TimeOut Text **/
     var screen = document.createElement("div")
-    screen.id = "SCREEN"
-    if (!this.config.screen.useScreen || !this.config.screen.displayCounter) screen.className = "hidden"
+    screen.id = "A2D_SCREEN"
+    if (!this.config.screen.useScreen || (this.config.screen.displayStyle != "Text")) screen.className = "hidden"
     var screenText = document.createElement("div")
-    screenText.id = "SCREEN_TEXT"
+    screenText.id = "A2D_SCREEN_TEXT"
     screenText.textContent = this.config.screen.text
     screen.appendChild(screenText)
     var screenCounter = document.createElement("div")
-    screenCounter.id = "SCREEN_COUNTER"
+    screenCounter.id = "A2D_SCREEN_COUNTER"
     screenCounter.classList.add("counter")
-    screenCounter.textContent = "--:--:--"
+    screenCounter.textContent = "--:--"
     screen.appendChild(screenCounter)
 
+    /** Screen TimeOut Bar **/
+    var bar = document.createElement("div")
+    bar.id = "A2D_BAR"
+    if (!this.config.screen.useScreen || (this.config.screen.displayStyle == "Text") || !this.config.screen.displayBar) bar.className = "hidden"
+    var screenBar = document.createElement(this.config.screen.displayStyle == "Bar" ? "meter" : "div")
+    screenBar.id = "A2D_SCREEN_BAR"
+    screenBar.classList.add(this.config.screen.displayStyle)
+    if (this.config.screen.displayStyle == "Bar") {
+      screenBar.value = 0
+      screenBar.max= this.config.screen.delay
+    }
+    bar.appendChild(screenBar)
+
+    /** internet Ping **/
     var internet = document.createElement("div")
-    internet.id = "INTERNET"
+    internet.id = "A2D_INTERNET"
     if (!this.config.internet.useInternet || !this.config.internet.displayPing) internet.className = "hidden"
     var internetText = document.createElement("div")
-    internetText.id = "INTERNET_TEXT"
+    internetText.id = "A2D_INTERNET_TEXT"
     internetText.textContent = "Ping: "
     internet.appendChild(internetText)
     var internetPing = document.createElement("div")
-    internetPing.id = "INTERNET_PING"
+    internetPing.id = "A2D_INTERNET_PING"
     internetPing.classList.add("ping")
     internetPing.textContent = "Loading ..."
     internet.appendChild(internetPing)
 
+    /** Radio **/
     var radio = document.createElement("div")
-    radio.id = "RADIO"
+    radio.id = "A2D_RADIO"
     radio.className = "hidden"
     var radioImg = document.createElement("img")
-    radioImg.id = "RADIO_IMG"
+    radioImg.id = "A2D_RADIO_IMG"
     radio.appendChild(radioImg)
 
     dom.appendChild(radio)
     dom.appendChild(screen)
     dom.appendChild(internet)
+    dom.appendChild(bar)
     return dom
   },
 
@@ -202,7 +227,8 @@ Module.register("MMM-Assistant2Display",{
     return [
        "/modules/MMM-Assistant2Display/components/display.js",
        "/modules/MMM-Assistant2Display/ui/" + ui,
-       "/modules/MMM-Assistant2Display/components/youtube.js"
+       "/modules/MMM-Assistant2Display/components/youtube.js",
+       "/modules/MMM-Assistant2Display/components/progressbar.js"
     ]
   },
 
@@ -216,7 +242,8 @@ Module.register("MMM-Assistant2Display",{
   getTranslations: function() {
     return {
       en: "translations/en.json",
-      fr: "translations/fr.json"
+      fr: "translations/fr.json",
+      it: "translations/it.json"
     }
   },
 
@@ -229,6 +256,7 @@ Module.register("MMM-Assistant2Display",{
       switch(notification) {
         case "DOM_OBJECTS_CREATED":
           this.displayResponse.prepare()
+          if (this.config.screen.useScreen && (this.config.screen.displayStyle != "Text")) this.prepareBar()
           break
         case "ASSISTANT_READY":
           this.onReady()
@@ -281,7 +309,7 @@ Module.register("MMM-Assistant2Display",{
         case "A2D_ASSISTANT_READY":
           if (this.config.screen.useScreen && !this.A2D.locked) this.sendSocketNotification("SCREEN_RESET")
           break
-        case "VOLUME_SET":
+        case "A2D_VOLUME":
           if (this.config.volume.useVolume) {
             this.sendSocketNotification("SET_VOLUME", payload)
           }
@@ -305,7 +333,7 @@ Module.register("MMM-Assistant2Display",{
           if (this.A2D.youtube.displayed) this.displayResponse.player.command("stopVideo")
           if (payload.link) {
             if (payload.img) {
-              var radioImg = document.getElementById("RADIO_IMG")
+              var radioImg = document.getElementById("A2D_RADIO_IMG")
               this.radioPlayer.img = payload.img
               radioImg.src = this.radioPlayer.img
             }
@@ -349,8 +377,29 @@ Module.register("MMM-Assistant2Display",{
         this.screenHiding()
         break
       case "SCREEN_TIMER":
-        var counter = document.getElementById("SCREEN_COUNTER")
-        counter.textContent = payload
+        if (this.config.screen.useScreen && (this.config.screen.displayStyle == "Text")) {
+          let counter = document.getElementById("A2D_SCREEN_COUNTER")
+          counter.textContent = payload
+        }
+        break
+      case "SCREEN_BAR":
+        if (this.config.screen.useScreen) {
+          if (this.config.screen.displayStyle == "Bar") {
+            let bar = document.getElementById("A2D_SCREEN_BAR")
+            bar.value= this.config.screen.delay - payload
+          }
+          else if (this.config.screen.displayStyle != "Text") {
+            let value = (100 - ((payload * 100) / this.config.screen.delay))/100
+            let timeOut = moment(new Date(this.config.screen.delay-payload)).format("mm:ss")
+            this.bar.animate(value, {
+              step: (state, bar) => {
+                bar.path.setAttribute('stroke', state.color)
+                bar.setText(this.config.screen.displayCounter ? timeOut : "")
+                bar.text.style.color = state.color
+              }
+            })
+          }
+        }
         break
       case "INTERNET_DOWN":
         this.sendNotification("SHOW_ALERT", {
@@ -371,7 +420,7 @@ Module.register("MMM-Assistant2Display",{
         this.sendSocketNotification("SCREEN_WAKEUP")
         break
       case "INTERNET_PING":
-        var ping = document.getElementById("INTERNET_PING")
+        var ping = document.getElementById("A2D_INTERNET_PING")
         ping.textContent = payload
         break
       case "SNOWBOY_STOP":
@@ -408,6 +457,47 @@ Module.register("MMM-Assistant2Display",{
     }
   },
 
+  prepareBar: function () {
+    /** Prepare TimeOut Bar **/
+    if (this.config.screen.displayStyle == "Bar") return
+    this.bar = new ProgressBar[this.config.screen.displayStyle](document.getElementById('A2D_SCREEN_BAR'), {
+      strokeWidth: this.config.screen.displayStyle == "Line" ? 2 : 5,
+      trailColor: '#1B1B1B',
+      trailWidth: 1,
+      easing: 'easeInOut',
+      duration: 500,
+      svgStyle: null,
+      from: {color: '#FF0000'},
+      to: {color: '#00FF00'},
+      text: {
+        style: {
+          position: 'absolute',
+          left: '50%',
+          top: this.config.screen.displayStyle == "Line" ? "0" : "50%",
+          padding: 0,
+          margin: 0,
+          transform: {
+              prefix: true,
+              value: 'translate(-50%, -50%)'
+          }
+        }
+      }
+    })
+  },
+
+  checkStyle: function () {
+    /** Crash prevent on Time Out Style Displaying **/
+    /** --> Set to "Text" if not found */
+    let Style = [ "Text", "Line", "SemiCircle", "Circle", "Bar" ]
+    let found = Style.find((style) => {
+      return style == this.config.screen.displayStyle
+    })
+    if (!found) {
+      console.log("[A2D] displayStyle Error ! ["+ this.config.screen.displayStyle + "]")
+      this.config.screen= Object.assign({}, this.config.screen, {displayStyle : "Text"} )
+    }
+  },
+
   configAssignment : function (result) {
     var stack = Array.prototype.slice.call(arguments, 1)
     var item
@@ -440,13 +530,13 @@ Module.register("MMM-Assistant2Display",{
     if (this.config.briefToday.useBriefToday) this.briefToday()
   },
 
-  screenShowing: function () {
+  screenShowing: function() {
     MM.getModules().enumerate((module)=> {
       module.show(1000, {lockString: "A2D_SCREEN"})
     })
   },
 
-  screenHiding: function () {
+  screenHiding: function() {
     MM.getModules().enumerate((module)=> {
       module.hide(1000, {lockString: "A2D_SCREEN"})
     })
@@ -456,7 +546,7 @@ Module.register("MMM-Assistant2Display",{
     this.A2D = this.displayResponse.A2D
     this.A2D.radio = this.radioPlayer.play
     if (this.radioPlayer.img) {
-      var radio = document.getElementById("RADIO")
+      var radio = document.getElementById("A2D_RADIO")
       if (this.radioPlayer.play) radio.classList.remove("hidden")
       else radio.classList.add("hidden")
     }
@@ -600,7 +690,7 @@ Module.register("MMM-Assistant2Display",{
       if (isLink || retryWithHttp) {
         handler.reply("TEXT", this.translate("A2D_OPEN") + handler.args)
         console.log(handler)
-        responseEmulate.transcription.transcription = " Telegram @"+ handler.message.from.username + ": " + handler.args
+        responseEmulate.transcription.transcription = " Telegram @" + handler.message.from.username + ": " + handler.args
         responseEmulate.transcription.done = true
         responseEmulate.urls[0] = isLink ? handler.args : ("http://" + handler.args)
         this.displayResponse.start(responseEmulate)
