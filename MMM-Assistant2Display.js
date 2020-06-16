@@ -426,7 +426,7 @@ Module.register("MMM-Assistant2Display",{
       case "SNOWBOY_STOP":
         this.sendNotification("ASSISTANT_STOP")
         break
-      case "SNWOBOY_START":
+      case "SNOWBOY_START":
         this.sendNotification("ASSISTANT_START")
         break
       case "CAST_START":
