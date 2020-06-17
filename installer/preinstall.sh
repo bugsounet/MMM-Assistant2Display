@@ -41,9 +41,10 @@ Installer_info "Checking OS..."
 Installer_checkOS
 if  [ "$os_name" == "raspbian" ] && [ "$os_version" -lt 10 ]; then
   Installer_error "OS Detected: $OSTYPE ($os_name $os_version $arch)"
-  Installer_error "Unfortunately, this program does not work with your OS"
-  Installer_error "Try compiling manually or updating to the lasted version"
-  exit 0
+  Installer_error "Unfortunately, this module is not compatible with your OS"
+  Installer_error "Try to update your OS to the lasted version of raspbian"
+  echo
+  exit 255
 else
   Installer_success "OS Detected: $OSTYPE ($os_name $os_version $arch)"
 fi
