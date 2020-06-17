@@ -11,12 +11,6 @@ Needed: MMM-GoogleAssistant v2.0.0 and more
 ## Installation, Configuration & Guides
 Read the docs in [wiki](https://github.com/bugsounet/MMM-Assistant2Display/wiki)
 
-## Last Tested
-- MagicMirror : 2.11.0
-- RPI 3B+ / raspbian 10
-- RPI 4 / raspbian 10
-- debian 10
-
 ## Credits
 - Author :
   - @bugsounet
