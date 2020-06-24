@@ -84,12 +84,11 @@ Module.register("MMM-Assistant2Display",{
       maxVolume: 100,
       updateInterval: 1000,
       idleInterval: 10000,
-      deviceDisplay: "Listening on",
-      miniBarConfig: {
-        album: true,
-        scroll: true,
-        logo: true
-      }
+      PATH: "../../../",
+      TOKEN: "./token.json",
+      CLIENT_ID: "",
+      CLIENT_SECRET: "",
+      dev: false
     }
   },
 
