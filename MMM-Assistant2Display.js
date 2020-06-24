@@ -77,10 +77,19 @@ Module.register("MMM-Assistant2Display",{
     },
     spotify: {
       useSpotify: false,
+      useLibrespot: false,
       connectTo: null,
       playDelay: 3000,
       minVolume: 10,
-      maxVolume: 100
+      maxVolume: 100,
+      updateInterval: 1000,
+      idleInterval: 10000,
+      deviceDisplay: "Listening on",
+      miniBarConfig: {
+        album: true,
+        scroll: true,
+        logo: true
+      }
     }
   },
 
@@ -106,7 +115,8 @@ Module.register("MMM-Assistant2Display",{
       pir: this.config.pir,
       governor: this.config.governor,
       internet: this.config.internet,
-      cast: this.config.cast
+      cast: this.config.cast,
+      spotify: this.config.spotify
     }
 
     this.radioPlayer = {
@@ -114,34 +124,7 @@ Module.register("MMM-Assistant2Display",{
       img: null,
       link: null,
     }
-    this.radio = new Audio()
-
-    this.radio.addEventListener("ended", ()=> {
-      A2D("Radio ended")
-      this.radioPlayer.play = false
-      this.showRadio()
-    })
-    this.radio.addEventListener("pause", ()=> {
-      A2D("Radio paused")
-      this.radioPlayer.play = false
-      this.showRadio()
-    })
-    this.radio.addEventListener("abort", ()=> {
-      A2D("Radio aborted")
-      this.radioPlayer.play = false
-      this.showRadio()
-    })
-    this.radio.addEventListener("error", (err)=> {
-      A2D("Radio error: " + err)
-      this.radioPlayer.play = false
-      this.showRadio()
-    })
-    this.radio.addEventListener("loadstart", ()=> {
-      A2D("Radio started")
-      this.radioPlayer.play = true
-      this.radio.volume = 0.6
-      this.showRadio()
-    })
+    this.createRadio()
 
     if (this.config.debug) A2D = A2D_
     var callbacks= {
@@ -550,6 +533,38 @@ Module.register("MMM-Assistant2Display",{
       if (this.radioPlayer.play) radio.classList.remove("hidden")
       else radio.classList.add("hidden")
     }
+  },
+
+  /** Create Radio function and cb **/
+  createRadio: function() {
+    this.radio = new Audio()
+
+    this.radio.addEventListener("ended", ()=> {
+      A2D("Radio ended")
+      this.radioPlayer.play = false
+      this.showRadio()
+    })
+    this.radio.addEventListener("pause", ()=> {
+      A2D("Radio paused")
+      this.radioPlayer.play = false
+      this.showRadio()
+    })
+    this.radio.addEventListener("abort", ()=> {
+      A2D("Radio aborted")
+      this.radioPlayer.play = false
+      this.showRadio()
+    })
+    this.radio.addEventListener("error", (err)=> {
+      A2D("Radio error: " + err)
+      this.radioPlayer.play = false
+      this.showRadio()
+    })
+    this.radio.addEventListener("loadstart", ()=> {
+      A2D("Radio started")
+      this.radioPlayer.play = true
+      this.radio.volume = 0.6
+      this.showRadio()
+    })
   },
 
   /** TelegramBot commands **/

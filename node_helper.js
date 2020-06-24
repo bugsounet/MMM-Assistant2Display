@@ -1,12 +1,15 @@
 /** node helper **/
 
 var exec = require('child_process').exec
+const fs = require("fs")
+const path = require("path")
 var NodeHelper = require("node_helper")
 const Screen = require("@bugsounet/screen")
 const Pir = require("@bugsounet/pir")
 const Governor = require("@bugsounet/governor")
 const Internet = require("@bugsounet/internet")
 const CastServer = require("@bugsounet/cast")
+const Spotify = require("./components/Spotify.js")
 
 var _log = function() {
   var context = "[A2D]"
@@ -121,5 +124,51 @@ module.exports = NodeHelper.create({
       this.cast = new CastServer(this.config.cast, callbacks.sendSocketNotification, this.config.debug)
       this.cast.start()
     }
-  }
+    if (this.config.spotify.useSpotify) {
+      let file = path.resolve(__dirname, "spotify.config.json")
+      if (fs.existsSync(file)) {
+        try {
+          this.spotifyConfig = JSON.parse(fs.readFileSync(file))
+        } catch (e) {
+          return console.log("[SPOTIFY] ERROR: spotify.config.json", e.name)
+        }
+        this.spotify = new Spotify(this.spotifyConfig, this.config.debug)
+      }
+      else return console.log("[SPOTIFY] ERROR: spotify.config.json file missing !")
+      this.updatePulse().then(() => {
+        if (this.config.debug) console.log("[SPOTIFY] Launch Librespot...")
+        if (this.config.debug) console.log("[SPOTIFY] Started...")
+      })
+    }
+  },
+
+/** spotify **/
+  updatePulse: async function () {
+    let idle = false
+    if (!this.spotify) return console.log("[SPOTIFY] updatePulse ERROR: Account not found")
+    try {
+      let result = await this.updateSpotify(this.spotify)
+      this.sendSocketNotification("SPOTIFY_PLAYBACK", result)
+      log("Spotify: Play")
+    } catch (e) {
+      idle = true
+      this.sendSocketNotification("SPOTIFY_NOPLAYBACK")
+      log("Spotify: Idle")
+    }
+    this.timer = setTimeout(() => {
+      this.updatePulse()
+    }, idle ? this.config.spotify.idleInterval : this.config.spotify.updateInterval)
+  },
+
+  updateSpotify: function (spotify) {
+    return new Promise((resolve, reject) => {
+      spotify.getCurrentPlayback((code, error, result) => {
+        if (result === "undefined" || code !== 200) {
+          reject()
+        } else {
+          resolve(result)
+        }
+      })
+    })
+  },
 });

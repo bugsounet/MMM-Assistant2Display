@@ -28,6 +28,7 @@
     "@bugsounet/governor": "^1.0.3",
     "@bugsounet/internet": "^1.0.0",
     "@bugsounet/pir": "^1.0.4",
-    "@bugsounet/screen": "^1.0.0"
+    "@bugsounet/screen": "^1.0.0",
+    "open": "^7.0.4"
   }
 }
