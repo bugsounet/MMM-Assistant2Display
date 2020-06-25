@@ -136,7 +136,7 @@ Module.register("MMM-Assistant2Display",{
         this.sendNotification(noti, params)
       },
       "radioStop": ()=> this.radio.pause(),
-      "spotify": (params) => this.A2D.spotify.connected = params // todo -> check player to lock screen
+      "spotify": (params) => this.A2D.spotify.connected = params
     }
     this.displayResponse = new Display(this.config, callbacks)
     if (this.config.spotify.useSpotify && this.config.spotify.useIntegred && this.config.spotify.dev) this.spotify = new Spotify(this.config.spotify, callbacks, this.config.debug)
@@ -349,12 +349,20 @@ Module.register("MMM-Assistant2Display",{
             this.radio.autoplay = true
           }
           break
-        case "SPOTIFY_UPDATE_PLAYING":
+        case "SPOTIFY_UPDATE_DEVICE":
           if (this.config.spotify.useSpotify && !this.config.spotify.useIntegred) {
-            this.A2D.spotify.connected = payload ? true : false
-            if (this.config.screen.useScreen && !this.displayResponse.working()) {
-              if (payload) this.sendSocketNotification("SCREEN_WAKEUP")
-              this.sendSocketNotification("SCREEN_LOCK", payload ? true : false)
+            if (payload.name) {
+              if (payload.name == this.config.spotify.connectTo) {
+                if (!this.A2D.spotify.librespot && this.config.screen.useScreen && !this.displayResponse.working()) {
+                  this.sendSocketNotification("SCREEN_WAKEUP")
+                  this.sendSocketNotification("SCREEN_LOCK", true)
+                  this.A2D.spotify.librespot = true
+                }
+              }
+              else if (this.A2D.spotify.librespot && this.config.screen.useScreen && !this.displayResponse.working()) {
+                  this.sendSocketNotification("SCREEN_LOCK", false)
+                  this.A2D.spotify.librespot = false
+              }
             }
           }
           break
@@ -437,9 +445,28 @@ Module.register("MMM-Assistant2Display",{
         break
       case "SPOTIFY_PLAY":
         this.spotify.updateCurrentSpotify(payload)
+        if (payload && payload.device && payload.device.name) { //prevent crash
+          if (payload.device.name == this.config.spotify.connectTo) {
+            if (!this.A2D.spotify.librespot && this.config.screen.useScreen && !this.displayResponse.working()) {
+              this.sendSocketNotification("SCREEN_WAKEUP")
+              this.sendSocketNotification("SCREEN_LOCK", true)
+              this.A2D.spotify.librespot = true
+            }
+          }
+          else {
+            if (this.A2D.spotify.librespot && this.config.screen.useScreen && !this.displayResponse.working()) {
+              this.sendSocketNotification("SCREEN_LOCK", false)
+              this.A2D.spotify.librespot = false
+            }
+          }
+        }
         break
       case "SPOTIFY_IDLE":
         this.spotify.updatePlayback(false)
+        if (this.A2D.spotify.librespot && this.config.screen.useScreen && !this.displayResponse.working()) {
+          this.sendSocketNotification("SCREEN_LOCK", false)
+          this.A2D.spotify.librespot = false
+        }
         break
     }
   },

@@ -35,7 +35,8 @@ class DisplayClass {
         running: false
       },
       spotify: {
-        connected: false
+        connected: false,
+        librespot: false
       }
     }
     console.log("[A2D] DisplayClass Loaded")
