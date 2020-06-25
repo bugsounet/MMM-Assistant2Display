@@ -382,13 +382,25 @@ class DisplayClass {
     if (!this.A2D.speak && !this.working()) this.A2DUnlock()
   }
 
+  hideSpotify() {
+    var spotifyModule = document.getElementById("module_A2D_Spotify")
+    spotifyModule.style.display = "none"
+  }
+
+  showSpotify() {
+    var spotifyModule = document.getElementById("module_A2D_Spotify")
+    spotifyModule.style.display = "block"
+  }
+
   A2DLock() {
     if (this.A2D.locked) return
     A2D("Lock Screen")
     MM.getModules().exceptWithClass("MMM-GoogleAssistant").enumerate((module)=> {
       module.hide(15, {lockString: "A2D_LOCKED"})
     })
-    // todo -> hide integred spotify fake module
+    if (this.A2D.spotify.connected && this.config.spotify.useIntegred) {
+      this.hideSpotify()
+    }
     if (this.config.screen.useScreen) this.sendSocketNotification("SCREEN_LOCK", true)
     this.A2D.locked = true
   }
@@ -399,7 +411,9 @@ class DisplayClass {
     MM.getModules().exceptWithClass("MMM-GoogleAssistant").enumerate((module)=> {
       module.show(15, {lockString: "A2D_LOCKED"})
     })
-    // todo -> show integred spotify fake module
+    if (this.A2D.spotify.connected && this.config.spotify.useIntegred) {
+      this.showSpotify()
+    }
     if (this.config.screen.useScreen && !this.A2D.spotify.connected) this.sendSocketNotification("SCREEN_LOCK", false)
     this.A2D.locked = false
   }

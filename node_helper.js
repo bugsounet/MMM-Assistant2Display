@@ -26,7 +26,6 @@ module.exports = NodeHelper.create({
   },
 
   socketNotificationReceived: function (noti, payload) {
-    // console.log(noti)
     switch (noti) {
       case "INIT":
         this.initialize(payload)
@@ -53,19 +52,27 @@ module.exports = NodeHelper.create({
       case "SPOTIFY_PLAY":
         this.spotify.play(payload, (code, error, result) => {
           if ((code !== 204) && (code !== 202)) {
-            console.log(error)
-            return
+            return console.log("[SPOTIFY:PLAY] Error", code, error, result)
           }
+          else log("[SPOTIFY] DONE_PLAY")
         })
         break
       case "SPOTIFY_VOLUME":
         this.spotify.volume(payload, (code, error, result) => {
-          if (code !== 204) console.log(error)
+          if (code !== 204) console.log("[SPOTIFY:VOLUME] Error", code, error, result)
+          else log("[SPOTIFY] DONE_VOLUME")
         })
         break
       case "SPOTIFY_PAUSE":
         this.spotify.pause((code, error, result) => {
-          console.log(code,error,result)
+          if ((code !== 204) && (code !== 202)) console.log("[SPOTIFY:PAUSE] Error", code, error, result)
+          else log("[SPOTIFY] DONE_PAUSE")
+        })
+        break
+      case "SPOTIFY_TRANSFER":
+        this.spotify.transferByName(payload, (code, error, result) => {
+          if ((code !== 204) && (code !== 202)) console.log("[SPOTIFY:TRANSFER] Error", code, error, result)
+          else log("[SPOTIFY] DONE_TRANSFER")
         })
         break
     }

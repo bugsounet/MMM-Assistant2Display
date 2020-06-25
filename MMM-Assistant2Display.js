@@ -259,7 +259,10 @@ Module.register("MMM-Assistant2Display",{
             this.displayResponse.player.command("setVolume", 5)
           }
           if (this.config.spotify.useSpotify && this.A2D.spotify.connected) {
-            if (this.config.spotify.useIntegred) this.sendSocketNotification("SPOTIFY_VOLUME", this.config.spotify.minVolume)
+            if (this.config.spotify.useIntegred) {
+              this.sendSocketNotification("SPOTIFY_VOLUME", this.config.spotify.minVolume)
+              this.displayResponse.hideSpotify()
+            }
             else this.sendNotification("SPOTIFY_VOLUME", this.config.spotify.minVolume)
           }
           if (this.A2D.radio) this.radio.volume = 0.1
@@ -271,7 +274,10 @@ Module.register("MMM-Assistant2Display",{
             this.displayResponse.player.command("setVolume", 100)
           }
           if (this.config.spotify.useSpotify) {
-            if (this.config.spotify.useIntegred) this.sendSocketNotification("SPOTIFY_VOLUME", this.config.spotify.maxVolume)
+            if (this.config.spotify.useIntegred) {
+              this.sendSocketNotification("SPOTIFY_VOLUME", this.config.spotify.maxVolume)
+              if (this.A2D.spotify.connected && !this.displayResponse.working()) this.displayResponse.showSpotify()
+            }
             else this.sendNotification("SPOTIFY_VOLUME", this.config.spotify.maxVolume)
           }
           if (this.A2D.radio) this.radio.volume = 0.6
@@ -296,7 +302,7 @@ Module.register("MMM-Assistant2Display",{
               this.displayResponse.hideDisplay()
             }
           }
-          if (this.A2D.spotify.connected) {
+          if (this.A2D.spotify.connected && this.A2D.spotify.librespot) {
             if (this.config.spotify.useIntegred) this.sendSocketNotification("SPOTIFY_PAUSE")
             else this.sendSocketNotification("SPOTIFY_PAUSE")
           }
@@ -331,6 +337,10 @@ Module.register("MMM-Assistant2Display",{
           break
         case "A2D_RADIO":
           if (this.A2D.youtube.displayed) this.displayResponse.player.command("stopVideo")
+          if (this.A2D.spotify.connected && this.A2D.spotify.librespot) {
+            if (this.config.spotify.useIntegred) this.sendSocketNotification("SPOTIFY_PAUSE")
+            else this.sendSocketNotification("SPOTIFY_PAUSE")
+          }
           if (payload.link) {
             if (payload.img) {
               var radioImg = document.getElementById("A2D_RADIO_IMG")
