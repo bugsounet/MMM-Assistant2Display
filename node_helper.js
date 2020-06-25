@@ -26,6 +26,7 @@ module.exports = NodeHelper.create({
   },
 
   socketNotificationReceived: function (noti, payload) {
+    // console.log(noti)
     switch (noti) {
       case "INIT":
         this.initialize(payload)
@@ -48,6 +49,24 @@ module.exports = NodeHelper.create({
         break
       case "RESTART":
         this.pm2Restart(payload)
+        break
+      case "SPOTIFY_PLAY":
+        this.spotify.play(payload, (code, error, result) => {
+          if ((code !== 204) && (code !== 202)) {
+            console.log(error)
+            return
+          }
+        })
+        break
+      case "SPOTIFY_VOLUME":
+        this.spotify.volume(payload, (code, error, result) => {
+          if (code !== 204) console.log(error)
+        })
+        break
+      case "SPOTIFY_PAUSE":
+        this.spotify.pause((code, error, result) => {
+          console.log(code,error,result)
+        })
         break
     }
   },
@@ -124,9 +143,9 @@ module.exports = NodeHelper.create({
       this.cast.start()
     }
     if (this.config.spotify.useSpotify) {
-      if (this.config.spotify.dev) {
+      if (this.config.spotify.useIntegred && this.config.spotify.dev) {
         /** dev testing **/
-        /** npm library not yet publish **/
+        /** npm library not yet published **/
         const Spotify = require("@bugsounet/spotify")
         this.spotify = new Spotify(this.config.spotify, callbacks.sendSocketNotification, this.config.debug)
         this.spotify.start()

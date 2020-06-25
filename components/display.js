@@ -35,7 +35,6 @@ class DisplayClass {
         running: false
       },
       spotify: {
-        playing: false,
         connected: false
       }
     }
@@ -152,7 +151,10 @@ class DisplayClass {
         let Type
         let YouTubeResponse = {}
         if (this.A2D.radio) this.radioStop()
-        if (this.A2D.spotify.playing && this.config.useSpotify) this.sendNotification("SPOTIFY_PAUSE")
+        if (this.A2D.spotify.connected && this.config.spotify.useSpotify) {
+          if (this.config.spotify.useIntegred) this.sendSocketNotification("SPOTIFY_PAUSE")
+          else this.sendNotification("SPOTIFY_PAUSE")
+        }
         if (YouTube[1] == "watch") Type = "id"
         if (YouTube[1] == "playlist") Type = "playlist"
         if (!Type) return console.log("[A2D:YouTube] Unknow Type !" , YouTube)
@@ -167,7 +169,10 @@ class DisplayClass {
       }
     }
     if (this.config.spotify.useSpotify) {
-      if (!this.A2D.spotify.connected && this.config.spotify.connectTo) this.sendNotification("SPOTIFY_TRANSFER", this.config.spotify.connectTo)
+      if (!this.A2D.spotify.connected && this.config.spotify.connectTo) {
+        if (this.config.spotify.useIntegred) this.sendSocketNotification("SPOTIFY_TRANSFER", this.config.spotify.connectTo)
+        else this.sendNotification("SPOTIFY_TRANSFER", this.config.spotify.connectTo)
+      }
       /** Spotify RegExp **/
       var SpotifyLink = new RegExp("open\.spotify\.com\/([a-z]+)\/([0-9a-zA-Z\-\_]+)", "ig")
       /** Scan Spotify Link **/
@@ -180,10 +185,12 @@ class DisplayClass {
           let id = Spotify[2]
           if (type == "track") {
             // don't know why tracks works only with uris !?
-            this.sendNotification("SPOTIFY_PLAY", {"uris": ["spotify:track:" + id ]})
+            if (this.config.spotify.useIntegred) this.sendSocketNotification("SPOTIFY_PLAY", {"uris": ["spotify:track:" + id ]})
+            else this.sendNotification("SPOTIFY_PLAY", {"uris": ["spotify:track:" + id ]})
           }
           else {
-            this.sendNotification("SPOTIFY_PLAY", {"context_uri": "spotify:"+ type + ":" + id})
+            if (this.config.spotify.useIntegred) this.sendSocketNotification("SPOTIFY_PLAY", {"context_uri": "spotify:"+ type + ":" + id})
+            else this.sendNotification("SPOTIFY_PLAY", {"context_uri": "spotify:"+ type + ":" + id})
           }
         }, this.config.spotify.playDelay)
         return
@@ -302,7 +309,10 @@ class DisplayClass {
   castStart(url) {
     /** stop all process before starting cast **/
     if (this.A2D.youtube.displayed) this.player.command("stopVideo")
-    if (this.A2D.spotify.playing) this.sendNotification("SPOTIFY_PAUSE")
+    if (this.A2D.spotify.connected) {
+      if (this.config.spotify.useIntegred) this.sendSocketNotification("SPOTIFY_PAUSE")
+      else this.sendNotification("SPOTIFY_PAUSE")
+    }
     if (this.A2D.photos.displayed) {
       this.resetPhotos()
       this.hideDisplay()
@@ -377,6 +387,7 @@ class DisplayClass {
     MM.getModules().exceptWithClass("MMM-GoogleAssistant").enumerate((module)=> {
       module.hide(15, {lockString: "A2D_LOCKED"})
     })
+    // todo -> hide integred spotify fake module
     if (this.config.screen.useScreen) this.sendSocketNotification("SCREEN_LOCK", true)
     this.A2D.locked = true
   }
@@ -387,7 +398,8 @@ class DisplayClass {
     MM.getModules().exceptWithClass("MMM-GoogleAssistant").enumerate((module)=> {
       module.show(15, {lockString: "A2D_LOCKED"})
     })
-    if (this.config.screen.useScreen && !this.A2D.spotify.playing) this.sendSocketNotification("SCREEN_LOCK", false)
+    // todo -> show integred spotify fake module
+    if (this.config.screen.useScreen && !this.A2D.spotify.connected) this.sendSocketNotification("SCREEN_LOCK", false)
     this.A2D.locked = false
   }
 
