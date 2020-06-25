@@ -85,11 +85,10 @@ Module.register("MMM-Assistant2Display",{
       maxVolume: 100,
       updateInterval: 1000, //!!!DEV!!!
       idleInterval: 10000, //!!!DEV!!!
-      PATH: "../../../", //!!!DEV!!!
+      PATH: "../../../", // Needed Don't modify it !
       TOKEN: "./token.json", //!!!DEV!!!
       CLIENT_ID: "", //!!!DEV!!!
       CLIENT_SECRET: "", //!!!DEV!!!
-      dev: false, //!!!DEV!!! (library spotify needed)
       deviceDisplay: "Listening on", //!!!DEV!!!
     }
   },
@@ -139,7 +138,7 @@ Module.register("MMM-Assistant2Display",{
       "spotify": (params) => this.A2D.spotify.connected = params
     }
     this.displayResponse = new Display(this.config, callbacks)
-    if (this.config.spotify.useSpotify && this.config.spotify.useIntegred && this.config.spotify.dev) this.spotify = new Spotify(this.config.spotify, callbacks, this.config.debug)
+    if (this.config.spotify.useSpotify && this.config.spotify.useIntegred) this.spotify = new Spotify(this.config.spotify, callbacks, this.config.debug)
     this.A2D = this.displayResponse.A2D
 
     this.bar= null
@@ -247,7 +246,7 @@ Module.register("MMM-Assistant2Display",{
         case "DOM_OBJECTS_CREATED":
           this.displayResponse.prepare()
           if (this.config.screen.useScreen && (this.config.screen.displayStyle != "Text")) this.prepareBar()
-          if (this.config.spotify.useSpotify && this.config.spotify.useIntegred && this.config.spotify.dev) this.spotify.prepare()
+          if (this.config.spotify.useSpotify && this.config.spotify.useIntegred) this.spotify.prepare()
           break
         case "ASSISTANT_READY":
           this.onReady()

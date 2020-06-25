@@ -151,11 +151,11 @@ module.exports = NodeHelper.create({
       this.cast.start()
     }
     if (this.config.spotify.useSpotify) {
-      if (this.config.spotify.useIntegred && this.config.spotify.dev) {
+      if (this.config.spotify.useIntegred) {
         this.spotify = new Spotify(this.config.spotify, callbacks.sendSocketNotification, this.config.debug)
         this.spotify.start()
-        if (this.config.spotify.useLibrespot) console.log("[SPOTIFY] Launch Librespot... not yet implented !!! :-)")
       }
+      if (this.config.spotify.useLibrespot) console.log("[SPOTIFY] Launch Librespot... not yet implented !!! :-)")
     }
   },
 });
