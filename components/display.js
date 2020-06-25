@@ -310,7 +310,7 @@ class DisplayClass {
   castStart(url) {
     /** stop all process before starting cast **/
     if (this.A2D.youtube.displayed) this.player.command("stopVideo")
-    if (this.A2D.spotify.connected) {
+    if (this.A2D.spotify.connected && this.A2D.spotify.librespot) {
       if (this.config.spotify.useIntegred) this.sendSocketNotification("SPOTIFY_PAUSE")
       else this.sendNotification("SPOTIFY_PAUSE")
     }

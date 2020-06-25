@@ -9,6 +9,7 @@ const Pir = require("@bugsounet/pir")
 const Governor = require("@bugsounet/governor")
 const Internet = require("@bugsounet/internet")
 const CastServer = require("@bugsounet/cast")
+const Spotify = require("@bugsounet/spotify")
 
 var _log = function() {
   var context = "[A2D]"
@@ -151,9 +152,6 @@ module.exports = NodeHelper.create({
     }
     if (this.config.spotify.useSpotify) {
       if (this.config.spotify.useIntegred && this.config.spotify.dev) {
-        /** dev testing **/
-        /** npm library not yet published **/
-        const Spotify = require("@bugsounet/spotify")
         this.spotify = new Spotify(this.config.spotify, callbacks.sendSocketNotification, this.config.debug)
         this.spotify.start()
         if (this.config.spotify.useLibrespot) console.log("[SPOTIFY] Launch Librespot... not yet implented !!! :-)")
