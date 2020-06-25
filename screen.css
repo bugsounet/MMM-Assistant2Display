@@ -1,3 +1,5 @@
+/** A2D css **/
+
 #A2D_RADIO,
 #A2D_SCREEN,
 #A2D_INTERNET {
@@ -51,18 +53,9 @@
   position:relative;
 }
 
+/** Spotify css**/
 
-/** spotify **/
-
-:root {
-  --sp-width: 360px;
-  --minimalist-height: 75px;
-  --minimalist-width: 100%;
-  --minimalist-cover-size: var(--minimalist-height);
-  --minimalist-button-size: 50px;
-}
-
-#SPOTIFY {
+#A2D_SPOTIFY {
   position: relative;
   border-radius:10px;
   box-sizing:border-box;
@@ -72,41 +65,100 @@
   text-align:left;
   line-height:120%;
   text-shadow:black 2px 2px 2px;
-  width: var(--minimalist-width);
-  height: calc(var(--minimalist-height) + 1px);
+  width: 100%;
+  height: 76px;
 }
 
-#SPOTIFY.inactive {
-  display:none;
-}
-
-#SPOTIFY_FOREGROUND {
+#A2D_SPOTIFY_FOREGROUND {
   position:relative;
   filter:none;
   top:0;
   left:0;
   width:100%;
   height:100%;
-  padding:20px;
   display:flex;
-  flex-direction:column;
-  box-sizing:border-box
+  box-sizing:border-box;
+  flex-direction:row;
+  justify-content: space-between;
+  padding:0;
 }
 
-#SPOTIFY_COVER {
-  width: calc(var(--sp-width) - 40px);
-  height: calc(var(--sp-width) - 40px);
+#A2D_SPOTIFY_COVER {
   margin-bottom:0.5vh;
+  position: relative;
+  width:75px;
+  height:75px;
+  padding:0;
+  z-index:1;
 }
 
-#SPOTIFY_COVER_IMAGE {
+#A2D_SPOTIFY_COVER_IMAGE {
   width:100%;
-  height:100%;
-  border-radius:10px;
   box-shadow:black 1px 1px 1px 1px;
+  height:75px;
+  border-radius:0px;
 }
 
-.fade-in {
+#A2D_SPOTIFY_PROGRESS_BAR {
+  position: relative;
+  width: 100%;
+  height: 1px;
+  border: 0px transparent;
+  margin-bottom: 4px;
+}
+
+progress[value]#A2D_SPOTIFY_PROGRESS_BAR::-webkit-progress-value {
+  background-color: #FFF;
+}
+
+progress[value]#A2D_SPOTIFY_PROGRESS_BAR::-webkit-progress-bar {
+  background-color: #666;
+}
+
+#A2D_SPOTIFY_CONTROL_PLAY {
+  display: inline-block;
+  margin: auto;
+  width: 50px;
+}
+
+#A2D_SPOTIFY_MISC {
+  display: flex;
+  flex-direction:column;
+  justify-content: space-between;
+  margin-left: 0.5vw;
+  margin-right: 0.5vw;
+  overflow: hidden;
+  width:calc(100% - 75px - 50px);
+}
+
+#A2D_SPOTIFY_INFO {
+  display: flex;
+  flex-direction:row;
+  justify-content: flex-start;
+  height: 70%;
+  justify-content: center;
+  align-items: center;
+  width: initial;
+}
+
+#A2D_SPOTIFY_TITLE {
+  font-weight: bold;
+}
+
+#A2D_SPOTIFY_LOGO {
+  position: absolute;
+  left: 50%;
+  transform: translate(-50%);
+}
+
+#A2D_SPOTIFY_INFO_FOOTER {
+  display: flex;
+  flex-direction:row;
+  justify-content: space-between;
+  align-content: flex-end;
+}
+
+#A2D_SPOTIFY_COVER_IMAGE.fade-in {
   animation: fadeInOpacity 1s 1;
   animation-timing-function: linear;
 }
@@ -120,64 +172,12 @@
   }
 }
 
-#SPOTIFY.pausing #SPOTIFY_COVER_IMAGE {
-  filter:brightness(50%) grayscale(75%);
-}
-
-#SPOTIFY_PROGRESS_TIME {
-  display:flex;
-  flex-direction:row;
-  justify-content:space-between;
-  font-size:14px;
-}
-
-#SPOTIFY_PROGRESS_BAR {
-  margin-bottom:10px;
-  height:10px;
-  width: 100%;
-  position:relative;
-  border: 1px solid #aaaaaa;
-}
-
-progress[value]#SPOTIFY_PROGRESS_BAR::-webkit-progress-value {
-  background-color: #FFF;
-}
-
-progress[value]#SPOTIFY_PROGRESS_BAR::-webkit-progress-bar {
-  background-color: #666;
-}
-
-#SPOTIFY_CONTROL {
-  display:flex;
-  flex-direction:row;
-  justify-content: space-around;
-  font-size:32px;
-  color:#FFF;
-}
-
-#SPOTIFY_CONTROL > * {
-  border-radius:4px;
-  background-color:rgba(0,0,0,0.2);
-}
-
-#SPOTIFY_CONTROL .iconify {
-  justify-self: center;
-  align-self: center;
-}
-
-/* control "hidden" */
-#SPOTIFY.hidden #SPOTIFY_CONTROL{
-  display:none;
-}
-
-/* style "minimalistBar" */
-
-#SPOTIFY.bottomIn {
+#A2D_SPOTIFY.bottomIn {
   animation-duration: 1s;
   animation-name: fadeInBottom;
 }
 
-#SPOTIFY.bottomOut {
+#A2D_SPOTIFY.bottomOut {
   animation-duration: 1s;
   animation-name: fadeOutBottom;
   animation-fill-mode: forwards;
@@ -207,12 +207,7 @@ progress[value]#SPOTIFY_PROGRESS_BAR::-webkit-progress-bar {
   }
 }
 
-#SPOTIFY.pausing #SPOTIFY_PROGRESS_BAR,
-#SPOTIFY.pausing #SPOTIFY_MISC {
-  filter:brightness(50%) grayscale(75%);
-}
-
-#SPOTIFY .text {
+#A2D_SPOTIFY .text {
   width: inherit;
   margin-right: 0.5em;
   white-space: nowrap;
@@ -220,108 +215,32 @@ progress[value]#SPOTIFY_PROGRESS_BAR::-webkit-progress-bar {
   font-size: 1em;
 }
 
-#SPOTIFY #TEXT_BULLET {
-  margin-right: 0.5em;
-  white-space: nowrap;
-  display:inline-block;
-  color: grey;
-}
-
-#SPOTIFY .iconify {
+#A2D_SPOTIFY .iconify {
   display: inline-block;
-  width: var(--minimalist-button-size);
-  height: var(--minimalist-button-size);
+  width: 50px;
+  height: 50px;
   margin-right: 0px;
 }
 
-#SPOTIFY .infoicon {
+#A2D_SPOTIFY .infoicon {
   margin-right: 8px;
 }
 
-#SPOTIFY_VOLUME .mdi {
+#A2D_SPOTIFY_VOLUME .mdi {
   font-size: 20px;
 }
 
-#SPOTIFY #SPOTIFY_PROGRESS_BAR {
-  position: relative;
-  width: var(--minimalist-width);
-  height: 1px;
-  border: 0px transparent;
-  margin-bottom: 4px;
+#A2D_SPOTIFY.pausing #A2D_SPOTIFY_COVER_IMAGE,
+#A2D_SPOTIFY.pausing #A2D_SPOTIFY_PROGRESS_BAR,
+#A2D_SPOTIFY.pausing #A2D_SPOTIFY_MISC {
+  filter:brightness(50%) grayscale(75%);
 }
 
-#SPOTIFY #SPOTIFY_FOREGROUND {
-  display: flex;
-  flex-direction:row;
-  justify-content: space-between;
-  padding:0;
+#A2D_SPOTIFY.inactive {
+  display:none;
 }
 
-#SPOTIFY #SPOTIFY_COVER {
-  position: relative;
-  width:var(--minimalist-cover-size);
-  height:var(--minimalist-height);
-  padding:0;
-  z-index:1;
-}
-
-#SPOTIFY #SPOTIFY_COVER_IMAGE {
-  height:var(--minimalist-height);
-  border-radius:0px;
-}
-
-#SPOTIFY #SPOTIFY_CONTROL_PLAY {
-  display: inline-block;
-  margin: auto;
-  width: var(--minimalist-button-size);
-}
-
-#SPOTIFY #SPOTIFY_MISC {
-  display: flex;
-  flex-direction:column;
-  justify-content: space-between;
-  margin-left: 0.5vw;
-  margin-right: 0.5vw;
-  overflow: hidden;
-  width:calc(
-    var(--minimalist-width) -
-    var(--minimalist-cover-size) -
-    var(--minimalist-button-size)
-  );
-}
-
-#SPOTIFY #SPOTIFY_INFO {
-  display: flex;
-  flex-direction:row;
-  justify-content: flex-start;
-  height: 70%;
-  justify-content: center;
-  align-items: center;
-  width: initial;
-}
-
-#SPOTIFY #SPOTIFY_TITLE {
-  font-weight: bold;
-}
-
-#SPOTIFY #SPOTIFY_ALBUM {
-  color: grey;
-}
-
-#SPOTIFY #SPOTIFY_INFO_FOOTER > #SPOTIFY_LOGO {
-  position: absolute;
-  left: 50%;
-  transform: translate(-50%);
-}
-
-#SPOTIFY #SPOTIFY_INFO_FOOTER {
-  display: flex;
-  flex-direction:row;
-  justify-content: space-between;
-  align-content: flex-end;
-}
-
-#SPOTIFY #TEXT_BULLET {
+#TEXT_BULLET {
   margin-right: 0.5em;
   white-space: nowrap;
   display:inline-block;

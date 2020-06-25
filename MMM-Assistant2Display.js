@@ -139,7 +139,7 @@ Module.register("MMM-Assistant2Display",{
       "spotify": (params) => this.A2D.spotify.connected = params // todo -> check player to lock screen
     }
     this.displayResponse = new Display(this.config, callbacks)
-    if (this.config.spotify.useSpotify && this.config.spotify.useIntegred && this.config.spotify.dev) this.spotify = new Spotify(this.config.spotify, callbacks)
+    if (this.config.spotify.useSpotify && this.config.spotify.useIntegred && this.config.spotify.dev) this.spotify = new Spotify(this.config.spotify, callbacks, this.config.debug)
     this.A2D = this.displayResponse.A2D
 
     this.bar= null
