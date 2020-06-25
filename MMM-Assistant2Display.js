@@ -303,7 +303,7 @@ Module.register("MMM-Assistant2Display",{
           }
           if (this.A2D.spotify.connected && this.A2D.spotify.librespot) {
             if (this.config.spotify.useIntegred) this.sendSocketNotification("SPOTIFY_PAUSE")
-            else this.sendSocketNotification("SPOTIFY_PAUSE")
+            else this.sendNotification("SPOTIFY_PAUSE")
           }
           if (this.A2D.radio) this.radio.pause()
           this.sendNotification("TV-STOP") // Stop MMM-FreeboxTV
