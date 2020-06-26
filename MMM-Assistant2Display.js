@@ -260,10 +260,10 @@ Module.register("MMM-Assistant2Display",{
           if (this.config.spotify.useSpotify && this.A2D.spotify.librespot) {
             if (this.config.spotify.useIntegred) {
               this.sendSocketNotification("SPOTIFY_VOLUME", this.config.spotify.minVolume)
-              this.displayResponse.hideSpotify()
             }
             else this.sendNotification("SPOTIFY_VOLUME", this.config.spotify.minVolume)
           }
+          if (this.config.spotify.useSpotify && this.config.spotify.useIntegred && this.A2D.spotify.connected) this.displayResponse.hideSpotify()
           if (this.A2D.radio) this.radio.volume = 0.1
           if (this.A2D.locked) this.displayResponse.hideDisplay()
           break
@@ -275,10 +275,11 @@ Module.register("MMM-Assistant2Display",{
           if (this.config.spotify.useSpotify && this.A2D.spotify.librespot) {
             if (this.config.spotify.useIntegred) {
               this.sendSocketNotification("SPOTIFY_VOLUME", this.config.spotify.maxVolume)
-              if (this.A2D.spotify.connected && !this.displayResponse.working()) this.displayResponse.showSpotify()
             }
             else this.sendNotification("SPOTIFY_VOLUME", this.config.spotify.maxVolume)
           }
+          if (this.config.spotify.useSpotify && this.config.spotify.useIntegred
+            && this.A2D.spotify.connected && !this.displayResponse.working()) this.displayResponse.showSpotify()
           if (this.A2D.radio) this.radio.volume = 0.6
           if (this.displayResponse.working()) this.displayResponse.showDisplay()
           else this.displayResponse.hideDisplay()
