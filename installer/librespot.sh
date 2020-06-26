@@ -52,6 +52,6 @@ cat<<EOM > librespot.sh
 $actualpath/target/release/librespot -n $name -u $email -p $password --initial-volume 90
 EOM
 chmod +x librespot.sh
-Installer_sucess "Done."
+Installer_success "Done."
 
 Installer_exit "Librespot for A2D is now installed !"
