@@ -41,16 +41,15 @@ class Spotify {
     var module = document.getElementById("module_A2D_Spotify")
     this.timer = null
     clearTimeout(this.timer)
-    let pos = "bottom"
     if (status) {
       module.style.display = "block"
-      dom.classList.remove(pos+"Out")
-      dom.classList.add(pos+"In")
+      dom.classList.remove("bottomOut")
+      dom.classList.add("bottomIn")
       dom.classList.remove("inactive")
     }
     else {
-      dom.classList.remove(pos+"In")
-      dom.classList.add(pos+"Out")
+      dom.classList.remove("bottomIn")
+      dom.classList.add("bottomOut")
       this.timer = setTimeout(() => {
         dom.classList.add("inactive")
         module.style.display = "none"

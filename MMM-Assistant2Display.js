@@ -263,7 +263,6 @@ Module.register("MMM-Assistant2Display",{
             }
             else this.sendNotification("SPOTIFY_VOLUME", this.config.spotify.minVolume)
           }
-          if (this.config.spotify.useSpotify && this.config.spotify.useIntegred && this.A2D.spotify.connected) this.displayResponse.hideSpotify()
           if (this.A2D.radio) this.radio.volume = 0.1
           if (this.A2D.locked) this.displayResponse.hideDisplay()
           break
@@ -278,8 +277,6 @@ Module.register("MMM-Assistant2Display",{
             }
             else this.sendNotification("SPOTIFY_VOLUME", this.config.spotify.maxVolume)
           }
-          if (this.config.spotify.useSpotify && this.config.spotify.useIntegred
-            && this.A2D.spotify.connected && !this.displayResponse.working()) this.displayResponse.showSpotify()
           if (this.A2D.radio) this.radio.volume = 0.6
           if (this.displayResponse.working()) this.displayResponse.showDisplay()
           else this.displayResponse.hideDisplay()
@@ -584,17 +581,25 @@ Module.register("MMM-Assistant2Display",{
     MM.getModules().enumerate((module)=> {
       module.show(1000, {lockString: "A2D_SCREEN"})
     })
-    if (this.A2D.spotify.connected && this.config.spotify.useIntegred) {
-      this.displayResponse.showSpotify()
-    }
   },
 
   screenHiding: function() {
     MM.getModules().enumerate((module)=> {
       module.hide(1000, {lockString: "A2D_SCREEN"})
     })
+  },
+
+  resume: function() {
+    if (this.A2D.spotify.connected && this.config.spotify.useIntegred) {
+      this.displayResponse.showSpotify()
+      A2D("Spotify is resumed.")
+    }
+  },
+
+  suspend: function() {
     if (this.A2D.spotify.connected && this.config.spotify.useIntegred) {
       this.displayResponse.hideSpotify()
+      A2D("Spotify is suspended.")
     }
   },
 

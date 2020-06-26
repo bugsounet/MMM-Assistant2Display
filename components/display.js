@@ -152,7 +152,7 @@ class DisplayClass {
         let Type
         let YouTubeResponse = {}
         if (this.A2D.radio) this.radioStop()
-        if (this.A2D.spotify.connected && this.config.spotify.useSpotify) {
+        if (this.A2D.spotify.librespot && this.config.spotify.useSpotify) {
           if (this.config.spotify.useIntegred) this.sendSocketNotification("SPOTIFY_PAUSE")
           else this.sendNotification("SPOTIFY_PAUSE")
         }
@@ -384,12 +384,24 @@ class DisplayClass {
 
   hideSpotify() {
     var spotifyModule = document.getElementById("module_A2D_Spotify")
-    spotifyModule.style.display = "none"
+    var dom = document.getElementById("A2D_SPOTIFY")
+    this.timer = null
+    clearTimeout(this.timer)
+    dom.classList.remove("bottomIn")
+    dom.classList.add("bottomOut")
+    this.timer = setTimeout(() => {
+      dom.classList.add("inactive")
+      spotifyModule.style.display = "none"
+    }, 500)
   }
 
   showSpotify() {
     var spotifyModule = document.getElementById("module_A2D_Spotify")
+    var dom = document.getElementById("A2D_SPOTIFY")
     spotifyModule.style.display = "block"
+    dom.classList.remove("bottomOut")
+    dom.classList.add("bottomIn")
+    dom.classList.remove("inactive")
   }
 
   A2DLock() {
