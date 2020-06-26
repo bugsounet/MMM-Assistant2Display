@@ -170,11 +170,11 @@ module.exports = NodeHelper.create({
     const librespot = spawn(filePath)
 
     librespot.stdout.on('data', (data) => {
-      console.log(`${data}`)
+      if (this.config.debug) console.log(`${data}`)
     })
 
     librespot.stderr.on('data', (data) => {
-      console.log(`${data}`)
+      if (this.config.debug) console.log(`${data}`)
     })
 
     librespot.on('close', (code) => {
