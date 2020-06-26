@@ -584,12 +584,18 @@ Module.register("MMM-Assistant2Display",{
     MM.getModules().enumerate((module)=> {
       module.show(1000, {lockString: "A2D_SCREEN"})
     })
+    if (this.A2D.spotify.connected && this.config.spotify.useIntegred) {
+      this.displayResponse.showSpotify()
+    }
   },
 
   screenHiding: function() {
     MM.getModules().enumerate((module)=> {
       module.hide(1000, {lockString: "A2D_SCREEN"})
     })
+    if (this.A2D.spotify.connected && this.config.spotify.useIntegred) {
+      this.displayResponse.hideSpotify()
+    }
   },
 
   showRadio: function() {
