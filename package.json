@@ -6,7 +6,9 @@
   "scripts": {
     "preinstall": "installer/preinstall.sh",
     "postinstall": "installer/postinstall.sh",
-    "update": "installer/update.sh"
+    "update": "installer/update.sh",
+    "librespot": "installer/librespot.sh",
+    "spotify": "node installer/spotify-setup.js"
   },
   "keywords": [
     "magic mirror",

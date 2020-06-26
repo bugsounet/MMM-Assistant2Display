@@ -86,7 +86,7 @@ Module.register("MMM-Assistant2Display",{
       updateInterval: 1000, //!!!DEV!!!
       idleInterval: 10000, //!!!DEV!!!
       PATH: "../../../", // Needed Don't modify it !
-      TOKEN: "./token.json", //!!!DEV!!!
+      TOKEN: "./spotify-token.json", //!!!DEV!!!
       CLIENT_ID: "", //!!!DEV!!!
       CLIENT_SECRET: "", //!!!DEV!!!
       deviceDisplay: "Listening on", //!!!DEV!!!

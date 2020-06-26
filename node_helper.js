@@ -1,6 +1,7 @@
 /** node helper **/
 
 var exec = require('child_process').exec
+const { spawn } = require('child_process')
 const fs = require("fs")
 const path = require("path")
 var NodeHelper = require("node_helper")
@@ -155,7 +156,30 @@ module.exports = NodeHelper.create({
         this.spotify = new Spotify(this.config.spotify, callbacks.sendSocketNotification, this.config.debug)
         this.spotify.start()
       }
-      if (this.config.spotify.useLibrespot) console.log("[SPOTIFY] Launch Librespot... not yet implented !!! :-)")
+      if (this.config.spotify.useLibrespot) {
+        console.log("[SPOTIFY] Launch Librespot...")
+        this.librespot()
+      }
     }
   },
+
+  librespot: function() {
+    var file = "librespot.sh"
+    var filePath = path.resolve(__dirname, "components/librespot/", file)
+    if (!fs.existsSync(filePath)) return console.log("[LIBRESPOT] librespot is not installed !")
+    const librespot = spawn(filePath)
+
+    librespot.stdout.on('data', (data) => {
+      console.log(`${data}`)
+    })
+
+    librespot.stderr.on('data', (data) => {
+      console.log(`${data}`)
+    })
+
+    librespot.on('close', (code) => {
+      console.log(`[LIBRESPOT] Exited with code ${code}, relaunch it...`)
+      this.librespot()
+    })
+  }
 });
