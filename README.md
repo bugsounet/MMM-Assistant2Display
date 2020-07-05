@@ -2,7 +2,7 @@
 
 This module is an addons for MMM-GoogleAssistant.
 
-It allows to display the links, photos and YouTube video found by your assistant.
+It allows to display the links, photos, Spotify music and YouTube video found by your assistant.
 
 You can control MagicMirror sound volume, screen, detector, pir sensor, and more
 
