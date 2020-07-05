@@ -77,19 +77,21 @@ Module.register("MMM-Assistant2Display",{
     },
     spotify: {
       useSpotify: false,
-      useIntegred: false, //!!!DEV!!!
-      useLibrespot: false, //!!!DEV!!! (not yet implented)
+      useIntegred: false,
+      useLibrespot: false,
       connectTo: null,
       playDelay: 3000,
       minVolume: 10,
-      maxVolume: 100,
-      updateInterval: 1000, //!!!DEV!!!
-      idleInterval: 10000, //!!!DEV!!!
+      maxVolume: 90,
+      updateInterval: 1000,
+      idleInterval: 10000,
+      username: "",
+      password: "",
       PATH: "../../../", // Needed Don't modify it !
-      TOKEN: "./spotify-token.json", //!!!DEV!!!
-      CLIENT_ID: "", //!!!DEV!!!
-      CLIENT_SECRET: "", //!!!DEV!!!
-      deviceDisplay: "Listening on", //!!!DEV!!!
+      TOKEN: "./spotify-token.json",
+      CLIENT_ID: "",
+      CLIENT_SECRET: "",
+      deviceDisplay: "Listening on",
     }
   },
 
@@ -359,7 +361,7 @@ Module.register("MMM-Assistant2Display",{
         case "SPOTIFY_UPDATE_DEVICE":
           if (this.config.spotify.useSpotify && !this.config.spotify.useIntegred) {
             if (payload.name) {
-              if (payload.name == this.config.spotify.connectTo) {
+              if (payload.name === this.config.spotify.connectTo) {
                 if (!this.A2D.spotify.librespot && this.config.screen.useScreen && !this.displayResponse.working()) {
                   this.sendSocketNotification("SCREEN_WAKEUP")
                   this.sendSocketNotification("SCREEN_LOCK", true)
@@ -461,14 +463,15 @@ Module.register("MMM-Assistant2Display",{
         this.spotify.updateCurrentSpotify(payload)
         if (payload && payload.device && payload.device.name) { //prevent crash
           if (payload.device.name == this.config.spotify.connectTo) {
-            if (!this.A2D.spotify.librespot && this.config.screen.useScreen && !this.displayResponse.working()) {
+            if (!this.A2D.spotify.librespot) this.A2D.spotify.librespot = true
+            if (this.config.screen.useScreen && !this.displayResponse.working()) {
               this.sendSocketNotification("SCREEN_WAKEUP")
               this.sendSocketNotification("SCREEN_LOCK", true)
-              this.A2D.spotify.librespot = true
             }
           }
           else {
-            if (this.A2D.spotify.librespot && this.config.screen.useScreen && !this.displayResponse.working()) {
+            if (this.A2D.spotify.librespot) this.A2D.spotify.librespot = false
+            if (this.config.screen.useScreen && !this.displayResponse.working()) {
               this.sendSocketNotification("SCREEN_LOCK", false)
               this.A2D.spotify.librespot = false
             }

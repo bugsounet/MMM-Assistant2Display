@@ -25,6 +25,8 @@ module.exports = NodeHelper.create({
 
   start: function () {
     this.config = {}
+    timeout = null
+    retry = null
   },
 
   socketNotificationReceived: function (noti, payload) {
@@ -51,8 +53,40 @@ module.exports = NodeHelper.create({
       case "RESTART":
         this.pm2Restart(payload)
         break
+      case "SPOTIFY_RETRY_PLAY":
+        clearTimeout(timeout)
+        timeout= null
+        clearTimeout(retry)
+        retry = null
+        retry = setTimeout(() => {
+          this.spotify.play(payload, (code, error, result) => {
+            if ((code == 404) && (result.error.reason == "NO_ACTIVE_DEVICE")) {
+              if (this.config.spotify.useIntegred) {
+                log("[SPOTIFY] RETRY playing...")
+                this.socketNotificationReceived("SPOTIFY_PLAY", payload)
+              }
+            }
+            if ((code !== 204) && (code !== 202)) {
+              return console.log("[SPOTIFY:PLAY] RETRY Error", code, error, result)
+            }
+            else log("[SPOTIFY] RETRY: DONE_PLAY")
+          })
+        }, 3000)
+        break
       case "SPOTIFY_PLAY":
         this.spotify.play(payload, (code, error, result) => {
+          clearTimeout(timeout)
+          timeout= null
+          if ((code == 404) && (result.error.reason == "NO_ACTIVE_DEVICE")) {
+            if (this.config.spotify.useIntegred) {
+              console.log("[SPOTIFY] No response from librespot !")
+              librespot.kill() // relaunch librespot
+              timeout= setTimeout(() => {
+                this.socketNotificationReceived("SPOTIFY_TRANSFER", this.config.spotify.connectTo)
+                this.socketNotificationReceived("SPOTIFY_RETRY_PLAY", payload)
+              }, 3000)
+            }
+          }
           if ((code !== 204) && (code !== 202)) {
             return console.log("[SPOTIFY:PLAY] Error", code, error, result)
           }
@@ -158,17 +192,17 @@ module.exports = NodeHelper.create({
       }
       if (this.config.spotify.useLibrespot) {
         console.log("[SPOTIFY] Launch Librespot...")
+        const libresport = null
         this.librespot()
       }
     }
   },
 
   librespot: function() {
-    var file = "librespot.sh"
-    var filePath = path.resolve(__dirname, "components/librespot/", file)
+    var file = "librespot"
+    var filePath = path.resolve(__dirname, "components/librespot/target/release", file)
     if (!fs.existsSync(filePath)) return console.log("[LIBRESPOT] librespot is not installed !")
-    const librespot = spawn(filePath)
-
+    librespot = spawn(filePath, ["-n", this.config.spotify.connectTo, "-u", this.config.spotify.username, "-p", this.config.spotify.password , "--initial-volume" , this.config.spotify.maxVolume] )
     librespot.stdout.on('data', (data) => {
       if (this.config.debug) console.log(`${data}`)
     })
@@ -178,8 +212,14 @@ module.exports = NodeHelper.create({
     })
 
     librespot.on('close', (code) => {
+      if (code == 101) return console.log("[LIBRESPOT] Error !")
+      if (!code) {
+        console.log(`[LIBRESPOT] Exited with an unkown code, relaunch it...`)
+        return this.librespot()
+      }
       console.log(`[LIBRESPOT] Exited with code ${code}, relaunch it...`)
-      this.librespot()
     })
+    if (!librespot.pid) console.log("[LIBRESPOT] Error !")
+    else if (this.config.debug) console.log("[LIBRESPOT] Device " + this.config.spotify.connectTo + " is ready for playing. pid:", librespot.pid)
   }
 });

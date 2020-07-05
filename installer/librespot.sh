@@ -35,23 +35,9 @@ Installer_success "Done."
 echo
 Installer_info "Installing Librespot..."
 Installer_warning "Open the fridge and take a beer..."
-Installer_warning "It could takes 10~30 minutes."
+Installer_warning "It could takes ~30 minutes."
 cd librespot
 cargo build --release --no-default-features --features alsa-backend
 Installer_success "Done."
 echo
-Installer_info "Spotify identification..."
-read -p "E-mail adress: " email
-read -p "Password: " password
-Installer_info "Librespot device name..."
-read -p "Wanted device name: " name
-Installer_info "Creating executable file..."
-actualpath="$(pwd)"
-echo $actualpath
-cat<<EOM > librespot.sh
-$actualpath/target/release/librespot -n $name -u $email -p $password --initial-volume 90
-EOM
-chmod +x librespot.sh
-Installer_success "Done."
-
 Installer_exit "Librespot for A2D is now installed !"
