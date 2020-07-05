@@ -1,12 +1,14 @@
 {
   "name": "MMM-Assistant2Display",
-  "version": "2.0.2",
+  "version": "2.1.0",
   "description": "GoogleAssistant Display module",
   "main": "MMM-Assistant2Display.js",
   "scripts": {
     "preinstall": "installer/preinstall.sh",
     "postinstall": "installer/postinstall.sh",
-    "update": "installer/update.sh"
+    "update": "installer/update.sh",
+    "librespot": "installer/librespot.sh",
+    "spotify": "node installer/spotify-setup.js"
   },
   "keywords": [
     "magic mirror",
@@ -28,6 +30,7 @@
     "@bugsounet/governor": "^1.0.3",
     "@bugsounet/internet": "^1.0.0",
     "@bugsounet/pir": "^1.0.4",
-    "@bugsounet/screen": "^1.0.0"
+    "@bugsounet/screen": "^1.0.0",
+    "@bugsounet/spotify": "^1.0.0"
   }
 }

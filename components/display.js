@@ -35,8 +35,8 @@ class DisplayClass {
         running: false
       },
       spotify: {
-        playing: false,
-        connected: false
+        connected: false,
+        librespot: false
       }
     }
     console.log("[A2D] DisplayClass Loaded")
@@ -152,7 +152,10 @@ class DisplayClass {
         let Type
         let YouTubeResponse = {}
         if (this.A2D.radio) this.radioStop()
-        if (this.A2D.spotify.playing && this.config.useSpotify) this.sendNotification("SPOTIFY_PAUSE")
+        if (this.A2D.spotify.librespot && this.config.spotify.useSpotify) {
+          if (this.config.spotify.useIntegred) this.sendSocketNotification("SPOTIFY_PAUSE")
+          else this.sendNotification("SPOTIFY_PAUSE")
+        }
         if (YouTube[1] == "watch") Type = "id"
         if (YouTube[1] == "playlist") Type = "playlist"
         if (!Type) return console.log("[A2D:YouTube] Unknow Type !" , YouTube)
@@ -167,7 +170,10 @@ class DisplayClass {
       }
     }
     if (this.config.spotify.useSpotify) {
-      if (!this.A2D.spotify.connected && this.config.spotify.connectTo) this.sendNotification("SPOTIFY_TRANSFER", this.config.spotify.connectTo)
+      if (!this.A2D.spotify.connected && this.config.spotify.connectTo) {
+        if (this.config.spotify.useIntegred) this.sendSocketNotification("SPOTIFY_TRANSFER", this.config.spotify.connectTo)
+        else this.sendNotification("SPOTIFY_TRANSFER", this.config.spotify.connectTo)
+      }
       /** Spotify RegExp **/
       var SpotifyLink = new RegExp("open\.spotify\.com\/([a-z]+)\/([0-9a-zA-Z\-\_]+)", "ig")
       /** Scan Spotify Link **/
@@ -180,10 +186,12 @@ class DisplayClass {
           let id = Spotify[2]
           if (type == "track") {
             // don't know why tracks works only with uris !?
-            this.sendNotification("SPOTIFY_PLAY", {"uris": ["spotify:track:" + id ]})
+            if (this.config.spotify.useIntegred) this.sendSocketNotification("SPOTIFY_PLAY", {"uris": ["spotify:track:" + id ]})
+            else this.sendNotification("SPOTIFY_PLAY", {"uris": ["spotify:track:" + id ]})
           }
           else {
-            this.sendNotification("SPOTIFY_PLAY", {"context_uri": "spotify:"+ type + ":" + id})
+            if (this.config.spotify.useIntegred) this.sendSocketNotification("SPOTIFY_PLAY", {"context_uri": "spotify:"+ type + ":" + id})
+            else this.sendNotification("SPOTIFY_PLAY", {"context_uri": "spotify:"+ type + ":" + id})
           }
         }, this.config.spotify.playDelay)
         return
@@ -302,7 +310,10 @@ class DisplayClass {
   castStart(url) {
     /** stop all process before starting cast **/
     if (this.A2D.youtube.displayed) this.player.command("stopVideo")
-    if (this.A2D.spotify.playing) this.sendNotification("SPOTIFY_PAUSE")
+    if (this.A2D.spotify.connected && this.A2D.spotify.librespot) {
+      if (this.config.spotify.useIntegred) this.sendSocketNotification("SPOTIFY_PAUSE")
+      else this.sendNotification("SPOTIFY_PAUSE")
+    }
     if (this.A2D.photos.displayed) {
       this.resetPhotos()
       this.hideDisplay()
@@ -371,12 +382,37 @@ class DisplayClass {
     if (!this.A2D.speak && !this.working()) this.A2DUnlock()
   }
 
+  hideSpotify() {
+    var spotifyModule = document.getElementById("module_A2D_Spotify")
+    var dom = document.getElementById("A2D_SPOTIFY")
+    this.timer = null
+    clearTimeout(this.timer)
+    dom.classList.remove("bottomIn")
+    dom.classList.add("bottomOut")
+    this.timer = setTimeout(() => {
+      dom.classList.add("inactive")
+      spotifyModule.style.display = "none"
+    }, 500)
+  }
+
+  showSpotify() {
+    var spotifyModule = document.getElementById("module_A2D_Spotify")
+    var dom = document.getElementById("A2D_SPOTIFY")
+    spotifyModule.style.display = "block"
+    dom.classList.remove("bottomOut")
+    dom.classList.add("bottomIn")
+    dom.classList.remove("inactive")
+  }
+
   A2DLock() {
     if (this.A2D.locked) return
     A2D("Lock Screen")
     MM.getModules().exceptWithClass("MMM-GoogleAssistant").enumerate((module)=> {
       module.hide(15, {lockString: "A2D_LOCKED"})
     })
+    if (this.A2D.spotify.connected && this.config.spotify.useIntegred) {
+      this.hideSpotify()
+    }
     if (this.config.screen.useScreen) this.sendSocketNotification("SCREEN_LOCK", true)
     this.A2D.locked = true
   }
@@ -387,7 +423,10 @@ class DisplayClass {
     MM.getModules().exceptWithClass("MMM-GoogleAssistant").enumerate((module)=> {
       module.show(15, {lockString: "A2D_LOCKED"})
     })
-    if (this.config.screen.useScreen && !this.A2D.spotify.playing) this.sendSocketNotification("SCREEN_LOCK", false)
+    if (this.A2D.spotify.connected && this.config.spotify.useIntegred) {
+      this.showSpotify()
+    }
+    if (this.config.screen.useScreen && !this.A2D.spotify.connected) this.sendSocketNotification("SCREEN_LOCK", false)
     this.A2D.locked = false
   }
 

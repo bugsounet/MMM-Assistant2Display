@@ -77,10 +77,21 @@ Module.register("MMM-Assistant2Display",{
     },
     spotify: {
       useSpotify: false,
+      useIntegred: false,
+      useLibrespot: false,
       connectTo: null,
       playDelay: 3000,
       minVolume: 10,
-      maxVolume: 100
+      maxVolume: 90,
+      updateInterval: 1000,
+      idleInterval: 10000,
+      username: "",
+      password: "",
+      PATH: "../../../", // Needed Don't modify it !
+      TOKEN: "./spotify-token.json",
+      CLIENT_ID: "",
+      CLIENT_SECRET: "",
+      deviceDisplay: "Listening on",
     }
   },
 
@@ -106,7 +117,8 @@ Module.register("MMM-Assistant2Display",{
       pir: this.config.pir,
       governor: this.config.governor,
       internet: this.config.internet,
-      cast: this.config.cast
+      cast: this.config.cast,
+      spotify: this.config.spotify
     }
 
     this.radioPlayer = {
@@ -114,34 +126,7 @@ Module.register("MMM-Assistant2Display",{
       img: null,
       link: null,
     }
-    this.radio = new Audio()
-
-    this.radio.addEventListener("ended", ()=> {
-      A2D("Radio ended")
-      this.radioPlayer.play = false
-      this.showRadio()
-    })
-    this.radio.addEventListener("pause", ()=> {
-      A2D("Radio paused")
-      this.radioPlayer.play = false
-      this.showRadio()
-    })
-    this.radio.addEventListener("abort", ()=> {
-      A2D("Radio aborted")
-      this.radioPlayer.play = false
-      this.showRadio()
-    })
-    this.radio.addEventListener("error", (err)=> {
-      A2D("Radio error: " + err)
-      this.radioPlayer.play = false
-      this.showRadio()
-    })
-    this.radio.addEventListener("loadstart", ()=> {
-      A2D("Radio started")
-      this.radioPlayer.play = true
-      this.radio.volume = 0.6
-      this.showRadio()
-    })
+    this.createRadio()
 
     if (this.config.debug) A2D = A2D_
     var callbacks= {
@@ -151,9 +136,11 @@ Module.register("MMM-Assistant2Display",{
       "sendNotification": (noti, params)=> {
         this.sendNotification(noti, params)
       },
-      "radioStop": ()=> this.radio.pause()
+      "radioStop": ()=> this.radio.pause(),
+      "spotify": (params) => this.A2D.spotify.connected = params
     }
     this.displayResponse = new Display(this.config, callbacks)
+    if (this.config.spotify.useSpotify && this.config.spotify.useIntegred) this.spotify = new Spotify(this.config.spotify, callbacks, this.config.debug)
     this.A2D = this.displayResponse.A2D
 
     this.bar= null
@@ -228,14 +215,18 @@ Module.register("MMM-Assistant2Display",{
        "/modules/MMM-Assistant2Display/components/display.js",
        "/modules/MMM-Assistant2Display/ui/" + ui,
        "/modules/MMM-Assistant2Display/components/youtube.js",
-       "/modules/MMM-Assistant2Display/components/progressbar.js"
+       "/modules/MMM-Assistant2Display/components/progressbar.js",
+       "/modules/MMM-Assistant2Display/components/spotify.js",
+       "https://cdn.materialdesignicons.com/5.2.45/css/materialdesignicons.min.css",
+       "https://code.iconify.design/1/1.0.6/iconify.min.js"
     ]
   },
 
   getStyles: function() {
     return [
       "/modules/MMM-Assistant2Display/ui/" + this.ui + "/" + this.ui + ".css",
-      "screen.css"
+      "screen.css",
+      "font-awesome.css"
     ]
   },
 
@@ -257,6 +248,7 @@ Module.register("MMM-Assistant2Display",{
         case "DOM_OBJECTS_CREATED":
           this.displayResponse.prepare()
           if (this.config.screen.useScreen && (this.config.screen.displayStyle != "Text")) this.prepareBar()
+          if (this.config.spotify.useSpotify && this.config.spotify.useIntegred) this.spotify.prepare()
           break
         case "ASSISTANT_READY":
           this.onReady()
@@ -267,7 +259,12 @@ Module.register("MMM-Assistant2Display",{
           if (this.config.useYoutube && this.displayResponse.player) {
             this.displayResponse.player.command("setVolume", 5)
           }
-          if (this.config.spotify.useSpotify && this.A2D.spotify.playing) this.sendNotification("SPOTIFY_VOLUME", this.config.spotify.minVolume)
+          if (this.config.spotify.useSpotify && this.A2D.spotify.librespot) {
+            if (this.config.spotify.useIntegred) {
+              this.sendSocketNotification("SPOTIFY_VOLUME", this.config.spotify.minVolume)
+            }
+            else this.sendNotification("SPOTIFY_VOLUME", this.config.spotify.minVolume)
+          }
           if (this.A2D.radio) this.radio.volume = 0.1
           if (this.A2D.locked) this.displayResponse.hideDisplay()
           break
@@ -276,7 +273,12 @@ Module.register("MMM-Assistant2Display",{
           if (this.config.useYoutube && this.displayResponse.player) {
             this.displayResponse.player.command("setVolume", 100)
           }
-          if (this.config.spotify.useSpotify) this.sendNotification("SPOTIFY_VOLUME", this.config.spotify.maxVolume)
+          if (this.config.spotify.useSpotify && this.A2D.spotify.librespot) {
+            if (this.config.spotify.useIntegred) {
+              this.sendSocketNotification("SPOTIFY_VOLUME", this.config.spotify.maxVolume)
+            }
+            else this.sendNotification("SPOTIFY_VOLUME", this.config.spotify.maxVolume)
+          }
           if (this.A2D.radio) this.radio.volume = 0.6
           if (this.displayResponse.working()) this.displayResponse.showDisplay()
           else this.displayResponse.hideDisplay()
@@ -299,7 +301,10 @@ Module.register("MMM-Assistant2Display",{
               this.displayResponse.hideDisplay()
             }
           }
-          if (this.A2D.spotify.playing) this.sendNotification("SPOTIFY_PAUSE")
+          if (this.A2D.spotify.librespot) {
+            if (this.config.spotify.useIntegred) this.sendSocketNotification("SPOTIFY_PAUSE")
+            else this.sendNotification("SPOTIFY_PAUSE")
+          }
           if (this.A2D.radio) this.radio.pause()
           this.sendNotification("TV-STOP") // Stop MMM-FreeboxTV
           break
@@ -331,6 +336,10 @@ Module.register("MMM-Assistant2Display",{
           break
         case "A2D_RADIO":
           if (this.A2D.youtube.displayed) this.displayResponse.player.command("stopVideo")
+          if (this.A2D.spotify.librespot) {
+            if (this.config.spotify.useIntegred) this.sendSocketNotification("SPOTIFY_PAUSE")
+            else this.sendSocketNotification("SPOTIFY_PAUSE")
+          }
           if (payload.link) {
             if (payload.img) {
               var radioImg = document.getElementById("A2D_RADIO_IMG")
@@ -349,20 +358,35 @@ Module.register("MMM-Assistant2Display",{
             this.radio.autoplay = true
           }
           break
-        case "SPOTIFY_UPDATE_PLAYING":
-          if (this.config.spotify.useSpotify) {
-            this.A2D.spotify.playing = payload ? true : false
-            if (this.config.screen.useScreen && !this.displayResponse.working()) {
-              if (payload) this.sendSocketNotification("SCREEN_WAKEUP")
-              this.sendSocketNotification("SCREEN_LOCK", payload ? true : false)
+        case "SPOTIFY_UPDATE_DEVICE":
+          if (this.config.spotify.useSpotify && !this.config.spotify.useIntegred) {
+            if (payload.name) {
+              if (payload.name === this.config.spotify.connectTo) {
+                if (!this.A2D.spotify.librespot && this.config.screen.useScreen && !this.displayResponse.working()) {
+                  this.sendSocketNotification("SCREEN_WAKEUP")
+                  this.sendSocketNotification("SCREEN_LOCK", true)
+                }
+                if (!this.A2D.spotify.librespot) this.A2D.spotify.librespot = true
+              } else {
+                if (this.A2D.spotify.librespot && this.config.screen.useScreen && !this.displayResponse.working()) {
+                  this.sendSocketNotification("SCREEN_LOCK", false)
+                }
+                if (this.A2D.spotify.librespot) this.A2D.spotify.librespot = false
+              }
             }
           }
           break
         case "SPOTIFY_CONNECTED":
-          if (this.config.spotify.useSpotify) this.A2D.spotify.connected = true
+          if (this.config.spotify.useSpotify && !this.config.spotify.useIntegred) this.A2D.spotify.connected = true
           break
         case "SPOTIFY_DISCONNECTED":
-          if (this.config.spotify.useSpotify) this.A2D.spotify.connected = false
+          if (this.config.spotify.useSpotify && !this.config.spotify.useIntegred) {
+            this.A2D.spotify.connected = false
+            if (this.A2D.spotify.librespot && this.config.screen.useScreen && !this.displayResponse.working()) {
+              this.sendSocketNotification("SCREEN_LOCK", false)
+            }
+            this.A2D.spotify.librespot = false
+          }
           break
       }
     }
@@ -434,6 +458,32 @@ Module.register("MMM-Assistant2Display",{
         break
       case "CAST_STOP":
         this.displayResponse.castStop()
+        break
+      case "SPOTIFY_PLAY":
+        this.spotify.updateCurrentSpotify(payload)
+        if (payload && payload.device && payload.device.name) { //prevent crash
+          if (payload.device.name == this.config.spotify.connectTo) {
+            if (!this.A2D.spotify.librespot) this.A2D.spotify.librespot = true
+            if (this.config.screen.useScreen && !this.displayResponse.working()) {
+              this.sendSocketNotification("SCREEN_WAKEUP")
+              this.sendSocketNotification("SCREEN_LOCK", true)
+            }
+          }
+          else {
+            if (this.A2D.spotify.librespot) this.A2D.spotify.librespot = false
+            if (this.config.screen.useScreen && !this.displayResponse.working()) {
+              this.sendSocketNotification("SCREEN_LOCK", false)
+              this.A2D.spotify.librespot = false
+            }
+          }
+        }
+        break
+      case "SPOTIFY_IDLE":
+        this.spotify.updatePlayback(false)
+        if (this.A2D.spotify.librespot && this.config.screen.useScreen && !this.displayResponse.working()) {
+          this.sendSocketNotification("SCREEN_LOCK", false)
+          this.A2D.spotify.librespot = false
+        }
         break
     }
   },
@@ -542,6 +592,20 @@ Module.register("MMM-Assistant2Display",{
     })
   },
 
+  resume: function() {
+    if (this.A2D.spotify.connected && this.config.spotify.useIntegred) {
+      this.displayResponse.showSpotify()
+      A2D("Spotify is resumed.")
+    }
+  },
+
+  suspend: function() {
+    if (this.A2D.spotify.connected && this.config.spotify.useIntegred) {
+      this.displayResponse.hideSpotify()
+      A2D("Spotify is suspended.")
+    }
+  },
+
   showRadio: function() {
     this.A2D = this.displayResponse.A2D
     this.A2D.radio = this.radioPlayer.play
@@ -550,6 +614,38 @@ Module.register("MMM-Assistant2Display",{
       if (this.radioPlayer.play) radio.classList.remove("hidden")
       else radio.classList.add("hidden")
     }
+  },
+
+  /** Create Radio function and cb **/
+  createRadio: function() {
+    this.radio = new Audio()
+
+    this.radio.addEventListener("ended", ()=> {
+      A2D("Radio ended")
+      this.radioPlayer.play = false
+      this.showRadio()
+    })
+    this.radio.addEventListener("pause", ()=> {
+      A2D("Radio paused")
+      this.radioPlayer.play = false
+      this.showRadio()
+    })
+    this.radio.addEventListener("abort", ()=> {
+      A2D("Radio aborted")
+      this.radioPlayer.play = false
+      this.showRadio()
+    })
+    this.radio.addEventListener("error", (err)=> {
+      A2D("Radio error: " + err)
+      this.radioPlayer.play = false
+      this.showRadio()
+    })
+    this.radio.addEventListener("loadstart", ()=> {
+      A2D("Radio started")
+      this.radioPlayer.play = true
+      this.radio.volume = 0.6
+      this.showRadio()
+    })
   },
 
   /** TelegramBot commands **/
