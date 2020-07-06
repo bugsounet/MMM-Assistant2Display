@@ -465,10 +465,16 @@ Module.register("MMM-Assistant2Display",{
         break
       case "SPOTIFY_PLAY":
         this.spotify.updateCurrentSpotify(payload)
+        //console.log("Spotify PLAY status:", this.A2D.spotify)
+        if (!this.A2D.spotify.connected && this.A2D.spotify.librespot && this.config.screen.useScreen && !this.displayResponse.working()) {
+          this.A2D.spotify.librespot = false
+          return this.sendSocketNotification("SCREEN_LOCK", false)
+        }
+        if (!this.A2D.spotify.connected) return this.A2D.spotify.librespot = false // don't check if not connected
         if (payload && payload.device && payload.device.name) { //prevent crash
           if (payload.device.name == this.config.spotify.connectTo) {
             if (!this.A2D.spotify.librespot) this.A2D.spotify.librespot = true
-            if (this.config.screen.useScreen && !this.displayResponse.working()) {
+            if (this.A2D.spotify.connected && this.config.screen.useScreen && !this.displayResponse.working()) {
               this.sendSocketNotification("SCREEN_WAKEUP")
               this.sendSocketNotification("SCREEN_LOCK", true)
             }
@@ -483,6 +489,7 @@ Module.register("MMM-Assistant2Display",{
         break
       case "SPOTIFY_IDLE":
         this.spotify.updatePlayback(false)
+        //console.log("Spotify IDLE status:", this.A2D.spotify)
         if (this.A2D.spotify.librespot && this.config.screen.useScreen && !this.displayResponse.working()) {
           this.sendSocketNotification("SCREEN_LOCK", false)
         }
