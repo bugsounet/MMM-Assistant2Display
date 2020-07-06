@@ -138,7 +138,16 @@ Module.register("MMM-Assistant2Display",{
         this.sendNotification(noti, params)
       },
       "radioStop": ()=> this.radio.pause(),
-      "spotify": (params) => this.A2D.spotify.connected = params
+      "spotify": (params) => { // try to use spotify callback to unlock screen ...
+        if (params) this.A2D.spotify.connected = true
+        else {
+          this.A2D.spotify.connected = false
+          if (this.A2D.spotify.librespot && this.config.screen.useScreen && !this.displayResponse.working()) {
+              this.sendSocketNotification("SCREEN_LOCK", false)
+          }
+          this.A2D.spotify.librespot = false
+        }
+      }
     }
     this.displayResponse = new Display(this.config, callbacks)
     if (this.config.spotify.useSpotify && this.config.spotify.useIntegred) this.spotify = new Spotify(this.config.spotify, callbacks, this.config.debug)
@@ -466,11 +475,7 @@ Module.register("MMM-Assistant2Display",{
       case "SPOTIFY_PLAY":
         this.spotify.updateCurrentSpotify(payload)
         //console.log("Spotify PLAY status:", this.A2D.spotify)
-        if (!this.A2D.spotify.connected && this.A2D.spotify.librespot && this.config.screen.useScreen && !this.displayResponse.working()) {
-          this.A2D.spotify.librespot = false
-          return this.sendSocketNotification("SCREEN_LOCK", false)
-        }
-        if (!this.A2D.spotify.connected) return this.A2D.spotify.librespot = false // don't check if not connected
+        if (!this.A2D.spotify.connected) return // don't check if not connected (use spotify callback)
         if (payload && payload.device && payload.device.name) { //prevent crash
           if (payload.device.name == this.config.spotify.connectTo) {
             if (!this.A2D.spotify.librespot) this.A2D.spotify.librespot = true
