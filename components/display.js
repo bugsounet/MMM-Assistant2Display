@@ -170,10 +170,6 @@ class DisplayClass {
       }
     }
     if (this.config.spotify.useSpotify) {
-      if (!this.A2D.spotify.connected && this.config.spotify.connectTo) {
-        if (this.config.spotify.useIntegred) this.sendSocketNotification("SPOTIFY_TRANSFER", this.config.spotify.connectTo)
-        else this.sendNotification("SPOTIFY_TRANSFER", this.config.spotify.connectTo)
-      }
       /** Spotify RegExp **/
       var SpotifyLink = new RegExp("open\.spotify\.com\/([a-z]+)\/([0-9a-zA-Z\-\_]+)", "ig")
       /** Scan Spotify Link **/
@@ -181,6 +177,11 @@ class DisplayClass {
 
       if (Spotify) {
         if (this.A2D.radio) this.radioStop()
+        if (!this.A2D.spotify.connected && this.config.spotify.connectTo) {
+          if (this.config.spotify.useIntegred) this.sendSocketNotification("SPOTIFY_TRANSFER", this.config.spotify.connectTo)
+          else this.sendNotification("SPOTIFY_TRANSFER", this.config.spotify.connectTo)
+        }
+
         setTimeout(() => {
           let type = Spotify[1]
           let id = Spotify[2]
