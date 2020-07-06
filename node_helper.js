@@ -111,6 +111,9 @@ module.exports = NodeHelper.create({
           else log("[SPOTIFY] DONE_TRANSFER")
         })
         break
+      case "SPOTIFY_STOP":
+        librespot.kill() // stop and restart librespot
+        break
     }
   },
 

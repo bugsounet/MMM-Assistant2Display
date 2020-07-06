@@ -92,6 +92,7 @@ Module.register("MMM-Assistant2Display",{
       CLIENT_ID: "",
       CLIENT_SECRET: "",
       deviceDisplay: "Listening on",
+      usePause: true
     }
   },
 
@@ -302,7 +303,10 @@ Module.register("MMM-Assistant2Display",{
             }
           }
           if (this.A2D.spotify.librespot) {
-            if (this.config.spotify.useIntegred) this.sendSocketNotification("SPOTIFY_PAUSE")
+            if (this.config.spotify.useIntegred) {
+              if (this.config.spotify.usePause) this.sendSocketNotification("SPOTIFY_PAUSE")
+              else this.sendSocketNotification("SPOTIFY_STOP")
+            }
             else this.sendNotification("SPOTIFY_PAUSE")
           }
           if (this.A2D.radio) this.radio.pause()
@@ -470,11 +474,10 @@ Module.register("MMM-Assistant2Display",{
             }
           }
           else {
-            if (this.A2D.spotify.librespot) this.A2D.spotify.librespot = false
-            if (this.config.screen.useScreen && !this.displayResponse.working()) {
+            if (this.A2D.spotify.connected && this.A2D.spotify.librespot && this.config.screen.useScreen && !this.displayResponse.working()) {
               this.sendSocketNotification("SCREEN_LOCK", false)
-              this.A2D.spotify.librespot = false
             }
+            if (this.A2D.spotify.librespot) this.A2D.spotify.librespot = false
           }
         }
         break
@@ -482,8 +485,8 @@ Module.register("MMM-Assistant2Display",{
         this.spotify.updatePlayback(false)
         if (this.A2D.spotify.librespot && this.config.screen.useScreen && !this.displayResponse.working()) {
           this.sendSocketNotification("SCREEN_LOCK", false)
-          this.A2D.spotify.librespot = false
         }
+        this.A2D.spotify.librespot = false
         break
     }
   },
