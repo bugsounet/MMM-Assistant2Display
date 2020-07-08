@@ -2,6 +2,7 @@
 
 var exec = require('child_process').exec
 const { spawn } = require('child_process')
+const process = require('process')
 const fs = require("fs")
 const path = require("path")
 var NodeHelper = require("node_helper")
@@ -224,5 +225,9 @@ module.exports = NodeHelper.create({
     })
     if (!librespot.pid) console.log("[LIBRESPOT] Error !")
     else if (this.config.debug) console.log("[LIBRESPOT] Device " + this.config.spotify.connectTo + " is ready for playing. pid:", librespot.pid)
+    process.on('exit', (code) => {
+      librespot.kill() // try to kill librespot on exit
+      console.log("[LIBRESPOT] Killed")
+    })
   }
 });
