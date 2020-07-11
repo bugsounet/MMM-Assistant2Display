@@ -119,7 +119,8 @@ Module.register("MMM-Assistant2Display",{
       governor: this.config.governor,
       internet: this.config.internet,
       cast: this.config.cast,
-      spotify: this.config.spotify
+      spotify: this.config.spotify,
+      dev: this.config.dev
     }
 
     this.radioPlayer = {
