@@ -97,6 +97,13 @@ Module.register("MMM-Assistant2Display",{
   },
 
   start: function () {
+    var files= [
+      "modules/MMM-Assistant2Display/node_helper.js",
+      "modules/MMM-Assistant2Display/MMM-Assistant2Display.js",
+      "modules/MMM-Assistant2Display/components/display.js",
+      "modules/MMM-Assistant2Display/components/spotify.js",
+      "modules/MMM-Assistant2Display/components/youtube.js"
+    ]
     this.config = this.configAssignment({}, this.defaults, this.config)
     this.volumeScript= {
       "OSX": "osascript -e 'set volume output volume #VOLUME#'",
@@ -120,7 +127,8 @@ Module.register("MMM-Assistant2Display",{
       internet: this.config.internet,
       cast: this.config.cast,
       spotify: this.config.spotify,
-      dev: this.config.dev
+      dev: this.config.dev,
+      files: files
     }
 
     this.radioPlayer = {

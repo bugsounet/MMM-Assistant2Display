@@ -5,15 +5,14 @@ const { spawn } = require('child_process')
 const process = require('process')
 const fs = require("fs")
 const path = require("path")
-const md5 = require("md5")
 var NodeHelper = require("node_helper")
+const MD5 = require("@bugsounet/md5")
 const Screen = require("@bugsounet/screen")
 const Pir = require("@bugsounet/pir")
 const Governor = require("@bugsounet/governor")
 const Internet = require("@bugsounet/internet")
 const CastServer = require("@bugsounet/cast")
 const Spotify = require("@bugsounet/spotify")
-var A2D_MD5 = require('./package.json').A2D
 
 var _log = function() {
   var context = "[A2D]"
@@ -35,7 +34,8 @@ module.exports = NodeHelper.create({
   socketNotificationReceived: function (noti, payload) {
     switch (noti) {
       case "INIT":
-        this.initialize(payload)
+        console.log("[A2D] MMM-Assistant2Display Version:", require('./package.json').version)
+        new MD5(payload, () => { this.initialize(payload) })
         break
       case "SET_VOLUME":
         this.setVolume(payload)
@@ -121,11 +121,9 @@ module.exports = NodeHelper.create({
   },
 
   initialize: async function(config) {
-    console.log("[A2D] MMM-Assistant2Display Version:",  require('./package.json').version)
     this.config = config
     var debug = (this.config.debug) ? this.config.debug : false
     if (debug == true) log = _log
-    await this.scanMD5()
     if (this.config.useA2D) {
       this.addons()
       console.log("[A2D] Assistant2Display is initialized.")
@@ -231,31 +229,6 @@ module.exports = NodeHelper.create({
     process.on('exit', (code) => {
       librespot.abort() // try to kill librespot on exit
       console.log("[LIBRESPOT] Killed")
-    })
-  },
-
-  scanMD5 : async function() {
-    var NH = await this.get_MD5('modules/MMM-Assistant2Display/node_helper.js')
-    var A2D = await this.get_MD5('modules/MMM-Assistant2Display/MMM-Assistant2Display.js')
-    var MD5 = md5(NH + A2D)
-    return new Promise((resolve) => {
-      if (this.config.dev && this.config.debug) return resolve()
-      if (MD5 != A2D_MD5) {
-        console.log("[A2D] MMM-Assistant2Display sources edited !")
-        console.log("[A2D] Exiting MagicMirror...")
-        process.abort()
-      }
-      resolve()
-    })
-  },
-
-  get_MD5 : function(file) {
-    return new Promise((resolve) => {
-      fs.readFile(file, (err, buf) => {
-        if (err) return resolve()
-        var MD5 = md5(buf)
-        resolve(MD5)
-      })
     })
   }
 });

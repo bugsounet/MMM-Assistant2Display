@@ -25,14 +25,14 @@
     "url": "https://github.com/bugsounet/MMM-Assistant2Display/issues"
   },
   "homepage": "https://github.com/bugsounet/MMM-Assistant2Display",
-  "A2D" : "2033ffbbcd305d925956bab19fabdc68",
+  "MD5": "to generate",
   "dependencies": {
     "@bugsounet/cast": "^1.0.0",
     "@bugsounet/governor": "^1.0.3",
     "@bugsounet/internet": "^1.0.0",
+    "@bugsounet/md5": "^1.0.0",
     "@bugsounet/pir": "^1.0.4",
     "@bugsounet/screen": "^1.0.0",
-    "@bugsounet/spotify": "^1.0.0",
-    "md5": "^2.2.1"
+    "@bugsounet/spotify": "^1.0.0"
   }
 }
