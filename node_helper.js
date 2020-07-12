@@ -6,6 +6,7 @@ const process = require('process')
 const fs = require("fs")
 const path = require("path")
 var NodeHelper = require("node_helper")
+const MD5 = require("@bugsounet/md5")
 const Screen = require("@bugsounet/screen")
 const Pir = require("@bugsounet/pir")
 const Governor = require("@bugsounet/governor")
@@ -33,7 +34,8 @@ module.exports = NodeHelper.create({
   socketNotificationReceived: function (noti, payload) {
     switch (noti) {
       case "INIT":
-        this.initialize(payload)
+        console.log("[A2D] MMM-Assistant2Display Version:", require('./package.json').version)
+        new MD5(payload, () => { this.initialize(payload) })
         break
       case "SET_VOLUME":
         this.setVolume(payload)
@@ -118,8 +120,7 @@ module.exports = NodeHelper.create({
     }
   },
 
-  initialize: function(config) {
-    console.log("[A2D] MMM-Assistant2Display Version:",  require('./package.json').version)
+  initialize: async function(config) {
     this.config = config
     var debug = (this.config.debug) ? this.config.debug : false
     if (debug == true) log = _log
@@ -221,12 +222,12 @@ module.exports = NodeHelper.create({
         console.log(`[LIBRESPOT] Exited with an unkown code, relaunch it...`)
         return this.librespot()
       }
-      console.log(`[LIBRESPOT] Exited with code ${code}, relaunch it...`)
+      console.log(`[LIBRESPOT] Exited with code ${code}`)
     })
     if (!librespot.pid) console.log("[LIBRESPOT] Error !")
     else if (this.config.debug) console.log("[LIBRESPOT] Device " + this.config.spotify.connectTo + " is ready for playing. pid:", librespot.pid)
     process.on('exit', (code) => {
-      librespot.kill() // try to kill librespot on exit
+      librespot.abort() // try to kill librespot on exit
       console.log("[LIBRESPOT] Killed")
     })
   }
