@@ -1,6 +1,6 @@
 {
   "name": "MMM-Assistant2Display",
-  "version": "2.2.0",
+  "version": "2.2.1",
   "description": "GoogleAssistant Display module",
   "main": "MMM-Assistant2Display.js",
   "scripts": {
@@ -25,12 +25,19 @@
     "url": "https://github.com/bugsounet/MMM-Assistant2Display/issues"
   },
   "homepage": "https://github.com/bugsounet/MMM-Assistant2Display",
-  "MD5": "e0b7d9dbcb057aafb023d7250011a639",
+  "MD5": "8f06606b7c468c9039a5eee28adde5e3",
+  "files": [
+    "modules/MMM-Assistant2Display/node_helper.js",
+    "modules/MMM-Assistant2Display/MMM-Assistant2Display.js",
+    "modules/MMM-Assistant2Display/components/display.js",
+    "modules/MMM-Assistant2Display/components/spotify.js",
+    "modules/MMM-Assistant2Display/components/youtube.js"
+  ],
   "dependencies": {
     "@bugsounet/cast": "^1.0.0",
     "@bugsounet/governor": "^1.0.3",
     "@bugsounet/internet": "^1.0.0",
-    "@bugsounet/md5": "^1.0.0",
+    "@bugsounet/md5": "^1.1.0",
     "@bugsounet/pir": "^1.0.4",
     "@bugsounet/screen": "^1.0.0",
     "@bugsounet/spotify": "^1.0.0"
