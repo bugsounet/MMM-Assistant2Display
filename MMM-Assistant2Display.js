@@ -12,6 +12,7 @@ var A2D = function() {
 
 Module.register("MMM-Assistant2Display",{
   defaults: {
+    name: "Assistant2Display",
     debug: false,
     useYoutube: true,
     links: {
@@ -128,7 +129,8 @@ Module.register("MMM-Assistant2Display",{
       cast: this.config.cast,
       spotify: this.config.spotify,
       dev: this.config.dev,
-      files: files
+      files: files,
+      name: this.config.name
     }
 
     this.radioPlayer = {
