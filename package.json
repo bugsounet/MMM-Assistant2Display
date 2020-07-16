@@ -1,6 +1,6 @@
 {
   "name": "MMM-Assistant2Display",
-  "version": "2.2.1",
+  "version": "2.2.2",
   "description": "GoogleAssistant Display module",
   "main": "MMM-Assistant2Display.js",
   "scripts": {
@@ -40,6 +40,7 @@
     "@bugsounet/md5": "^1.1.0",
     "@bugsounet/pir": "^1.0.4",
     "@bugsounet/screen": "^1.0.0",
-    "@bugsounet/spotify": "^1.0.0"
+    "@bugsounet/spotify": "^1.0.0",
+    "pm2": "^4.4.0"
   }
 }
