@@ -27,7 +27,7 @@
     "url": "https://github.com/bugsounet/MMM-Assistant2Display/issues"
   },
   "homepage": "https://github.com/bugsounet/MMM-Assistant2Display",
-  "MD5": "84920082d9354bbc07f124347126f208",
+  "MD5": "73bd8a7f441c36af2313a1771b48e485",
   "dependencies": {
     "@bugsounet/secure-a2d": "^1.0.1"
   }
