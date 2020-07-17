@@ -1,6 +1,6 @@
 {
   "name": "MMM-Assistant2Display",
-  "version": "2.2.2",
+  "version": "2.3.0",
   "description": "GoogleAssistant Display module",
   "main": "MMM-Assistant2Display.js",
   "scripts": {
@@ -13,7 +13,9 @@
   "keywords": [
     "magic mirror",
     "MMM-GoogleAssistant",
-    "YouTube"
+    "YouTube",
+    "Spotify",
+    "Cast"
   ],
   "repository": {
     "type": "git",
@@ -26,21 +28,7 @@
   },
   "homepage": "https://github.com/bugsounet/MMM-Assistant2Display",
   "MD5": "8f06606b7c468c9039a5eee28adde5e3",
-  "files": [
-    "modules/MMM-Assistant2Display/node_helper.js",
-    "modules/MMM-Assistant2Display/MMM-Assistant2Display.js",
-    "modules/MMM-Assistant2Display/components/display.js",
-    "modules/MMM-Assistant2Display/components/spotify.js",
-    "modules/MMM-Assistant2Display/components/youtube.js"
-  ],
   "dependencies": {
-    "@bugsounet/cast": "^1.0.0",
-    "@bugsounet/governor": "^1.0.3",
-    "@bugsounet/internet": "^1.0.0",
-    "@bugsounet/md5": "^1.1.0",
-    "@bugsounet/pir": "^1.0.4",
-    "@bugsounet/screen": "^1.0.0",
-    "@bugsounet/spotify": "^1.0.0",
-    "pm2": "^4.4.0"
+    "@bugsounet/secure-a2d": "^1.0.1"
   }
 }
