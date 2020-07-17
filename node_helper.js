@@ -13,6 +13,7 @@ const Governor = require("@bugsounet/governor")
 const Internet = require("@bugsounet/internet")
 const CastServer = require("@bugsounet/cast")
 const Spotify = require("@bugsounet/spotify")
+const pm2 = require('pm2')
 
 var _log = function() {
   var context = "[A2D]"
@@ -81,9 +82,9 @@ module.exports = NodeHelper.create({
           clearTimeout(timeout)
           timeout= null
           if ((code == 404) && (result.error.reason == "NO_ACTIVE_DEVICE")) {
-            if (this.config.spotify.useIntegred) {
+            if (this.config.spotify.useLibrespot) {
               console.log("[SPOTIFY] No response from librespot !")
-              librespot.kill() // relaunch librespot
+              pm2.restart("librespot")
               timeout= setTimeout(() => {
                 this.socketNotificationReceived("SPOTIFY_TRANSFER", this.config.spotify.connectTo)
                 this.socketNotificationReceived("SPOTIFY_RETRY_PLAY", payload)
@@ -115,7 +116,7 @@ module.exports = NodeHelper.create({
         })
         break
       case "SPOTIFY_STOP":
-        librespot.kill() // stop and restart librespot
+        pm2.restart("librespot")
         break
     }
   },
@@ -197,38 +198,44 @@ module.exports = NodeHelper.create({
       }
       if (this.config.spotify.useLibrespot) {
         console.log("[SPOTIFY] Launch Librespot...")
-        const libresport = null
         this.librespot()
       }
     }
   },
 
+  /** launch librespot with pm2 **/
   librespot: function() {
     var file = "librespot"
     var filePath = path.resolve(__dirname, "components/librespot/target/release", file)
     if (!fs.existsSync(filePath)) return console.log("[LIBRESPOT] librespot is not installed !")
-    librespot = spawn(filePath, ["-n", this.config.spotify.connectTo, "-u", this.config.spotify.username, "-p", this.config.spotify.password , "--initial-volume" , this.config.spotify.maxVolume] )
-    librespot.stdout.on('data', (data) => {
-      if (this.config.debug) console.log(`${data}`)
+    pm2.connect((err) => {
+      if (err) return console.log(err)
+      console.log("[PM2] Connected!")
+      pm2.list((err,list) => {
+        if (err) return console.log(err)
+        if (list && Object.keys(list).length > 0) {
+          for (let [item, info] of Object.entries(list)) {
+            if (info.name == "librespot" && info.pid) {
+              return console.log("[PM2] Librespot already launched")
+            }
+          }
+        }
+        pm2.start({
+          script: filePath,
+          name: "librespot",
+          out_file: "/dev/null",
+          args: ["-n", this.config.spotify.connectTo, "-u", this.config.spotify.username, "-p", this.config.spotify.password , "--initial-volume" , this.config.spotify.maxVolume]
+        }, (err, proc) => {
+          if (err) return console.log(err)
+          console.log("[PM2] Librespot started !")
+        })
+      })
     })
-
-    librespot.stderr.on('data', (data) => {
-      if (this.config.debug) console.log(`${data}`)
-    })
-
-    librespot.on('close', (code) => {
-      if (code == 101) return console.log("[LIBRESPOT] Error !")
-      if (!code) {
-        console.log(`[LIBRESPOT] Exited with an unkown code, relaunch it...`)
-        return this.librespot()
-      }
-      console.log(`[LIBRESPOT] Exited with code ${code}`)
-    })
-    if (!librespot.pid) console.log("[LIBRESPOT] Error !")
-    else if (this.config.debug) console.log("[LIBRESPOT] Device " + this.config.spotify.connectTo + " is ready for playing. pid:", librespot.pid)
     process.on('exit', (code) => {
-      librespot.abort() // try to kill librespot on exit
-      console.log("[LIBRESPOT] Killed")
+      // try to kill librespot on exit ... or not ...
+      pm2.stop("librespot", (e,p) => {
+        console.log("[LIBRESPOT] Killed")
+      })
     })
   }
 });
