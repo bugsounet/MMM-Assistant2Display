@@ -84,7 +84,10 @@ module.exports = NodeHelper.create({
           if ((code == 404) && (result.error.reason == "NO_ACTIVE_DEVICE")) {
             if (this.config.spotify.useLibrespot) {
               console.log("[SPOTIFY] No response from librespot !")
-              pm2.restart("librespot")
+              pm2.restart("librespot", (err, proc) => {
+                if (err) console.log("[PM2] librespot error: " + err)
+                else console.log("[PM2] restart librespot")
+              })
               timeout= setTimeout(() => {
                 this.socketNotificationReceived("SPOTIFY_TRANSFER", this.config.spotify.connectTo)
                 this.socketNotificationReceived("SPOTIFY_RETRY_PLAY", payload)
@@ -116,7 +119,10 @@ module.exports = NodeHelper.create({
         })
         break
       case "SPOTIFY_STOP":
-        pm2.restart("librespot")
+        pm2.restart("librespot", (err, proc) => {
+          if (err) console.log("[PM2] librespot error: " + err)
+          else log("[PM2] restart librespot")
+        })
         break
     }
   },
