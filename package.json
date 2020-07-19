@@ -1,6 +1,6 @@
 {
   "name": "MMM-Assistant2Display",
-  "version": "2.3.1",
+  "version": "2.3.2",
   "description": "GoogleAssistant Display module",
   "main": "MMM-Assistant2Display.js",
   "scripts": {
@@ -27,7 +27,7 @@
     "url": "https://github.com/bugsounet/MMM-Assistant2Display/issues"
   },
   "homepage": "https://github.com/bugsounet/MMM-Assistant2Display",
-  "MD5": "73bd8a7f441c36af2313a1771b48e485",
+  "MD5": "1c73f5679ec6652f8dda808e3bdc242e",
   "dependencies": {
     "@bugsounet/secure-a2d": "^1.0.1"
   }
