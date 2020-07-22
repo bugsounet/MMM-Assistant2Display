@@ -14,6 +14,11 @@ Needed: MMM-GoogleAssistant v2.0.0 and more
 ![](https://raw.githubusercontent.com/bugsounet/MMM-Assistant2Display/dev/screenshot/screenshot2.png)
 ![](https://raw.githubusercontent.com/bugsounet/MMM-Assistant2Display/dev/screenshot/YouTube_Cast.png)
 
+## Demo videos
+
+- [EN version](https://youtu.be/viE9Ds8IvUQ)
+- [FR version](https://www.youtube.com/watch?v=1hpx4xujqHg)
+
 ## Installation, Configuration & Guides
 Read the docs in [wiki](https://github.com/bugsounet/MMM-Assistant2Display/wiki)
 
