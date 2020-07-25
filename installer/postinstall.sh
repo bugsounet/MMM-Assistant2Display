@@ -33,4 +33,7 @@ cp -f ../components/with-radio_fr.js ../../MMM-GoogleAssistant/recipes && Instal
 Installer_info "Copy recipe 'with-radio_it.js' to MMM-GoogleAssistant recipe directory"
 cp -f ../components/with-radio_it.js ../../MMM-GoogleAssistant/recipes && Installer_success "Done"
 
+Installer_info "Copy recipe 'with-A2DSpotify.js' to MMM-GoogleAssistant recipe direcetory"
+cp -f ../components/with-A2DSpotify.js ../../MMM-GoogleAssistant/recipes && Installer_success "Done"
+
 Installer_exit "$Installer_module is now installed !"
