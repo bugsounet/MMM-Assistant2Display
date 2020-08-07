@@ -1,0 +1,101 @@
+#A2D {
+  position:fixed;
+  width:100%;
+  height:100%;
+  overflow:auto;
+  border:none;
+  top:0;
+  left:0;
+  z-index:99999;
+}
+
+#A2D.hidden {
+   display:none;
+}
+
+#A2D_WINDOW {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+}
+
+#A2D.hidden #A2D_WINDOW {
+  visibility: hidden;
+  opacity: 0;
+  transition: visibility 0s 1s, opacity 1s linear;
+}
+
+#A2D_OUTPUT {
+    order: 1;
+    flex: 1 1 auto;
+    border: none;
+}
+
+#A2D_OUTPUT.hidden {
+   display:none;
+}
+
+#A2D_PHOTO {
+    order: 1;
+    flex: 1 1 auto;
+    border: none;
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    background-color: #000;
+}
+
+#A2D_PHOTO.hidden {
+   display:none;
+}
+
+#A2D_YOUTUBE {
+    width: 100%;
+    height: 100%;
+}
+
+#A2D_YOUTUBE.hidden {
+  display:none;
+}
+
+/* transscription */
+#A2D_CONTENER {
+    order: 2;
+    -webkit-flex: none;
+    flex: none;
+    height: 100px;
+    background-color: #f3f3f3; /* better than #181818 */
+    color: #000;
+}
+
+#A2D_LOGO {
+  width: 150px;
+  height:100px;
+  display:inline-block;
+  background-image:url('/modules/MMM-GoogleAssistant/resources/GA_Small.png');
+  background-position : 2px -5px;
+  background-repeat: no-repeat;
+  background-size: 90%;
+ }
+
+#A2D_TRANSCRIPTION {
+  display:inline-block;
+  min-width:100px;
+  height:100px;
+  vertical-align: top;
+  margin-top: 0px;
+  box-sizing: border-box;
+}
+
+#A2D_TRANSCRIPTION p {
+  margin-top: 23px;
+}
+
+#A2D_TRANSCRIPTION p.error {
+  color:#FF6633;
+  text-align:left;
+}
+
+#A2D_TRANSCRIPTION.hidden {
+  display: none
+}

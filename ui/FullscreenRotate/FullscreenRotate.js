@@ -1,7 +1,7 @@
 class Display extends DisplayClass {
-  constructor (Config, callback) {
-    super(Config, callback)
-    console.log("[A2D] Extends Display with Classic ui Loaded")
+  constructor (Config, callbacks) {
+    super(Config, callbacks)
+    console.log("[A2D] Extend Display with FullscreenRotate ui Loaded")
   }
 
   prepare() {
@@ -13,7 +13,7 @@ class Display extends DisplayClass {
     scoutpan.id = "A2D_WINDOW"
     var scoutphoto = document.createElement("img")
     scoutphoto.id = "A2D_PHOTO"
-    scoutphoto.classList.add("hidden")    
+    scoutphoto.classList.add("hidden")
     var scout = document.createElement("webview")
     scout.useragent= "Mozilla/5.0 (SMART-TV; Linux; Tizen 2.4.0) AppleWebkit/538.1 (KHTML, like Gecko) SamsungBrowser/1.1 TV Safari/538.1"
     scout.id = "A2D_OUTPUT"
@@ -77,4 +77,4 @@ class Display extends DisplayClass {
     A2D("Prepare ok")
     super.prepareDisplay()
   }
-} 
+}
