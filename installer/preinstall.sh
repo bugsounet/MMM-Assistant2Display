@@ -51,6 +51,12 @@ fi
 
 echo
 
+# apply @sdetweil pm2 installer
+Installer_info "Installing @sdetweil installer for spotify..."
+bash -c "$(curl -sL https://raw.githubusercontent.com/sdetweil/MagicMirror_scripts/master/fixuppm2.sh)" nosetup
+
+echo
+
 # switch branch
 Installer_info "Installing Sources..."
 git checkout -f prod 2>/dev/null || Installer_error "Installing Error !"
