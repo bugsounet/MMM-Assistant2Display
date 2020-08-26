@@ -38,3 +38,7 @@ Read the docs in [wiki](https://github.com/bugsounet/MMM-Assistant2Display/wiki)
   - @bugsounet
 - License : MIT
   - **By terms of Google Assistant SDK, You are not allowed to use or provide this module for commercial purpose.**
+
+## Thanks
+ - [@sdetweil](https://github.com/sdetweil/MagicMirror_scripts): For his magical script !
+ - To all for using this modules !
