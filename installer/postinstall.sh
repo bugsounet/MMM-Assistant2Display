@@ -4,8 +4,8 @@
 # | @bugsounet      |
 # +-----------------+
 
+# with or without prompt ?
 prompt=true
-
 if [ -e no-prompt ]; then
   prompt=false
 fi
