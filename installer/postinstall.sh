@@ -51,5 +51,6 @@ cp -f ../components/with-A2DSpotify.js ../../MMM-GoogleAssistant/recipes && Inst
 if $prompt; then
   Installer_exit "$Installer_module is now installed !"
 fi
+
 cd ~/MagicMirror/modules/MMM-Assistant2Display
 rm -rf no-prompt
