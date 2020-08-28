@@ -4,6 +4,12 @@
 # | @bugsounet      |
 # +-----------------+
 
+prompt=true
+
+if [ -e no-prompt ]; then
+  prompt=false
+fi
+
 # get the installer directory
 Installer_get_current_dir () {
   SOURCE="${BASH_SOURCE[0]}"
@@ -36,4 +42,8 @@ cp -f ../components/with-radio_it.js ../../MMM-GoogleAssistant/recipes && Instal
 Installer_info "Copy recipe 'with-A2DSpotify.js' to MMM-GoogleAssistant recipe direcetory"
 cp -f ../components/with-A2DSpotify.js ../../MMM-GoogleAssistant/recipes && Installer_success "Done"
 
-Installer_exit "$Installer_module is now installed !"
+if $prompt; then
+  Installer_exit "$Installer_module is now installed !"
+fi
+cd ~/MagicMirror/modules/MMM-Assistant2Display
+rm -rf no-prompt

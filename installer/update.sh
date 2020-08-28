@@ -2,6 +2,22 @@
 # +-------------+
 # | A2D updater |
 # +-------------+
+
+# with or without prompt ?
+p0=$0
+prompt= true
+# if not 'bash', and some parm specified
+if [ $0 != 'bash' -a "$1." != "." ]; then
+        # then executed locally
+        # get the parm
+        p0=$1
+fi
+
+if [ $p0 = without-prompt ]; then
+  touch no-prompt
+  prompt= false
+fi
+
 # get the installer directory
 Installer_get_current_dir () {
   SOURCE="${BASH_SOURCE[0]}"
