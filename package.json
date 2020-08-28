@@ -1,6 +1,6 @@
 {
   "name": "MMM-Assistant2Display",
-  "version": "2.3.11",
+  "version": "2.3.11+Dev",
   "description": "GoogleAssistant Display module",
   "main": "MMM-Assistant2Display.js",
   "scripts": {
