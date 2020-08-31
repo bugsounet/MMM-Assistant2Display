@@ -2,6 +2,22 @@
 # +-------------+
 # | A2D updater |
 # +-------------+
+
+# with or without prompt ?
+p0=$0
+prompt=true
+# if not 'bash', and some parm specified
+if [ $0 != 'bash' -a "$1." != "." ]; then
+        # then executed locally
+        # get the parm
+        p0=$1
+fi
+
+if [ $p0 = without-prompt ]; then
+  touch no-prompt
+  prompt=false
+fi
+
 # get the installer directory
 Installer_get_current_dir () {
   SOURCE="${BASH_SOURCE[0]}"
@@ -18,20 +34,32 @@ Installer_dir="$(Installer_get_current_dir)"
 # move to installler directory
 cd "$Installer_dir"
 source utils.sh
-Installer_info "Welcome to A2D updater !"
+
+if $prompt; then
+  Installer_info "Welcome to A2D updater !"
 echo
+fi
 
 cd ~/MagicMirror/modules/MMM-Assistant2Display
 # deleting package.json because npm install add/update package
 rm -f package.json package-lock.json
-Installer_info "Updating..."
+
+if $prompt; then
+  Installer_info "Updating..."
+fi
 git pull
 #fresh package.json
 git checkout package.json
 cd node_modules
-Installer_info "Deleting ALL @bugsounet libraries..."
+
+if $prompt; then
+  Installer_info "Deleting ALL @bugsounet libraries..."
+fi
 rm -rf @bugsounet
 cd ~/MagicMirror/modules/MMM-Assistant2Display
-Installer_info "Ready for Installing..."
+
+if $prompt; then
+  Installer_info "Ready for Installing..."
+fi
 # launch installer
 npm install

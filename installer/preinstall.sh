@@ -4,6 +4,12 @@
 # | @bugsounet      |
 # +-----------------+
 
+# with or without prompt ?
+prompt=true
+if [ -e no-prompt ]; then
+  prompt=false
+fi
+
 # get the installer directory
 Installer_get_current_dir () {
   SOURCE="${BASH_SOURCE[0]}"
@@ -29,9 +35,10 @@ Installer_module="Assistant2Display"
 Installer_version="$(cat ../package.json | grep version | cut -c14-30 2>/dev/null)"
 
 # Let's start !
-Installer_info "Welcome to $Installer_module $Installer_version"
-
-echo
+if $prompt; then
+  Installer_info "Welcome to $Installer_module $Installer_version"
+  echo
+fi
 
 # Check not run as root
 if [ "$EUID" -eq 0 ]; then
@@ -39,5 +46,7 @@ if [ "$EUID" -eq 0 ]; then
   exit 1
 fi
 
-Installer_info "Installing all library..."
-echo
+if $prompt; then
+  Installer_info "Installing all library..."
+  echo
+fi
