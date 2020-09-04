@@ -1,13 +1,13 @@
 # MMM-Assistant2Display
 
 
-This module is an addons for MMM-GoogleAssistant.
+This module is an addon for MMM-GoogleAssistant.
 
-It allows to display the links, photos and YouTube video found by your assistant.
+It is capable to display links, photos and YouTube videos found by your assistant.
 
-You can control MagicMirror sound volume, screen, detector, pir sensor, and more
+You can control MagicMirror's volume settings, display state, detector, pir sensor and more.
 
-Needed: MMM-GoogleAssistant v2.0.0 and more
+Requirements: MMM-GoogleAssistant v2.0.0 or newer
 
 ## Installation, Configuration & Guides
 Read the docs in [wiki](https://github.com/bugsounet/MMM-Assistant2Display/wiki)
