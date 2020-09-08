@@ -3,7 +3,9 @@
   * copying my MagicMirror modules and my npm modules don't pay !
   * don't delete my username !
 
-# MMM-Assistant2Display
+# MMM-Assistant2Display 
+
+![](https://img.shields.io/npm/dm/@bugsounet/secure-a2d) ![npm](https://img.shields.io/npm/dt/@bugsounet/secure-a2d)
 
 This module is an addons for MMM-GoogleAssistant.
 
