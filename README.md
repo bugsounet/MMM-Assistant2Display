@@ -15,5 +15,8 @@ Read the docs in [wiki](https://github.com/bugsounet/MMM-Assistant2Display/wiki)
 ## Credits
 - Author :
   - @bugsounet
+- Translators:
+  - @lxne 
+  - @Saljoke
 - License : MIT
   - **By terms of Google Assistant SDK, You are not allowed to use or provide this module for commercial purpose.**
