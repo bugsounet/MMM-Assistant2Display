@@ -1,8 +1,3 @@
-# GLOBAL NOTICE IN ALL MODULES
-# [@ktoanlba89](https://github.com/ktoanlba89): 
-  * copying my MagicMirror modules and my npm modules don't pay !
-  * don't delete my username !
-
 # MMM-Assistant2Display 
 
 ![](https://img.shields.io/npm/dm/@bugsounet/secure-a2d) ![](https://img.shields.io/npm/dt/@bugsounet/secure-a2d)
@@ -40,6 +35,9 @@ Read the docs in [wiki](https://github.com/bugsounet/MMM-Assistant2Display/wiki)
   - @bugsounet
 - License : MIT
   - **By terms of Google Assistant SDK, You are not allowed to use or provide this module for commercial purpose.**
+  
+## Donate
+ [Donate](https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=TTHRH94Y4KL36&source=url), if you love this module !
 
 ## Thanks
  - To [@sdetweil](https://github.com/sdetweil/MagicMirror_scripts): For his magical scripts !
