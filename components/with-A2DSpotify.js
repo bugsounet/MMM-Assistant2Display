@@ -72,7 +72,7 @@ var recipe = {
     }
 
     "IT_SEARCH_SPOTIFY": {
-      pattern: "(.*) on spotify",
+      pattern: "(.*) su spotify",
       command: "SEARCH_SPOTIFY"
     },
     "IT_NEXT_SPOTIFY" : {
