@@ -70,6 +70,32 @@ var recipe = {
       pattern: "spotify transfer to (.*)",
       command: "TRANSTO_SPOTIFY"
     }
+
+    "IT_SEARCH_SPOTIFY": {
+      pattern: "(.*) on spotify",
+      command: "SEARCH_SPOTIFY"
+    },
+    "IT_NEXT_SPOTIFY" : {
+      pattern: "spotify seguente",
+      command: "NEXT_SPOTIFY"
+    },
+    "IT_PREVIOUS_SPOTIFY": {
+      pattern: "spotify precedente",
+      command: "PREVIOUS_SPOTIFY"
+    },
+    "IT_SHUFFLE_SPOTIFY": {
+      pattern: "spotify casuale",
+      command: "SHUFFLE_SPOTIFY"
+    },
+    "IT_REPEAT_SPOTIFY": {
+      pattern: "spotify ripeti",
+      command: "REPEAT_SPOTIFY"
+    },
+    "EN_TRANSTO_SPOTIFY": {
+      pattern: "spotify trasferisci a (.*)",
+      command: "TRANSTO_SPOTIFY"
+    }
+
   },
 
   commands: {
