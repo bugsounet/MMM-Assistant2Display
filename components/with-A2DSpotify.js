@@ -5,6 +5,10 @@
 
 var recipe = {
   transcriptionHooks: {
+    "SEARCH_SPOTIFY": {
+      pattern: "(.*) sur spotify",
+      command: "SEARCH_SPOTIFY"
+    },
     "START_SPOTIFY" : {
       pattern : "spotify play",
       command: "START_SPOTIFY"
@@ -42,6 +46,10 @@ var recipe = {
       command: "VOLUME_SPOTIFY"
     },
 
+    "EN_SEARCH_SPOTIFY": {
+      pattern: "(.*) on spotify",
+      command: "SEARCH_SPOTIFY"
+    },
     "EN_NEXT_SPOTIFY" : {
       pattern: "spotify next",
       command: "NEXT_SPOTIFY"
@@ -65,6 +73,22 @@ var recipe = {
   },
 
   commands: {
+    "SEARCH_SPOTIFY": {
+      notificationExec: {
+        notification: "A2D_SPOTIFY_SEARCH",
+        payload: (params) => {
+          return {
+            type: "artist,track,album,playlist",
+            query: params[1],
+            random:false,
+          }
+        }
+      },
+      soundExec: {
+        chime: "open"
+      },
+      displayResponse: true
+    },
     "START_SPOTIFY": {
       notificationExec: {
         notification: "A2D_SPOTIFY_PLAY"
