@@ -69,7 +69,7 @@ var recipe = {
     "EN_TRANSTO_SPOTIFY": {
       pattern: "spotify transfer to (.*)",
       command: "TRANSTO_SPOTIFY"
-    }
+    },
 
     "IT_SEARCH_SPOTIFY": {
       pattern: "(.*) su spotify",
@@ -91,7 +91,7 @@ var recipe = {
       pattern: "spotify ripeti",
       command: "REPEAT_SPOTIFY"
     },
-    "EN_TRANSTO_SPOTIFY": {
+    "IT_TRANSTO_SPOTIFY": {
       pattern: "spotify trasferisci a (.*)",
       command: "TRANSTO_SPOTIFY"
     }
