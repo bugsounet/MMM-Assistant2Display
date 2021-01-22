@@ -254,6 +254,7 @@ module.exports = NodeHelper.create({
   librespot: function() {
     var file = "librespot"
     var filePath = path.resolve(__dirname, "components/librespot/target/release", file)
+    var cacheDir = __dirname + "/components/librespot/cache"
     if (!fs.existsSync(filePath)) return console.log("[LIBRESPOT] librespot is not installed !")
     pm2.connect((err) => {
       if (err) return console.log(err)
@@ -271,9 +272,9 @@ module.exports = NodeHelper.create({
           script: filePath,
           name: "librespot",
           out_file: "/dev/null",
-          args: ["-n", this.config.spotify.connectTo, "-u", this.config.spotify.username, "-p", this.config.spotify.password , "--initial-volume" , this.config.spotify.maxVolume]
+          args: ["-n", this.config.spotify.connectTo, "-u", this.config.spotify.username, "-p", this.config.spotify.password , "--initial-volume" , this.config.spotify.maxVolume, "-c", cacheDir ]
         }, (err, proc) => {
-          if (err) return console.log(err)
+          if (err) return console.log("[LIBRESPOT] " + err)
           console.log("[PM2] Librespot started !")
         })
       })
