@@ -305,6 +305,7 @@ Module.register("MMM-Assistant2Display",{
         case "ASSISTANT_READY":
           this.onReady()
           break
+        case "ALEXA_ACTIVATE":
         case "ASSISTANT_LISTEN":
         case "ASSISTANT_THINK":
           this.A2D.speak = true
@@ -318,6 +319,7 @@ Module.register("MMM-Assistant2Display",{
           if (this.A2D.radio) this.radio.volume = 0.1
           if (this.A2D.locked) this.displayResponse.hideDisplay()
           break
+        case "ALEXA_STANDBY":
         case "ASSISTANT_STANDBY":
           this.A2D.speak = false
           if (this.config.useYoutube && this.displayResponse.player) {
@@ -613,6 +615,9 @@ Module.register("MMM-Assistant2Display",{
     this.ui = "Windows"
     console.log("[A2D] Scan config.js file")
     var GAFound = false
+    var GAActivated= false
+    var AlexaFound= false
+    var AlexaActivated= false
     for (let [item, value] of Object.entries(config.modules)) {
       if (value.module == "MMM-GoogleAssistant") {
         GAFound = true
@@ -620,10 +625,16 @@ Module.register("MMM-Assistant2Display",{
           if (value.config.responseConfig && value.config.responseConfig.screenRotate) this.ui = "FullscreenRotate"
           else this.ui = "Fullscreen"
         }
-        this.useA2D = (value.config.A2DServer && value.config.A2DServer.useA2D && !value.disabled) ? value.config.A2DServer.useA2D : false
+        GAActivated = value.config.A2DServer && value.config.A2DServer.useA2D && !value.disabled
+      }
+      if (value.module == "MMM-Alexa") {
+        AlexaFound = true
+        AlexaActivated = value.config.A2DServer && !value.disabled
       }
     }
-    if (!GAFound) console.log("[A2D][ERROR] GoogleAssistant not found!")
+    if (!GAFound) console.log("[A2D][WARN] GoogleAssistant not found!")
+    if (!AlexaFound) console.log("[A2D][WARN] Alexa not found!")
+    this.useA2D = GAActivated || AlexaActivated
     console.log("[A2D] Auto choice UI:", this.ui)
     if (!this.useA2D) {
       console.log("[A2D][ERROR] A2D is desactived!")
@@ -1051,5 +1062,5 @@ Module.register("MMM-Assistant2Display",{
   *to*: Transfert music to another device (case sensitive)\
   ',{parse_mode:'Markdown'})
     }
-  },
+  }
 });
