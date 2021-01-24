@@ -2,11 +2,17 @@
 
 #A2D_RADIO,
 #A2D_SCREEN,
-#A2D_INTERNET,
+#A2D_INTERNET {
+  font-size: large;
+  display: flex;
+  line-height: 1.5em;
+}
+
 #A2D_PRESENCE {
   font-size: large;
   display: flex;
   line-height: 1.5em;
+  justify-content: center;
 }
 
 #A2D_BAR {
@@ -262,3 +268,124 @@ progress[value]#A2D_SPOTIFY_PROGRESS_BAR::-webkit-progress-bar {
   color: grey;
 }
 
+/* spotify mini */
+/* style "mini" */
+#A2D_SPOTIFY.mini {
+  width: 360px;
+  font-size: 16px;
+  height: auto;
+}
+
+#A2D_SPOTIFY.mini #A2D_SPOTIFY_BACKGROUND {
+  background-size: cover;
+  background-position: center center;
+  filter: blur(16px) opacity(90%) grayscale(33%);
+  position:absolute;
+  top:0;
+  left:0;
+  width:100%;
+  height:100%;
+  z-index:0;
+}
+
+#A2D_SPOTIFY.mini #A2D_SPOTIFY_FOREGROUND {
+  flex-direction:row;
+  padding:0;
+}
+
+#A2D_SPOTIFY.mini .mdi {
+  font-size: 14px;
+}
+
+#A2D_SPOTIFY.mini .infoicon {
+  margin-right: 6px;
+}
+
+#A2D_SPOTIFY.mini #A2D_SPOTIFY_COVER {
+  width:140px;
+  height:140px;
+  padding:0;
+}
+
+#A2D_SPOTIFY.mini #A2D_SPOTIFY_COVER_IMAGE {
+  height:140px;
+  border-radius: 20px;
+}
+
+#A2D_SPOTIFY.mini #A2D_SPOTIFY_MISC {
+  display: unset;
+  flex-direction: initial;
+  justify-content: initial;
+  margin-left: initial;
+  margin-right: initial;
+  overflow: initial;
+  width: initial;
+}
+
+#A2D_SPOTIFY.mini #A2D_SPOTIFY_INFO {
+  width:220px;
+  padding-left:10px;
+  margin-top:5px;
+    display: block;
+    flex-direction: initial;
+    height: auto;
+    justify-content: initial;
+    align-items: initial;
+}
+
+#A2D_SPOTIFY.mini #A2D_SPOTIFY_INFO > * {
+  display: flex;
+  justify-content: flex-start;
+}
+
+#A2D_SPOTIFY.mini #A2D_SPOTIFY_INFO .text {
+  width: 290px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  display:inline-block;
+  margin-left: -5px;
+}
+
+#A2D_SPOTIFY.mini #A2D_SPOTIFY_PROGRESS_BAR {
+  margin:5px;
+  width: 95%;
+  border: 1px solid #aaaaaa;
+  height: 10px;
+  
+}
+
+#A2D_SPOTIFY.mini #A2D_SPOTIFY_PROGRESS_TIME {
+  display:none;
+}
+
+#A2D_SPOTIFY.mini #A2D_SPOTIFY_VOLUME {
+  margin-left: 10px;
+}
+
+
+
+#A2D_SPOTIFY.mini #A2D_SPOTIFY_LOGO {
+  position: relative;
+  text-align: center;
+  left: auto;
+  transform: none;
+}
+
+#A2D_SPOTIFY.mini #A2D_SPOTIFY_VOLUME .infoicon {
+  margin-right: 3px;
+  text-shadow: black 2px 2px 2px;
+  align-items: center;
+  text-align: center;
+  line-height: inherit;
+  font-size: 17px
+}
+
+#A2D_SPOTIFY.mini #A2D_SPOTIFY_INFO .infoicon {
+  width: 23px;
+  margin-right: 10px;
+  text-shadow: black 2px 2px 2px;
+  align-items: center;
+  text-align: center;
+  line-height: inherit;
+}
