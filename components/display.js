@@ -48,7 +48,16 @@ class DisplayClass {
 
   start(response) {
     /** Close all active windows and reset it **/
-    if (this.A2D.youtube.displayed && !this.config.useVLC) this.player.command("stopVideo")
+    if (this.A2D.youtube.displayed) {
+      if (this.config.useVLC) {
+        this.sendSocketNotification("YT_STOP")
+        this.A2D.youtube.displayed = false
+        this.showYT()
+        this.A2DUnlock()
+        this.resetYT()
+      }
+      else this.player.command("stopVideo")
+    }
     if (this.A2D.photos.displayed) {
       this.resetPhotos()
       this.hideDisplay()
@@ -317,7 +326,15 @@ class DisplayClass {
 /** Cast **/
   castStart(url) {
     /** stop all process before starting cast **/
-    if (this.A2D.youtube.displayed) this.player.command("stopVideo")
+    if (this.A2D.youtube.displayed) {
+      if (this.config.useVLC) {
+        this.sendSocketNotification("YT_STOP")
+        this.A2D.youtube.displayed = false
+        this.showYT()
+        this.resetYT()
+      }
+      else this.player.command("stopVideo")
+    }
     if (this.A2D.spotify.connected && this.A2D.spotify.librespot) {
       this.sendSocketNotification("SPOTIFY_PAUSE")
     }

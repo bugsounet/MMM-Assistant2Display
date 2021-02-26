@@ -2,6 +2,7 @@
 
 var exec = require('child_process').exec
 const { spawn } = require('child_process')
+const child_process = require('child_process')
 const process = require('process')
 const fs = require("fs")
 const path = require("path")
@@ -30,6 +31,7 @@ module.exports = NodeHelper.create({
     this.config = {}
     timeout = null
     retry = null
+    this.YouTube = null
   },
 
   socketNotificationReceived: function (noti, payload) {
@@ -160,6 +162,9 @@ module.exports = NodeHelper.create({
         break
       case "VLC_YOUTUBE":
         this.playWithVlc(payload)
+        break
+      case "YT_STOP":
+        this.CloseVlc()
         break
     }
   },
@@ -345,10 +350,14 @@ module.exports = NodeHelper.create({
   },
 
   playWithVlc: function (link) {
-    const child_process = require('child_process')
     const environ = Object.assign(process.env, { DISPLAY: ":0" })
+    if (this.YouTube) {
+      log("[YouTube] Closing VLC...")
+      this.YouTube.stderr.removeAllListeners()
+      this.YouTube.kill()
+      this.YouTube = null
+    }
     log("[YouTube] Found link:", link)
-    this.YouTube = null
     var vlcCmd = `cvlc`
     var args = ["--fullscreen", "--play-and-exit", '--video-on-top', "--no-video-deco", "--no-embedded-video", "--video-title=YouTube", link ]
     var opts = { detached: false, env: environ, stdio: ['ignore', 'ignore', 'pipe'] }
@@ -359,11 +368,22 @@ module.exports = NodeHelper.create({
     this.YouTube.on('error', (err) => {
       console.error("[YouTube] Error when start process: " +err)
       this.sendSocketNotification("FINISH_YOUTUBE")
+      this.YouTube = null
     })
     this.YouTube.on('close', (code) => {
       if (code === 0) log("[YouTube] Video ended")
       else log("[YouTube] Closed with code:", code)
       this.sendSocketNotification("FINISH_YOUTUBE")
+      this.YouTube = null
     })
+  },
+
+  CloseVlc: function () {
+    if (this.YouTube) {
+      log("[YouTube] Force Closing VLC...")
+      this.YouTube.stderr.removeAllListeners()
+      this.YouTube.kill()
+      this.YouTube = null
+    }
   }
 });

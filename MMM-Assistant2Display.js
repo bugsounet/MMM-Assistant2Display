@@ -310,7 +310,7 @@ Module.register("MMM-Assistant2Display",{
         case "ASSISTANT_LISTEN":
         case "ASSISTANT_THINK":
           this.A2D.speak = true
-          if (this.config.useYoutube && this.displayResponse.player) {
+          if (this.config.useYoutube && this.displayResponse.player && !this.config.useVLC) {
             this.displayResponse.player.command("setVolume", 5)
           }
           if (this.config.spotify.useSpotify && this.A2D.spotify.librespot) {
@@ -323,7 +323,7 @@ Module.register("MMM-Assistant2Display",{
         case "ALEXA_STANDBY":
         case "ASSISTANT_STANDBY":
           this.A2D.speak = false
-          if (this.config.useYoutube && this.displayResponse.player) {
+          if (this.config.useYoutube && this.displayResponse.player && !this.config.useVLC) {
             this.displayResponse.player.command("setVolume", 100)
           }
           if (this.config.spotify.useSpotify && this.A2D.spotify.librespot && !this.A2D.spotify.forceVolume) {
@@ -342,7 +342,14 @@ Module.register("MMM-Assistant2Display",{
         case "A2D_STOP":
           if (this.A2D.locked) {
             if (this.A2D.youtube.displayed) {
-              this.displayResponse.player.command("stopVideo")
+              if (this.config.useVLC) {
+                this.sendSocketNotification("YT_STOP")
+                this.A2D.youtube.displayed = false
+                this.displayResponse.showYT()
+                this.displayResponse.A2DUnlock()
+                this.displayResponse.resetYT()
+              }
+              else this.displayResponse.player.command("stopVideo")
             }
             if (this.A2D.photos.displayed) {
               this.displayResponse.resetPhotos()
@@ -387,7 +394,16 @@ Module.register("MMM-Assistant2Display",{
           }
           break
         case "A2D_RADIO":
-          if (this.A2D.youtube.displayed) this.displayResponse.player.command("stopVideo")
+          if (this.A2D.youtube.displayed) {
+            if (this.config.useVLC) {
+              this.sendSocketNotification("YT_STOP")
+              this.A2D.youtube.displayed = false
+              this.displayResponse.showYT()
+              this.displayResponse.A2DUnlock()
+              this.displayResponse.resetYT()
+            }
+            else this.displayResponse.player.command("stopVideo")
+          }
           if (this.A2D.spotify.librespot) this.sendSocketNotification("SPOTIFY_PAUSE")
           if (payload.link) {
             if (payload.img) {
@@ -402,7 +418,16 @@ Module.register("MMM-Assistant2Display",{
           break
         case "A2D_SPOTIFY_PLAY":
           if (this.config.spotify.useSpotify) {
-            if (this.A2D.youtube.displayed && this.A2D.spotify.librespot) this.displayResponse.player.command("stopVideo")
+            if (this.A2D.youtube.displayed && this.A2D.spotify.librespot) {
+              if (this.config.useVLC) {
+                this.sendSocketNotification("YT_STOP")
+                this.A2D.youtube.displayed = false
+                this.displayResponse.showYT()
+                this.displayResponse.A2DUnlock()
+                this.displayResponse.resetYT()
+              }
+              else this.displayResponse.player.command("stopVideo")
+            }
             this.sendSocketNotification("SPOTIFY_PLAY")
           }
           break
@@ -471,7 +496,16 @@ Module.register("MMM-Assistant2Display",{
             }
           }
           this.sendSocketNotification("SEARCH_AND_PLAY", pl)
-          if (this.A2D.youtube.displayed && this.A2D.spotify.librespot) this.displayResponse.player.command("stopVideo")
+          if (this.A2D.youtube.displayed && this.A2D.spotify.librespot) {
+            if (this.config.useVLC) {
+              this.sendSocketNotification("YT_STOP")
+              this.A2D.youtube.displayed = false
+              this.displayResponse.showYT()
+              this.displayResponse.A2DUnlock()
+              this.displayResponse.resetYT()
+            }
+            else this.displayResponse.player.command("stopVideo")
+          }
           break
       }
     }
@@ -611,6 +645,7 @@ Module.register("MMM-Assistant2Display",{
       case "FINISH_YOUTUBE":
         //console.log("Finish YT")
         this.A2D.youtube.displayed = false
+        this.displayResponse.showYT()
         this.displayResponse.A2DUnlock()
         this.displayResponse.resetYT()
         break
