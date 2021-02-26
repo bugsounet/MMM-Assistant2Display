@@ -158,6 +158,9 @@ module.exports = NodeHelper.create({
         log("[SPOTIFY] Search and Play", payload)
         this.searchAndPlay(payload.query, payload.condition)
         break
+      case "VLC_YOUTUBE":
+        this.playWithVlc(payload)
+        break
     }
   },
 
@@ -338,6 +341,29 @@ module.exports = NodeHelper.create({
       } else { //when fail
         console.log("[A2D] [SPOTIFY] Search and Play failed !")
       }
+    })
+  },
+
+  playWithVlc: function (link) {
+    const child_process = require('child_process')
+    const environ = Object.assign(process.env, { DISPLAY: ":0" })
+    log("[YouTube] Found link:", link)
+    this.YouTube = null
+    var vlcCmd = `cvlc`
+    var args = ["--fullscreen", "--play-and-exit", '--video-on-top', "--no-video-deco", "--no-embedded-video", "--video-title=YouTube", link ]
+    var opts = { detached: false, env: environ, stdio: ['ignore', 'ignore', 'pipe'] }
+
+    log("[YouTube] Command: cvlc", args.join(' '))
+    this.YouTube = child_process.spawn(vlcCmd, args, opts)
+
+    this.YouTube.on('error', (err) => {
+      console.error("[YouTube] Error when start process: " +err)
+      this.sendSocketNotification("FINISH_YOUTUBE")
+    })
+    this.YouTube.on('close', (code) => {
+      if (code === 0) log("[YouTube] Video ended")
+      else log("[YouTube] Closed with code:", code)
+      this.sendSocketNotification("FINISH_YOUTUBE")
     })
   }
 });

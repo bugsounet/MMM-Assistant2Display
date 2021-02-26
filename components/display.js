@@ -48,7 +48,7 @@ class DisplayClass {
 
   start(response) {
     /** Close all active windows and reset it **/
-    if (this.A2D.youtube.displayed) this.player.command("stopVideo")
+    if (this.A2D.youtube.displayed && !this.config.useVLC) this.player.command("stopVideo")
     if (this.A2D.photos.displayed) {
       this.resetPhotos()
       this.hideDisplay()
@@ -147,10 +147,12 @@ class DisplayClass {
   urlsScan() {
     let tmp = {}
     if (this.config.useYoutube) {
+      var YouTubeRealLink= this.A2D.links.urls[0]
       /** YouTube RegExp **/
       var YouTubeLink = new RegExp("youtube\.com\/([a-z]+)\\?([a-z]+)\=([0-9a-zA-Z\-\_]+)", "ig")
       /** Scan Youtube Link **/
-      var YouTube = YouTubeLink.exec(this.A2D.links.urls[0])
+      var YouTube = YouTubeLink.exec(YouTubeRealLink)
+
 
       if (YouTube) {
         let Type
@@ -165,10 +167,15 @@ class DisplayClass {
         YouTubeResponse = {
           "id": YouTube[3],
           "type": Type
-        },
+        }
         this.A2D.youtube = this.objAssign({}, this.A2D.youtube, YouTubeResponse)
         this.A2DLock()
-        this.player.load({id: this.A2D.youtube.id, type : this.A2D.youtube.type})
+        if (!this.config.useVLC) this.player.load({id: this.A2D.youtube.id, type : this.A2D.youtube.type})
+        else {
+          this.A2D.youtube.displayed = true
+          this.showYT()
+          this.sendSocketNotification("VLC_YOUTUBE", YouTubeRealLink)
+        }
         return
       }
     }

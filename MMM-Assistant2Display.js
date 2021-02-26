@@ -14,6 +14,7 @@ Module.register("MMM-Assistant2Display",{
   defaults: {
     debug: false,
     useYoutube: true,
+    useVLC: true,
     links: {
       useLinks: false,
       displayDelay: 60 * 1000,
@@ -606,6 +607,12 @@ Module.register("MMM-Assistant2Display",{
             this.A2D.spotify.targetVolume = payload
           }
         }
+        break
+      case "FINISH_YOUTUBE":
+        //console.log("Finish YT")
+        this.A2D.youtube.displayed = false
+        this.displayResponse.A2DUnlock()
+        this.displayResponse.resetYT()
         break
     }
   },
