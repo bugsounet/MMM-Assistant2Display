@@ -15,6 +15,7 @@ const Internet = require("@bugsounet/internet")
 const CastServer = require("@bugsounet/cast")
 const Spotify = require("@bugsounet/spotify")
 const pm2 = require('pm2')
+var Cvlc = require('@bugsounet/cvlc')
 
 var _log = function() {
   var context = "[A2D]"
@@ -165,6 +166,9 @@ module.exports = NodeHelper.create({
         break
       case "YT_STOP":
         this.CloseVlc()
+        break
+      case "YT_VOLUME":
+        this.VolumeVLC(payload)
         break
     }
   },
@@ -350,40 +354,34 @@ module.exports = NodeHelper.create({
   },
 
   playWithVlc: function (link) {
-    const environ = Object.assign(process.env, { DISPLAY: ":0" })
-    if (this.YouTube) {
-      log("[YouTube] Closing VLC...")
-      this.YouTube.stderr.removeAllListeners()
-      this.YouTube.kill()
-      this.YouTube = null
-    }
-    log("[YouTube] Found link:", link)
-    var vlcCmd = `cvlc`
-    var args = ["--fullscreen", "--play-and-exit", '--video-on-top', "--no-video-deco", "--no-embedded-video", "--video-title=YouTube", link ]
-    var opts = { detached: false, env: environ, stdio: ['ignore', 'ignore', 'pipe'] }
-
-    log("[YouTube] Command: cvlc", args.join(' '))
-    this.YouTube = child_process.spawn(vlcCmd, args, opts)
-
-    this.YouTube.on('error', (err) => {
-      console.error("[YouTube] Error when start process: " +err)
-      this.sendSocketNotification("FINISH_YOUTUBE")
-      this.YouTube = null
-    })
-    this.YouTube.on('close', (code) => {
-      if (code === 0) log("[YouTube] Video ended")
-      else log("[YouTube] Closed with code:", code)
-      this.sendSocketNotification("FINISH_YOUTUBE")
-      this.YouTube = null
-    })
+    if (this.YouTube) this.CloseVlc()
+    this.YouTube = new Cvlc()
+    this.YouTube.play(
+      link,
+      ()=> {
+        log("[YouTube] Found link:", link)
+         this.YouTube.cmd("volume 170")
+      },
+      ()=> {
+        log("[YouTube] Video ended")
+        this.sendSocketNotification("FINISH_YOUTUBE")
+        this.YouTube = null
+      }
+    )
   },
 
   CloseVlc: function () {
     if (this.YouTube) {
       log("[YouTube] Force Closing VLC...")
-      this.YouTube.stderr.removeAllListeners()
-      this.YouTube.kill()
+      this.YouTube.destroy()
       this.YouTube = null
+    }
+  },
+
+  VolumeVLC: function(volume) {
+    if (this.YouTube) {
+      log("[YouTube] Set VLC Volume to:", volume)
+      this.YouTube.cmd("volume " + volume)
     }
   }
 });

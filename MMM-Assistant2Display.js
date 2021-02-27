@@ -310,8 +310,9 @@ Module.register("MMM-Assistant2Display",{
         case "ASSISTANT_LISTEN":
         case "ASSISTANT_THINK":
           this.A2D.speak = true
-          if (this.config.useYoutube && this.displayResponse.player && !this.config.useVLC) {
-            this.displayResponse.player.command("setVolume", 5)
+          if (this.config.useYoutube && this.displayResponse.player) {
+            if (!this.config.useVLC) this.displayResponse.player.command("setVolume", 5)
+            else this.sendSocketNotification("YT_VOLUME", 70)
           }
           if (this.config.spotify.useSpotify && this.A2D.spotify.librespot) {
             this.A2D.spotify.targetVolume = this.A2D.spotify.currentVolume
@@ -323,8 +324,9 @@ Module.register("MMM-Assistant2Display",{
         case "ALEXA_STANDBY":
         case "ASSISTANT_STANDBY":
           this.A2D.speak = false
-          if (this.config.useYoutube && this.displayResponse.player && !this.config.useVLC) {
-            this.displayResponse.player.command("setVolume", 100)
+          if (this.config.useYoutube && this.displayResponse.player) {
+            if (!this.config.useVLC) this.displayResponse.player.command("setVolume", 100)
+            else this.sendSocketNotification("YT_VOLUME", 170)
           }
           if (this.config.spotify.useSpotify && this.A2D.spotify.librespot && !this.A2D.spotify.forceVolume) {
             this.sendSocketNotification("SPOTIFY_VOLUME", this.A2D.spotify.targetVolume)
