@@ -676,8 +676,16 @@ Module.register("MMM-Assistant2Display",{
         AlexaActivated = value.config.A2DServer && !value.disabled
       }
     }
-    if (!GAFound) console.log("[A2D][WARN] GoogleAssistant not found!")
-    if (!AlexaFound) console.log("[A2D][WARN] Alexa not found!")
+    if (GAFound) {
+      if (!GAActivated) console.log("[A2D][WARN] GoogleAssistant is disabled!")
+      else console.log("[A2D] Found: GoogleAssistant")
+    } else console.log("[A2D][WARN] GoogleAssistant not found!")
+
+    if (AlexaFound) {
+      if (!AlexaActivated) console.log("[A2D][WARN] Alexa is disabled!")
+      else console.log("[A2D] Found: Alexa")
+    } else console.log("[A2D][WARN] Alexa not found!")
+
     this.useA2D = GAActivated || AlexaActivated
     console.log("[A2D] Auto choice UI:", this.ui)
     if (!this.useA2D) {
