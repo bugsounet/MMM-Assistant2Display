@@ -50,8 +50,7 @@ Module.register("MMM-Assistant2Display",{
       detectorSleeping: false,
       governorSleeping: false,
       displayLastPresence: true,
-      LastPresenceText: "Last Presence:",
-      rpi4: false
+      LastPresenceText: "Last Presence:"
     },
     touch: {
       useTouch: true,
