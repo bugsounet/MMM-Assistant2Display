@@ -41,7 +41,7 @@ class Display extends DisplayClass {
           this.resetYT()
         }
       )
-      if (this.config.useYoutube) this.player.init()
+      if (this.config.useYoutube && !this.config.useVLC) this.player.init()
     }
     scoutpan.appendChild(scoutyt)
     scoutpan.appendChild(scoutphoto)
