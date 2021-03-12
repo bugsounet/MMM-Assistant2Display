@@ -1,6 +1,6 @@
 /**  Radio francaise   **/
-/** mis à jour le 31/05/20 **/
-/**  @bugsounet  **/
+/** mis à jour le 28/02/21 **/
+/**  @bugsounet  and @2hdlockness  **/
 
 var recipe = {
   transcriptionHooks: {
@@ -15,10 +15,6 @@ var recipe = {
     "rireetchansons": {
       pattern: "mets rire et chansons",
       command: "rireetchansons"
-    },
-    "franceinfo": {
-      pattern: "mets france info",
-      command: "franceinfo"
     },
     "rtl2": {
       pattern: "mets rtl2",
@@ -49,7 +45,7 @@ var recipe = {
       command: "nostalgie"
     },
     "contact": {
-      pattern: "mets contact",
+      pattern: "mets contact fm",
       command: "contact"
     },
     "voltage": {
@@ -76,7 +72,7 @@ var recipe = {
         notification: "A2D_RADIO",
         payload: (params) => {
           return {
-            img: "https://www.hbca07.fr/media/uploaded/sites/5499/partenaire/583038d328d24_slidercheriefm.jpg",
+            img: ['modules/MMM-GoogleAssistant/resources/LogosRadios/ChérieFM.png'],
             link: "https://scdn.nrjaudio.fm/fr/30201/mp3_128.mp3?origine=A2D&cdn_path=audio_lbs9"
           }
         }
@@ -90,7 +86,7 @@ var recipe = {
         notification: "A2D_RADIO",
         payload: (params) => {
           return {
-            img: "http://static.rtl.fr/www/img/live/logo.gif",
+            img: ['modules/MMM-GoogleAssistant/resources/LogosRadios/RTL.png'],
             link: "http://streaming.radio.rtl.fr/rtl-1-44-128"
           }
         }
@@ -104,22 +100,8 @@ var recipe = {
         notification: "A2D_RADIO",
         payload: (params) => {
           return {
-            img: "https://www.rireetchansons.fr/build/img/logo-rireetchansons-flat.svg",
-            link: "https://scdn.nrjaudio.fm/audio1/fr/30401/mp3_128.mp3?origine=A2D"
-          }
-        }
-      },
-      soundExec: {
-        chime: "open"
-      }
-    },
-    "franceinfo": {
-      notificationExec: {
-        notification: "A2D_RADIO",
-        payload: (params) => {
-          return {
-            img: "https://www.francetvinfo.fr/image/759r6589q-db33/1500/843/10579443.png",
-            link: "http://direct.franceinfo.fr/live/franceinfo-midfi.mp3"
+            img: ['modules/MMM-GoogleAssistant/resources/LogosRadios/Rire&Chansons.png'],
+            link: "http://185.52.127.160/fr/30401/aac_64.mp3?origine=A2D"
           }
         }
       },
@@ -132,7 +114,7 @@ var recipe = {
         notification: "A2D_RADIO",
         payload: (params) => {
           return {
-            img: "https://static.rtl2.fr/versions/www/6.0.717/img/rtl2_fb.jpg",
+            img: ['modules/MMM-GoogleAssistant/resources/LogosRadios/RTL2.png'],
             link: "http://streaming.radio.rtl2.fr/rtl2-1-44-128"
           }
         }
@@ -146,7 +128,7 @@ var recipe = {
         notification: "A2D_RADIO",
         payload: (params) => {
           return {
-            img: "https://upload.wikimedia.org/wikipedia/fr/thumb/e/eb/Fun_Radio.png/1200px-Fun_Radio.png",
+            img: ['modules/MMM-GoogleAssistant/resources/LogosRadios/FunRadio.png'],
             link: "http://streaming.radio.funradio.fr:80/fun-1-44-128"
           }
         }
@@ -160,7 +142,7 @@ var recipe = {
         notification: "A2D_RADIO",
         payload: (params) => {
           return {
-            img: "https://upload.wikimedia.org/wikipedia/commons/thumb/e/e8/Europe_1_logo_%282010%29.svg/1200px-Europe_1_logo_%282010%29.svg.png",
+            img: ['modules/MMM-GoogleAssistant/resources/LogosRadios/Europe1.png'],
             link: "http://ais-live.cloud-services.paris:8000/europe1.mp3"
           }
         }
@@ -174,7 +156,7 @@ var recipe = {
         notification: "A2D_RADIO",
         payload: (params) => {
           return {
-            img: "https://cdn-rfm.lanmedia.fr/bundles/rfmintegration/images/logoRFM.png",
+            img: ['modules/MMM-GoogleAssistant/resources/LogosRadios/RFM.png'],
             link: "https://ais-live.cloud-services.paris:8443/rfm.mp3"
           }
         }
@@ -188,7 +170,7 @@ var recipe = {
         notification: "A2D_RADIO",
         payload: (params) => {
           return {
-            img: "https://upload.wikimedia.org/wikipedia/commons/thumb/8/81/Logo_RMC_2002.svg/1200px-Logo_RMC_2002.svg.png",
+            img: ['modules/MMM-GoogleAssistant/resources/LogosRadios/RMC.svg'],
             link: "http://chai5she.cdn.dvmr.fr/rmcinfo"
           }
         }
@@ -202,8 +184,8 @@ var recipe = {
         notification: "A2D_RADIO",
         payload: (params) => {
           return {
-            img: "https://www.nrj.fr/uploads/assets/nrj/logo-nrj.png",
-            link: "https://scdn.nrjaudio.fm/audio1/fr/30001/mp3_128.mp3?origine=A2D"
+            img: ['modules/MMM-GoogleAssistant/resources/LogosRadios/NRJ.png'],
+            link: "http://185.52.127.173/fr/40008/aac_64.mp3?origine=A2D"
           }
         }
       },
@@ -216,8 +198,8 @@ var recipe = {
         notification: "A2D_RADIO",
         payload: (params) => {
           return {
-            img: "https://upload.wikimedia.org/wikipedia/fr/0/0b/Nostalgie_logo_2015.png",
-            link: "https://scdn.nrjaudio.fm/audio1/fr/30601/mp3_128.mp3?origine=A2D"
+            img: ['modules/MMM-GoogleAssistant/resources/LogosRadios/Nostalgie.png'],
+            link: "http://185.52.127.155/fr/40045/aac_64.mp3?origine=A2D"
           }
         }
       },
@@ -230,7 +212,7 @@ var recipe = {
         notification: "A2D_RADIO",
         payload: (params) => {
           return {
-            img: "https://ecouter.lesindesradios.fr/logos/orange14.png",
+            img: ['modules/MMM-GoogleAssistant/resources/LogosRadios/contact.png'],
             link: "http://radio-contact.ice.infomaniak.ch/radio-contact-high.mp3"
           }
         }
@@ -244,8 +226,8 @@ var recipe = {
         notification: "A2D_RADIO",
         payload: (params) => {
           return {
-            img: "https://www.voltage.fr/upload/design/5b834d25df7a01.53797175.png",
-            link: "http://broadcast.infomaniak.net/start-voltage-high.mp3"
+            img: ['modules/MMM-GoogleAssistant/resources/LogosRadios/voltage.png'],
+            link: "http://start-voltage.ice.infomaniak.ch/start-voltage-high.mp3"
           }
         }
       },
@@ -258,7 +240,7 @@ var recipe = {
         notification: "A2D_RADIO",
         payload: (params) => {
           return {
-            img: "https://skyrock.fm/layouts/frontoffice/images/skyrock.png",
+            img: ['modules/MMM-GoogleAssistant/resources/LogosRadios/Skyrock.png'],
             link: "http://icecast.skyrock.net/s/natio_mp3_128k"
           }
         }
@@ -272,7 +254,7 @@ var recipe = {
         notification: "A2D_RADIO",
         payload: (params) => {
           return {
-            img: "https://www.radiofg.com/upload/design/5c2f84d962eaa4.45175913.png",
+            img: ['modules/MMM-GoogleAssistant/resources/LogosRadios/fg.png'],
             link: "http://radiofg.impek.com/fg"
           }
         }

@@ -68,6 +68,7 @@
 
 #A2D_TRANSCRIPTION {
   display:inline-block;
+  max-width: 90%;
   min-width:100px;
   height:100px;
   vertical-align: top;
@@ -77,6 +78,9 @@
 
 #A2D_TRANSCRIPTION p {
   margin-top: 23px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 #A2D_TRANSCRIPTION p.error {
