@@ -7,6 +7,7 @@
     "preinstall": "installer/preinstall.sh",
     "postinstall": "installer/postinstall.sh",
     "update": "installer/update.sh",
+    "rebuild": "installer/rebuild.sh",
     "librespot": "installer/librespot.sh",
     "spotify": "node installer/spotify-setup.js"
   },
