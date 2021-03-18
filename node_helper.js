@@ -360,7 +360,7 @@ module.exports = NodeHelper.create({
       link,
       ()=> {
         log("[YouTube] Found link:", link)
-         if (this.YouTube) this.YouTube.cmd("volume 170")
+         if (this.YouTube) this.YouTube.cmd("volume "+ this.config.youtube.maxVolume)
       },
       ()=> {
         log("[YouTube] Video ended")

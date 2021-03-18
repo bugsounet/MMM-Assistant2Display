@@ -13,8 +13,12 @@ var A2D = function() {
 Module.register("MMM-Assistant2Display",{
   defaults: {
     debug: false,
-    useYoutube: true,
-    useVLC: true,
+    youtube: {
+      useYoutube: true,
+      useVLC: true,
+      minVolume: 70,
+      maxVolume: 170
+    },
     links: {
       useLinks: false,
       displayDelay: 60 * 1000,
@@ -25,12 +29,12 @@ Module.register("MMM-Assistant2Display",{
     },
     photos: {
       usePhotos: false,
-      displayDelay: 10 * 1000,
+      displayDelay: 10 * 1000
     },
     volume: {
       useVolume: false,
       volumePreset: "ALSA",
-      myScript: null,
+      myScript: null
     },
     briefToday: {
       useBriefToday: false,
@@ -309,9 +313,9 @@ Module.register("MMM-Assistant2Display",{
         case "ASSISTANT_LISTEN":
         case "ASSISTANT_THINK":
           this.A2D.speak = true
-          if (this.config.useYoutube && this.displayResponse.player) {
-            if (!this.config.useVLC) this.displayResponse.player.command("setVolume", 5)
-            else this.sendSocketNotification("YT_VOLUME", 70)
+          if (this.config.youtube.useYoutube && this.displayResponse.player) {
+            if (!this.config.youtube.useVLC) this.displayResponse.player.command("setVolume", 5)
+            else this.sendSocketNotification("YT_VOLUME", this.config.youtube.minVolume)
           }
           if (this.config.spotify.useSpotify && this.A2D.spotify.librespot) {
             this.A2D.spotify.targetVolume = this.A2D.spotify.currentVolume
@@ -323,8 +327,8 @@ Module.register("MMM-Assistant2Display",{
         case "ALEXA_STANDBY":
         case "ASSISTANT_STANDBY":
           this.A2D.speak = false
-          if (this.config.useYoutube && this.displayResponse.player) {
-            if (!this.config.useVLC) this.displayResponse.player.command("setVolume", 100)
+          if (this.config.youtube.useYoutube && this.displayResponse.player) {
+            if (!this.config.youtube.useVLC) this.displayResponse.player.command("setVolume", this.config.youtube.maxVolume)
             else this.sendSocketNotification("YT_VOLUME", 170)
           }
           if (this.config.spotify.useSpotify && this.A2D.spotify.librespot && !this.A2D.spotify.forceVolume) {
@@ -343,7 +347,7 @@ Module.register("MMM-Assistant2Display",{
         case "A2D_STOP":
           if (this.A2D.locked) {
             if (this.A2D.youtube.displayed) {
-              if (this.config.useVLC) {
+              if (this.config.youtube.useVLC) {
                 this.sendSocketNotification("YT_STOP")
                 this.A2D.youtube.displayed = false
                 this.displayResponse.showYT()
@@ -396,7 +400,7 @@ Module.register("MMM-Assistant2Display",{
           break
         case "A2D_RADIO":
           if (this.A2D.youtube.displayed) {
-            if (this.config.useVLC) {
+            if (this.config.youtube.useVLC) {
               this.sendSocketNotification("YT_STOP")
               this.A2D.youtube.displayed = false
               this.displayResponse.showYT()
@@ -420,7 +424,7 @@ Module.register("MMM-Assistant2Display",{
         case "A2D_SPOTIFY_PLAY":
           if (this.config.spotify.useSpotify) {
             if (this.A2D.youtube.displayed && this.A2D.spotify.librespot) {
-              if (this.config.useVLC) {
+              if (this.config.youtube.useVLC) {
                 this.sendSocketNotification("YT_STOP")
                 this.A2D.youtube.displayed = false
                 this.displayResponse.showYT()
@@ -498,7 +502,7 @@ Module.register("MMM-Assistant2Display",{
           }
           this.sendSocketNotification("SEARCH_AND_PLAY", pl)
           if (this.A2D.youtube.displayed && this.A2D.spotify.librespot) {
-            if (this.config.useVLC) {
+            if (this.config.youtube.useVLC) {
               this.sendSocketNotification("YT_STOP")
               this.A2D.youtube.displayed = false
               this.displayResponse.showYT()
