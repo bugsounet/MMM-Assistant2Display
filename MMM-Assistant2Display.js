@@ -13,8 +13,12 @@ var A2D = function() {
 Module.register("MMM-Assistant2Display",{
   defaults: {
     debug: false,
-    useYoutube: true,
-    useVLC: true,
+    youtube: {
+      useYoutube: false,
+      useVLC: false,
+      minVolume: 70,
+      maxVolume: 200
+    },
     links: {
       useLinks: false,
       displayDelay: 60 * 1000,
@@ -25,12 +29,12 @@ Module.register("MMM-Assistant2Display",{
     },
     photos: {
       usePhotos: false,
-      displayDelay: 10 * 1000,
+      displayDelay: 10 * 1000
     },
     volume: {
       useVolume: false,
       volumePreset: "ALSA",
-      myScript: null,
+      myScript: null
     },
     briefToday: {
       useBriefToday: false,
@@ -50,8 +54,7 @@ Module.register("MMM-Assistant2Display",{
       detectorSleeping: false,
       governorSleeping: false,
       displayLastPresence: true,
-      LastPresenceText: "Last Presence:",
-      rpi4: false
+      LastPresenceText: "Last Presence:"
     },
     touch: {
       useTouch: true,
@@ -135,7 +138,8 @@ Module.register("MMM-Assistant2Display",{
       cast: this.config.cast,
       spotify: this.config.spotify,
       dev: this.config.dev,
-      NPMCheck: this.config.NPMCheck
+      NPMCheck: this.config.NPMCheck,
+      youtube: this.config.youtube
     }
 
     this.radioPlayer = {
@@ -310,9 +314,9 @@ Module.register("MMM-Assistant2Display",{
         case "ASSISTANT_LISTEN":
         case "ASSISTANT_THINK":
           this.A2D.speak = true
-          if (this.config.useYoutube && this.displayResponse.player) {
-            if (!this.config.useVLC) this.displayResponse.player.command("setVolume", 5)
-            else this.sendSocketNotification("YT_VOLUME", 70)
+          if (this.config.youtube.useYoutube && this.displayResponse.player) {
+            if (!this.config.youtube.useVLC) this.displayResponse.player.command("setVolume", 5)
+            else this.sendSocketNotification("YT_VOLUME", this.config.youtube.minVolume)
           }
           if (this.config.spotify.useSpotify && this.A2D.spotify.librespot) {
             this.A2D.spotify.targetVolume = this.A2D.spotify.currentVolume
@@ -324,8 +328,8 @@ Module.register("MMM-Assistant2Display",{
         case "ALEXA_STANDBY":
         case "ASSISTANT_STANDBY":
           this.A2D.speak = false
-          if (this.config.useYoutube && this.displayResponse.player) {
-            if (!this.config.useVLC) this.displayResponse.player.command("setVolume", 100)
+          if (this.config.youtube.useYoutube && this.displayResponse.player) {
+            if (!this.config.youtube.useVLC) this.displayResponse.player.command("setVolume", this.config.youtube.maxVolume)
             else this.sendSocketNotification("YT_VOLUME", 170)
           }
           if (this.config.spotify.useSpotify && this.A2D.spotify.librespot && !this.A2D.spotify.forceVolume) {
@@ -344,7 +348,7 @@ Module.register("MMM-Assistant2Display",{
         case "A2D_STOP":
           if (this.A2D.locked) {
             if (this.A2D.youtube.displayed) {
-              if (this.config.useVLC) {
+              if (this.config.youtube.useVLC) {
                 this.sendSocketNotification("YT_STOP")
                 this.A2D.youtube.displayed = false
                 this.displayResponse.showYT()
@@ -396,8 +400,9 @@ Module.register("MMM-Assistant2Display",{
           }
           break
         case "A2D_RADIO":
+          if (this.A2D.spotify.librespot) this.sendSocketNotification("SPOTIFY_STOP")
           if (this.A2D.youtube.displayed) {
-            if (this.config.useVLC) {
+            if (this.config.youtube.useVLC) {
               this.sendSocketNotification("YT_STOP")
               this.A2D.youtube.displayed = false
               this.displayResponse.showYT()
@@ -406,7 +411,6 @@ Module.register("MMM-Assistant2Display",{
             }
             else this.displayResponse.player.command("stopVideo")
           }
-          if (this.A2D.spotify.librespot) this.sendSocketNotification("SPOTIFY_PAUSE")
           if (payload.link) {
             if (payload.img) {
               var radioImg = document.getElementById("A2D_RADIO_IMG")
@@ -421,7 +425,8 @@ Module.register("MMM-Assistant2Display",{
         case "A2D_SPOTIFY_PLAY":
           if (this.config.spotify.useSpotify) {
             if (this.A2D.youtube.displayed && this.A2D.spotify.librespot) {
-              if (this.config.useVLC) {
+              if (this.A2D.radio) this.radio.pause()
+              if (this.config.youtube.useVLC) {
                 this.sendSocketNotification("YT_STOP")
                 this.A2D.youtube.displayed = false
                 this.displayResponse.showYT()
@@ -499,7 +504,7 @@ Module.register("MMM-Assistant2Display",{
           }
           this.sendSocketNotification("SEARCH_AND_PLAY", pl)
           if (this.A2D.youtube.displayed && this.A2D.spotify.librespot) {
-            if (this.config.useVLC) {
+            if (this.config.youtube.useVLC) {
               this.sendSocketNotification("YT_STOP")
               this.A2D.youtube.displayed = false
               this.displayResponse.showYT()
@@ -614,6 +619,7 @@ Module.register("MMM-Assistant2Display",{
           this.A2D.spotify.repeat = payload.repeat_state
           this.A2D.spotify.shuffle = payload.shuffle_state
           if (payload.device.name == this.config.spotify.connectTo) {
+            if (this.A2D.radio) this.radio.pause()
             this.A2D.spotify.currentVolume = payload.device.volume_percent
             if (!this.A2D.spotify.librespot) this.A2D.spotify.librespot = true
             if (this.A2D.spotify.connected && this.config.screen.useScreen && !this.displayResponse.working()) {
@@ -676,8 +682,16 @@ Module.register("MMM-Assistant2Display",{
         AlexaActivated = value.config.A2DServer && !value.disabled
       }
     }
-    if (!GAFound) console.log("[A2D][WARN] GoogleAssistant not found!")
-    if (!AlexaFound) console.log("[A2D][WARN] Alexa not found!")
+    if (GAFound) {
+      if (!GAActivated) console.log("[A2D][WARN] GoogleAssistant is disabled!")
+      else console.log("[A2D] Found: GoogleAssistant")
+    } else console.log("[A2D][WARN] GoogleAssistant not found!")
+
+    if (AlexaFound) {
+      if (!AlexaActivated) console.log("[A2D][WARN] Alexa is disabled!")
+      else console.log("[A2D] Found: Alexa")
+    } else console.log("[A2D][WARN] Alexa not found!")
+
     this.useA2D = GAActivated || AlexaActivated
     console.log("[A2D] Auto choice UI:", this.ui)
     if (!this.useA2D) {
@@ -791,6 +805,12 @@ Module.register("MMM-Assistant2Display",{
       var radio = document.getElementById("A2D_RADIO")
       if (this.radioPlayer.play) radio.classList.remove("hidden")
       else radio.classList.add("hidden")
+    }
+    if (this.A2D.radio) {
+      this.sendSocketNotification("SCREEN_WAKEUP")
+      this.sendSocketNotification("SCREEN_LOCK", true)
+    } else {
+      this.sendSocketNotification("SCREEN_LOCK", false)
     }
   },
 
@@ -1038,6 +1058,7 @@ Module.register("MMM-Assistant2Display",{
         responseEmulate.transcription.transcription = " Telegram @" + handler.message.from.username + ": " + handler.args
         responseEmulate.transcription.done = true
         responseEmulate.urls[0] = isLink ? handler.args : ("http://" + handler.args)
+        if (this.config.screen.useScreen) this.sendSocketNotification("SCREEN_WAKEUP")
         this.displayResponse.start(responseEmulate)
       }
       else handler.reply("TEXT", this.translate("A2D_INVALID"))

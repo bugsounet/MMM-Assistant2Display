@@ -1,12 +1,13 @@
 {
   "name": "MMM-Assistant2Display",
-  "version": "2.5.0-YT-Beta",
+  "version": "2.6.1-YT-Beta",
   "description": "GoogleAssistant Display module",
   "main": "MMM-Assistant2Display.js",
   "scripts": {
     "preinstall": "installer/preinstall.sh",
     "postinstall": "installer/postinstall.sh",
     "update": "installer/update.sh",
+    "rebuild": "installer/rebuild.sh",
     "librespot": "installer/librespot.sh",
     "spotify": "node installer/spotify-setup.js"
   },

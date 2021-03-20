@@ -49,7 +49,7 @@ class DisplayClass {
   start(response) {
     /** Close all active windows and reset it **/
     if (this.A2D.youtube.displayed) {
-      if (this.config.useVLC) {
+      if (this.config.youtube.useVLC) {
         this.sendSocketNotification("YT_STOP")
         this.A2D.youtube.displayed = false
         this.showYT()
@@ -155,7 +155,7 @@ class DisplayClass {
 /** urls scan : dispatch links, youtube, spotify **/
   urlsScan() {
     let tmp = {}
-    if (this.config.useYoutube) {
+    if (this.config.youtube.useYoutube) {
       var YouTubeRealLink= this.A2D.links.urls[0]
       /** YouTube RegExp **/
       var YouTubeLink = new RegExp("youtube\.com\/([a-z]+)\\?([a-z]+)\=([0-9a-zA-Z\-\_]+)", "ig")
@@ -179,7 +179,7 @@ class DisplayClass {
         }
         this.A2D.youtube = this.objAssign({}, this.A2D.youtube, YouTubeResponse)
         this.A2DLock()
-        if (!this.config.useVLC) this.player.load({id: this.A2D.youtube.id, type : this.A2D.youtube.type})
+        if (!this.config.youtube.useVLC) this.player.load({id: this.A2D.youtube.id, type : this.A2D.youtube.type})
         else {
           this.A2D.youtube.displayed = true
           this.showYT()
@@ -327,7 +327,7 @@ class DisplayClass {
   castStart(url) {
     /** stop all process before starting cast **/
     if (this.A2D.youtube.displayed) {
-      if (this.config.useVLC) {
+      if (this.config.youtube.useVLC) {
         this.sendSocketNotification("YT_STOP")
         this.A2D.youtube.displayed = false
         this.showYT()
