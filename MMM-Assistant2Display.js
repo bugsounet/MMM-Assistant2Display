@@ -14,8 +14,8 @@ Module.register("MMM-Assistant2Display",{
   defaults: {
     debug: false,
     youtube: {
-      useYoutube: true,
-      useVLC: true,
+      useYoutube: false,
+      useVLC: false,
       minVolume: 70,
       maxVolume: 200
     },
