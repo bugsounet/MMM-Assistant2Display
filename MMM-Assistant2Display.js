@@ -17,7 +17,7 @@ Module.register("MMM-Assistant2Display",{
       useYoutube: true,
       useVLC: true,
       minVolume: 70,
-      maxVolume: 170
+      maxVolume: 200
     },
     links: {
       useLinks: false,
@@ -138,7 +138,8 @@ Module.register("MMM-Assistant2Display",{
       cast: this.config.cast,
       spotify: this.config.spotify,
       dev: this.config.dev,
-      NPMCheck: this.config.NPMCheck
+      NPMCheck: this.config.NPMCheck,
+      youtube: this.config.youtube
     }
 
     this.radioPlayer = {
@@ -399,6 +400,7 @@ Module.register("MMM-Assistant2Display",{
           }
           break
         case "A2D_RADIO":
+          if (this.A2D.spotify.librespot) this.sendSocketNotification("SPOTIFY_STOP")
           if (this.A2D.youtube.displayed) {
             if (this.config.youtube.useVLC) {
               this.sendSocketNotification("YT_STOP")
@@ -409,7 +411,6 @@ Module.register("MMM-Assistant2Display",{
             }
             else this.displayResponse.player.command("stopVideo")
           }
-          if (this.A2D.spotify.librespot) this.sendSocketNotification("SPOTIFY_PAUSE")
           if (payload.link) {
             if (payload.img) {
               var radioImg = document.getElementById("A2D_RADIO_IMG")
@@ -424,6 +425,7 @@ Module.register("MMM-Assistant2Display",{
         case "A2D_SPOTIFY_PLAY":
           if (this.config.spotify.useSpotify) {
             if (this.A2D.youtube.displayed && this.A2D.spotify.librespot) {
+              if (this.A2D.radio) this.radio.pause()
               if (this.config.youtube.useVLC) {
                 this.sendSocketNotification("YT_STOP")
                 this.A2D.youtube.displayed = false
@@ -617,6 +619,7 @@ Module.register("MMM-Assistant2Display",{
           this.A2D.spotify.repeat = payload.repeat_state
           this.A2D.spotify.shuffle = payload.shuffle_state
           if (payload.device.name == this.config.spotify.connectTo) {
+            if (this.A2D.radio) this.radio.pause()
             this.A2D.spotify.currentVolume = payload.device.volume_percent
             if (!this.A2D.spotify.librespot) this.A2D.spotify.librespot = true
             if (this.A2D.spotify.connected && this.config.screen.useScreen && !this.displayResponse.working()) {
@@ -802,6 +805,12 @@ Module.register("MMM-Assistant2Display",{
       var radio = document.getElementById("A2D_RADIO")
       if (this.radioPlayer.play) radio.classList.remove("hidden")
       else radio.classList.add("hidden")
+    }
+    if (this.A2D.radio) {
+      this.sendSocketNotification("SCREEN_WAKEUP")
+      this.sendSocketNotification("SCREEN_LOCK", true)
+    } else {
+      this.sendSocketNotification("SCREEN_LOCK", false)
     }
   },
 
@@ -1049,6 +1058,7 @@ Module.register("MMM-Assistant2Display",{
         responseEmulate.transcription.transcription = " Telegram @" + handler.message.from.username + ": " + handler.args
         responseEmulate.transcription.done = true
         responseEmulate.urls[0] = isLink ? handler.args : ("http://" + handler.args)
+        if (this.config.screen.useScreen) this.sendSocketNotification("SCREEN_WAKEUP")
         this.displayResponse.start(responseEmulate)
       }
       else handler.reply("TEXT", this.translate("A2D_INVALID"))

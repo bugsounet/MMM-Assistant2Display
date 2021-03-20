@@ -1,12 +1,12 @@
 /** node helper **/
 
+
 var exec = require('child_process').exec
 const { spawn } = require('child_process')
 const child_process = require('child_process')
 const process = require('process')
 const fs = require("fs")
 const path = require("path")
-var NodeHelper = require("node_helper")
 const npmCheck = require("@bugsounet/npmcheck")
 const Screen = require("@bugsounet/screen")
 const Pir = require("@bugsounet/pir")
@@ -16,6 +16,8 @@ const CastServer = require("@bugsounet/cast")
 const Spotify = require("@bugsounet/spotify")
 const pm2 = require('pm2')
 var Cvlc = require('@bugsounet/cvlc')
+
+var NodeHelper = require("node_helper")
 
 var _log = function() {
   var context = "[A2D]"
