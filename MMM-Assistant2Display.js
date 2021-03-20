@@ -329,8 +329,8 @@ Module.register("MMM-Assistant2Display",{
         case "ASSISTANT_STANDBY":
           this.A2D.speak = false
           if (this.config.youtube.useYoutube && this.displayResponse.player) {
-            if (!this.config.youtube.useVLC) this.displayResponse.player.command("setVolume", this.config.youtube.maxVolume)
-            else this.sendSocketNotification("YT_VOLUME", 170)
+            if (!this.config.youtube.useVLC) this.displayResponse.player.command("setVolume", 100)
+            else this.sendSocketNotification("YT_VOLUME", this.config.youtube.maxVolume)
           }
           if (this.config.spotify.useSpotify && this.A2D.spotify.librespot && !this.A2D.spotify.forceVolume) {
             this.sendSocketNotification("SPOTIFY_VOLUME", this.A2D.spotify.targetVolume)
