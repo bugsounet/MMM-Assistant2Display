@@ -375,8 +375,12 @@ module.exports = NodeHelper.create({
   CloseVlc: function () {
     if (this.YouTube) {
       log("[YouTube] Force Closing VLC...")
-      this.YouTube.destroy()
-      this.YouTube = null
+      log("[YouTube] Set VLC Volume to:", this.config.youtube.maxVolume)
+      this.YouTube.cmd("volume " + this.config.youtube.maxVolume)
+      setTimeout(() => {
+        this.YouTube.destroy()
+        this.YouTube = null
+      }, 500)
     }
   },
 
