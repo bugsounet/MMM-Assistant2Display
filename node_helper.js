@@ -35,6 +35,7 @@ module.exports = NodeHelper.create({
     timeout = null
     retry = null
     this.YouTube = null
+    this.YT = 0
   },
 
   socketNotificationReceived: function (noti, payload) {
@@ -356,6 +357,7 @@ module.exports = NodeHelper.create({
   },
 
   playWithVlc: function (link) {
+    this.YT++
     if (this.YouTube) this.CloseVlc()
     this.YouTube = new Cvlc()
     this.YouTube.play(
@@ -365,9 +367,14 @@ module.exports = NodeHelper.create({
          if (this.YouTube) this.YouTube.cmd("volume "+ this.config.youtube.maxVolume)
       },
       ()=> {
-        log("[YouTube] Video ended")
-        this.sendSocketNotification("FINISH_YOUTUBE")
-        this.YouTube = null
+        this.YT--
+        if (this.YT < 0) this.YT = 0
+        log("[YouTube] Video ended #" + this.YT )
+        if (this.YT == 0) {
+          log("[YouTube] Finish !")
+          this.sendSocketNotification("FINISH_YOUTUBE")
+          this.YouTube = null
+        }
       }
     )
   },
@@ -375,12 +382,12 @@ module.exports = NodeHelper.create({
   CloseVlc: function () {
     if (this.YouTube) {
       log("[YouTube] Force Closing VLC...")
-      log("[YouTube] Set VLC Volume to:", this.config.youtube.maxVolume)
-      this.YouTube.cmd("volume " + this.config.youtube.maxVolume)
-      setTimeout(() => {
-        this.YouTube.destroy()
-        this.YouTube = null
-      }, 500)
+      this.YouTube.destroy()
+      this.YouTube = null
+      log("[YouTube] Done Closing VLC...")
+    }
+    else {
+      log("[YouTube] Not running!")
     }
   },
 
