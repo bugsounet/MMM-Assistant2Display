@@ -1,1 +1,479 @@
-class DisplayClass{constructor(t,s){this.config=t,this.sendSocketNotification=s.sendSocketNotification,this.radioStop=s.radioStop,this.timer=null,this.player=null,this.A2D={radio:!1,speak:!1,locked:!1,GA:{transcription:null,done:null},youtube:{displayed:!1,id:null,type:null,title:null},photos:{displayed:!1,position:0,urls:null,length:0},links:{displayed:!1,urls:null,length:0,running:!1},spotify:{connected:!1,librespot:!1,currentVolume:0,targetVolume:this.config.spotify.maxVolume,repeat:null,shuffle:null,forceVolume:!1}},console.log("[A2D] DisplayClass Loaded")}start(t){this.A2D.youtube.displayed&&(this.config.useVLC?(this.sendSocketNotification("YT_STOP"),this.A2D.youtube.displayed=!1,this.showYT(),this.A2DUnlock(),this.resetYT()):this.player.command("stopVideo")),this.A2D.photos.displayed&&(this.resetPhotos(),this.hideDisplay()),this.A2D.links.displayed&&(this.resetLinks(),this.hideDisplay());let s={};A2D("Response Scan"),s={GA:{transcription:t.transcription.transcription,done:t.transcription.done},photos:{position:0,urls:t.photos,length:t.photos.length},links:{urls:t.urls,length:t.urls.length}},this.A2D=this.objAssign({},this.A2D,s),this.prepareDisplay(),this.config.photos.usePhotos&&this.A2D.photos.length>0?(this.A2DLock(),this.A2D.photos.displayed=!0,this.photoDisplay(),this.showDisplay()):this.A2D.links.length>0&&this.urlsScan(),A2D("Response Structure:",this.A2D)}photoDisplay(){var t=document.getElementById("A2D_PHOTO");A2D("Loading photo #"+(this.A2D.photos.position+1)+"/"+this.A2D.photos.length),t.src=this.A2D.photos.urls[this.A2D.photos.position],t.addEventListener("load",()=>{A2D("Photo Loaded"),this.timerPhoto=setTimeout(()=>{this.photoNext()},this.config.photos.displayDelay)},{once:!0}),t.addEventListener("error",t=>{this.A2D.photos.displayed&&(A2D("Photo Loading Error... retry with next"),clearTimeout(this.timerPhoto),this.timerPhoto=null,this.photoNext())},{once:!0})}photoNext(){this.A2D.photos.position>=this.A2D.photos.length-1?(this.resetPhotos(),this.hideDisplay()):(this.A2D.photos.position++,this.photoDisplay())}resetPhotos(){clearTimeout(this.timerPhoto),this.timerPhoto=null;this.A2D=this.objAssign({},this.A2D,{photos:{displayed:!1,position:0,urls:null,length:0}}),document.getElementById("A2D_PHOTO").removeAttribute("src"),A2D("Reset Photos",this.A2D)}urlsScan(){if(this.config.useYoutube){var t=this.A2D.links.urls[0],s=new RegExp("youtube.com/([a-z]+)\\?([a-z]+)=([0-9a-zA-Z-_]+)","ig").exec(t);if(s){let i,e={};return this.A2D.radio&&this.radioStop(),this.A2D.spotify.librespot&&this.config.spotify.useSpotify&&this.sendSocketNotification("SPOTIFY_PAUSE"),"watch"==s[1]&&(i="id"),"playlist"==s[1]&&(i="playlist"),i?(e={id:s[3],type:i},this.A2D.youtube=this.objAssign({},this.A2D.youtube,e),this.A2DLock(),void(this.config.useVLC?(this.A2D.youtube.displayed=!0,this.showYT(),this.sendSocketNotification("VLC_YOUTUBE",t)):this.player.load({id:this.A2D.youtube.id,type:this.A2D.youtube.type}))):console.log("[A2D:YouTube] Unknow Type !",s)}}if(this.config.spotify.useSpotify){var i=new RegExp("open.spotify.com/([a-z]+)/([0-9a-zA-Z-_]+)","ig").exec(this.A2D.links.urls[0]);if(i)return this.A2D.radio&&this.radioStop(),!this.A2D.spotify.connected&&this.config.spotify.connectTo&&this.sendSocketNotification("SPOTIFY_TRANSFER",this.config.spotify.connectTo),void setTimeout(()=>{let t=i[1],s=i[2];"track"==t?this.sendSocketNotification("SPOTIFY_PLAY",{uris:["spotify:track:"+s]}):this.sendSocketNotification("SPOTIFY_PLAY",{context_uri:"spotify:"+t+":"+s})},this.config.spotify.playDelay)}this.config.links.useLinks&&(this.A2DLock(),this.A2D.links.displayed=!0,this.linksDisplay())}linksDisplay(){this.A2D.links.running=!1;var t=document.getElementById("A2D_OUTPUT");A2D("Loading",this.A2D.links.urls[0]),this.showDisplay(),t.src=this.A2D.links.urls[0],t.addEventListener("did-fail-load",()=>{console.log("[A2D:LINKS] Loading error")}),t.addEventListener("crashed",t=>{console.log("[A2D:LINKS] J'ai tout pété mon général !!!"),console.log("[A2D:LINKS]",t)}),t.addEventListener("console-message",t=>{1==t.level&&this.config.debug&&console.log("[A2D:LINKS]",t.message)}),t.addEventListener("did-stop-loading",()=>{this.A2D.links.running||"about:blank"==t.getURL()||(this.A2D.links.running=!0,A2D("URL Loaded",t.getURL()),t.executeJavaScript(`\n      var timer = null\n      function scrollDown(posY){\n        clearTimeout(timer)\n        timer = null\n        var scrollHeight = document.body.scrollHeight\n        if (posY == 0) console.log("Begin Scrolling")\n        if (posY > scrollHeight) posY = scrollHeight\n        document.documentElement.scrollTop = document.body.scrollTop = posY;\n        if (posY == scrollHeight) return console.log("End Scrolling")\n        timer = setTimeout(function(){\n          if (posY < scrollHeight) {\n            posY = posY + ${this.config.links.scrollStep}\n            scrollDown(posY);\n          }\n        }, ${this.config.links.scrollInterval});\n      };\n      if (${this.config.links.scrollActivate}) {\n        setTimeout(scrollDown(0), ${this.config.links.scrollStart});\n      };`))}),this.timerLinks=setTimeout(()=>{this.resetLinks(),this.hideDisplay()},this.config.links.displayDelay)}resetLinks(){clearTimeout(this.timerLinks),this.timerLinks=null;this.A2D=this.objAssign({},this.A2D,{links:{displayed:!1,urls:null,length:0,running:!1}}),document.getElementById("A2D_OUTPUT").src="about:blank",A2D("Reset Links",this.A2D)}showYT(){var t=document.getElementById("A2D_YOUTUBE"),s=document.getElementById("A2D");this.A2D.youtube.displayed?(this.A2DLock(),s.classList.remove("hidden"),t.classList.remove("hidden")):this.A2D.photos.displayed||this.A2D.links.displayed?(s.classList.remove("hidden"),t.classList.add("hidden")):this.hideDisplay()}titleYT(){document.getElementById("A2D_TRANSCRIPTION").getElementsByTagName("p")[0].innerHTML=this.A2D.youtube.title}resetYT(){this.A2D=this.objAssign({},this.A2D,{youtube:{displayed:!1,id:null,type:null,title:null}}),A2D("Reset YouTube",this.A2D)}castStart(t){this.A2D.youtube.displayed&&(this.config.useVLC?(this.sendSocketNotification("YT_STOP"),this.A2D.youtube.displayed=!1,this.showYT(),this.resetYT()):this.player.command("stopVideo")),this.A2D.spotify.connected&&this.A2D.spotify.librespot&&this.sendSocketNotification("SPOTIFY_PAUSE"),this.A2D.photos.displayed&&(this.resetPhotos(),this.hideDisplay()),this.A2D.links.displayed&&(this.resetLinks(),this.hideDisplay()),this.A2D.radio&&this.radioStop(),this.A2D.GA.transcription="YouTube Cast",this.prepareDisplay(),this.A2D.links.running=!1;var s=document.getElementById("A2D_OUTPUT");A2D("Cast Loading",t),this.A2D.links.displayed=!0,this.A2D.links.running=!0,this.showDisplay(),this.A2DLock(),s.src=t}castStop(){document.getElementById("A2D_OUTPUT");this.resetLinks(),this.hideDisplay()}prepare(){}prepareDisplay(){}showDisplay(){A2D("Show Iframe");var t=document.getElementById("A2D_YOUTUBE"),s=document.getElementById("A2D_OUTPUT"),i=document.getElementById("A2D_PHOTO"),e=document.getElementById("A2D");this.A2D.speak?e.classList.add("hidden"):e.classList.remove("hidden"),this.A2D.links.displayed&&s.classList.remove("hidden"),this.A2D.photos.displayed&&i.classList.remove("hidden"),this.A2D.photos.forceClose&&i.classList.add("hidden"),this.A2D.youtube.displayed&&t.classList.remove("hidden")}hideDisplay(){A2D("Hide Iframe");var t=document.getElementById("A2D"),s=document.getElementById("A2D_OUTPUT"),i=document.getElementById("A2D_PHOTO"),e=document.getElementById("A2D_YOUTUBE");this.A2D.youtube.displayed||e.classList.add("hidden"),this.A2D.links.displayed||s.classList.add("hidden"),this.A2D.photos.displayed||i.classList.add("hidden"),!this.A2D.speak&&this.working()||t.classList.add("hidden"),this.A2D.speak||this.working()||this.A2DUnlock()}hideSpotify(){var t=document.getElementById("module_A2D_Spotify"),s=document.getElementById("A2D_SPOTIFY");this.timer=null,clearTimeout(this.timer),s.classList.remove("bottomIn"),s.classList.add("bottomOut"),this.timer=setTimeout(()=>{s.classList.add("inactive"),t.style.display="none"},500)}showSpotify(){var t=document.getElementById("module_A2D_Spotify"),s=document.getElementById("A2D_SPOTIFY");t.style.display="block",s.classList.remove("bottomOut"),s.classList.add("bottomIn"),s.classList.remove("inactive")}A2DLock(){this.A2D.locked||(A2D("Lock Screen"),MM.getModules().exceptWithClass("MMM-GoogleAssistant").enumerate(t=>{t.hide(15,{lockString:"A2D_LOCKED"})}),this.A2D.spotify.connected&&this.config.spotify.useBottomBar&&this.hideSpotify(),this.config.screen.useScreen&&this.sendSocketNotification("SCREEN_LOCK",!0),this.A2D.locked=!0)}A2DUnlock(){this.A2D.locked&&!this.working()&&(A2D("Unlock Screen"),MM.getModules().exceptWithClass("MMM-GoogleAssistant").enumerate(t=>{t.show(15,{lockString:"A2D_LOCKED"})}),this.A2D.spotify.connected&&this.config.spotify.useBottomBar&&this.showSpotify(),this.config.screen.useScreen&&!this.A2D.spotify.connected&&this.sendSocketNotification("SCREEN_LOCK",!1),this.A2D.locked=!1)}objAssign(t){for(var s,i,e=Array.prototype.slice.call(arguments,1);e.length;)for(i in s=e.shift())s.hasOwnProperty(i)&&("object"==typeof t[i]&&t[i]&&"[object Array]"!==Object.prototype.toString.call(t[i])&&"object"==typeof s[i]&&null!==s[i]?t[i]=this.objAssign({},t[i],s[i]):t[i]=s[i]);return t}working(){return this.A2D.youtube.displayed||this.A2D.photos.displayed||this.A2D.links.displayed}}
+/* Common A2D Class */
+
+class DisplayClass {
+  constructor (Config, callbacks) {
+    this.config = Config
+    this.sendSocketNotification = callbacks.sendSocketNotification
+    this.radioStop = callbacks.radioStop
+    this.timer = null
+    this.player = null
+    this.A2D = {
+      radio: false,
+      speak: false,
+      locked: false,
+      GA: {
+        transcription: null,
+        done: null,
+      },
+      youtube: {
+        displayed: false,
+        id: null,
+        type: null,
+        title: null
+      },
+      photos: {
+        displayed: false,
+        position: 0,
+        urls: null,
+        length: 0
+      },
+      links: {
+        displayed: false,
+        urls: null,
+        length: 0,
+        running: false
+      },
+      spotify: {
+        connected: false,
+        librespot: false,
+        currentVolume: 0,
+        targetVolume: this.config.spotify.maxVolume,
+        repeat: null,
+        shuffle: null,
+        forceVolume: false
+      }
+    }
+    console.log("[A2D] DisplayClass Loaded")
+  }
+
+  start(response) {
+    /** Close all active windows and reset it **/
+    if (this.A2D.youtube.displayed) {
+      if (this.config.youtube.useVLC) {
+        this.sendSocketNotification("YT_STOP")
+        this.A2D.youtube.displayed = false
+        this.showYT()
+        this.A2DUnlock()
+        this.resetYT()
+      }
+      else this.player.command("stopVideo")
+    }
+    if (this.A2D.photos.displayed) {
+      this.resetPhotos()
+      this.hideDisplay()
+    }
+    if (this.A2D.links.displayed) {
+      this.resetLinks()
+      this.hideDisplay()
+    }
+
+    /** prepare **/
+    let tmp = {}
+    A2D("Response Scan")
+
+    tmp = {
+      GA: {
+        transcription: response.transcription.transcription,
+        done: response.transcription.done,
+      },
+      photos: {
+        position: 0,
+        urls: response.photos,
+        length: response.photos.length,
+      },
+      links: {
+        urls: response.urls,
+        length: response.urls.length
+      }
+    }
+
+    /** the show must go on ! **/
+    this.A2D = this.objAssign({}, this.A2D, tmp)
+    this.prepareDisplay()
+    if(this.config.photos.usePhotos && this.A2D.photos.length > 0) {
+      this.A2DLock()
+      this.A2D.photos.displayed = true
+      this.photoDisplay()
+      this.showDisplay()
+    }
+    else if (this.A2D.links.length > 0) {
+      this.urlsScan()
+    }
+    A2D("Response Structure:", this.A2D)
+  }
+
+/** photos code **/
+  photoDisplay() {
+    var photo = document.getElementById("A2D_PHOTO")
+    A2D("Loading photo #" + (this.A2D.photos.position+1) + "/" + (this.A2D.photos.length))
+    photo.src = this.A2D.photos.urls[this.A2D.photos.position]
+
+    photo.addEventListener("load", () => {
+      A2D("Photo Loaded")
+      this.timerPhoto = setTimeout( () => {
+        this.photoNext()
+      }, this.config.photos.displayDelay)
+    }, {once: true})
+    photo.addEventListener("error", (event) => {
+      if (this.A2D.photos.displayed) {
+        A2D("Photo Loading Error... retry with next")
+        clearTimeout(this.timerPhoto)
+        this.timerPhoto = null
+        this.photoNext()
+      }
+    }, {once: true})
+  }
+
+  photoNext() {
+    if (this.A2D.photos.position >= (this.A2D.photos.length-1) ) {
+      this.resetPhotos()
+      this.hideDisplay()
+    } else {
+      this.A2D.photos.position++
+      this.photoDisplay()
+    }
+  }
+
+  resetPhotos() {
+    clearTimeout(this.timerPhoto)
+    this.timerPhoto = null
+    let tmp = {
+      photos: {
+        displayed: false,
+        position: 0,
+        urls: null,
+        length: 0
+      }
+    }
+    this.A2D = this.objAssign({}, this.A2D, tmp)
+    var photo = document.getElementById("A2D_PHOTO")
+    photo.removeAttribute('src')
+    A2D("Reset Photos", this.A2D)
+
+  }
+
+/** urls scan : dispatch links, youtube, spotify **/
+  urlsScan() {
+    let tmp = {}
+    if (this.config.youtube.useYoutube) {
+      var YouTubeRealLink= this.A2D.links.urls[0]
+      /** YouTube RegExp **/
+      var YouTubeLink = new RegExp("youtube\.com\/([a-z]+)\\?([a-z]+)\=([0-9a-zA-Z\-\_]+)", "ig")
+      /** Scan Youtube Link **/
+      var YouTube = YouTubeLink.exec(YouTubeRealLink)
+
+
+      if (YouTube) {
+        let Type
+        let YouTubeResponse = {}
+        if (this.A2D.radio) this.radioStop()
+        if (this.A2D.spotify.librespot && this.config.spotify.useSpotify) {
+          this.sendSocketNotification("SPOTIFY_PAUSE")
+        }
+        if (YouTube[1] == "watch") Type = "id"
+        if (YouTube[1] == "playlist") Type = "playlist"
+        if (!Type) return console.log("[A2D:YouTube] Unknow Type !" , YouTube)
+        YouTubeResponse = {
+          "id": YouTube[3],
+          "type": Type
+        }
+        this.A2D.youtube = this.objAssign({}, this.A2D.youtube, YouTubeResponse)
+        this.A2DLock()
+        if (!this.config.youtube.useVLC) this.player.load({id: this.A2D.youtube.id, type : this.A2D.youtube.type})
+        else {
+          this.A2D.youtube.displayed = true
+          this.showYT()
+          this.sendSocketNotification("VLC_YOUTUBE", YouTubeRealLink)
+        }
+        return
+      }
+    }
+    if (this.config.spotify.useSpotify) {
+      /** Spotify RegExp **/
+      var SpotifyLink = new RegExp("open\.spotify\.com\/([a-z]+)\/([0-9a-zA-Z\-\_]+)", "ig")
+      /** Scan Spotify Link **/
+      var Spotify = SpotifyLink.exec(this.A2D.links.urls[0])
+
+      if (Spotify) {
+        if (this.A2D.radio) this.radioStop()
+        if (!this.A2D.spotify.connected && this.config.spotify.connectTo) {
+          this.sendSocketNotification("SPOTIFY_TRANSFER", this.config.spotify.connectTo)
+        }
+
+        setTimeout(() => {
+          let type = Spotify[1]
+          let id = Spotify[2]
+          if (type == "track") {
+            // don't know why tracks works only with uris !?
+            this.sendSocketNotification("SPOTIFY_PLAY", {"uris": ["spotify:track:" + id ]})
+          }
+          else {
+            this.sendSocketNotification("SPOTIFY_PLAY", {"context_uri": "spotify:"+ type + ":" + id})
+          }
+        }, this.config.spotify.playDelay)
+        return
+      }
+    }
+    if (this.config.links.useLinks) {
+      this.A2DLock()
+      this.A2D.links.displayed = true
+      this.linksDisplay()
+    }
+  }
+
+/** link display **/
+  linksDisplay() {
+    this.A2D.links.running = false
+    var webView = document.getElementById("A2D_OUTPUT")
+    A2D("Loading", this.A2D.links.urls[0])
+    this.showDisplay()
+    webView.src= this.A2D.links.urls[0]
+
+    webView.addEventListener("did-fail-load", () => {
+      console.log("[A2D:LINKS] Loading error")
+    })
+    webView.addEventListener("crashed", (event) => {
+      console.log("[A2D:LINKS] J'ai tout pété mon général !!!")
+      console.log("[A2D:LINKS]", event)
+    })
+    webView.addEventListener("console-message", (event) => {
+      if (event.level == 1 && this.config.debug) console.log("[A2D:LINKS]", event.message)
+    })
+    webView.addEventListener("did-stop-loading", () => {
+      if (this.A2D.links.running || (webView.getURL() == "about:blank")) return
+      this.A2D.links.running = true
+      A2D("URL Loaded", webView.getURL())
+      webView.executeJavaScript(`
+      var timer = null
+      function scrollDown(posY){
+        clearTimeout(timer)
+        timer = null
+        var scrollHeight = document.body.scrollHeight
+        if (posY == 0) console.log("Begin Scrolling")
+        if (posY > scrollHeight) posY = scrollHeight
+        document.documentElement.scrollTop = document.body.scrollTop = posY;
+        if (posY == scrollHeight) return console.log("End Scrolling")
+        timer = setTimeout(function(){
+          if (posY < scrollHeight) {
+            posY = posY + ${this.config.links.scrollStep}
+            scrollDown(posY);
+          }
+        }, ${this.config.links.scrollInterval});
+      };
+      if (${this.config.links.scrollActivate}) {
+        setTimeout(scrollDown(0), ${this.config.links.scrollStart});
+      };`)
+    })
+    this.timerLinks = setTimeout(() => {
+      this.resetLinks()
+      this.hideDisplay()
+    }, this.config.links.displayDelay)
+  }
+
+  resetLinks() {
+    clearTimeout(this.timerLinks)
+    this.timerLinks = null
+    let tmp = {
+      links: {
+        displayed: false,
+        urls: null,
+        length: 0,
+        running: false
+      }
+    }
+    this.A2D = this.objAssign({}, this.A2D, tmp)
+    var iframe = document.getElementById("A2D_OUTPUT")
+    iframe.src= "about:blank"
+    A2D("Reset Links", this.A2D)
+  }
+
+/** youtube rules **/
+  showYT() {
+    var YT = document.getElementById("A2D_YOUTUBE")
+    var winh = document.getElementById("A2D")
+    if (this.A2D.youtube.displayed) {
+      this.A2DLock() // for YT playlist
+      winh.classList.remove("hidden")
+      YT.classList.remove("hidden")
+    } else {
+      if (this.A2D.photos.displayed || this.A2D.links.displayed) {
+        winh.classList.remove("hidden")
+        YT.classList.add("hidden")
+      } else {
+        this.hideDisplay()
+      }
+    }
+  }
+
+  titleYT() {
+    var tr = document.getElementById("A2D_TRANSCRIPTION").getElementsByTagName("p")
+    tr[0].innerHTML= this.A2D.youtube.title
+  }
+
+  resetYT() {
+    let tmp = {
+      youtube: {
+        displayed: false,
+        id: null,
+        type: null,
+        title: null
+      }
+    }
+    this.A2D = this.objAssign({}, this.A2D, tmp)
+    A2D("Reset YouTube", this.A2D)
+  }
+
+/** Cast **/
+  castStart(url) {
+    /** stop all process before starting cast **/
+    if (this.A2D.youtube.displayed) {
+      if (this.config.youtube.useVLC) {
+        this.sendSocketNotification("YT_STOP")
+        this.A2D.youtube.displayed = false
+        this.showYT()
+        this.resetYT()
+      }
+      else this.player.command("stopVideo")
+    }
+    if (this.A2D.spotify.connected && this.A2D.spotify.librespot) {
+      this.sendSocketNotification("SPOTIFY_PAUSE")
+    }
+    if (this.A2D.photos.displayed) {
+      this.resetPhotos()
+      this.hideDisplay()
+    }
+    if (this.A2D.links.displayed) {
+      this.resetLinks()
+      this.hideDisplay()
+    }
+    if (this.A2D.radio) this.radioStop()
+
+    /** emulation of displaying links **/
+    this.A2D.GA.transcription = "YouTube Cast"
+    this.prepareDisplay()
+    this.A2D.links.running = false
+    var webView = document.getElementById("A2D_OUTPUT")
+    A2D("Cast Loading", url)
+    this.A2D.links.displayed = true
+    this.A2D.links.running = true
+    this.showDisplay()
+    this.A2DLock()
+    webView.src= url
+  }
+
+  castStop() {
+    var webView = document.getElementById("A2D_OUTPUT")
+    this.resetLinks()
+    this.hideDisplay()
+  }
+
+/** Other Cmds **/
+  prepare() {
+    // reserved for extends
+  }
+
+  prepareDisplay() {
+    // reserved for extends
+  }
+
+  showDisplay() {
+    A2D("Show Iframe")
+    var YT = document.getElementById("A2D_YOUTUBE")
+    var iframe = document.getElementById("A2D_OUTPUT")
+    var photo = document.getElementById("A2D_PHOTO")
+    var winA2D = document.getElementById("A2D")
+    if (this.A2D.speak) winA2D.classList.add("hidden")
+    else winA2D.classList.remove("hidden")
+
+    if (this.A2D.links.displayed) iframe.classList.remove("hidden")
+    if (this.A2D.photos.displayed) photo.classList.remove("hidden")
+    if (this.A2D.photos.forceClose) photo.classList.add("hidden")
+    if (this.A2D.youtube.displayed) YT.classList.remove("hidden")
+  }
+
+  hideDisplay() {
+    A2D("Hide Iframe")
+    var winA2D = document.getElementById("A2D")
+    var iframe = document.getElementById("A2D_OUTPUT")
+    var photo = document.getElementById("A2D_PHOTO")
+    var YT = document.getElementById("A2D_YOUTUBE")
+
+    if (!this.A2D.youtube.displayed) YT.classList.add("hidden")
+    if (!this.A2D.links.displayed) iframe.classList.add("hidden")
+    if (!this.A2D.photos.displayed) photo.classList.add("hidden")
+    if (this.A2D.speak || !this.working()) winA2D.classList.add("hidden")
+
+    if (!this.A2D.speak && !this.working()) this.A2DUnlock()
+  }
+
+  hideSpotify() {
+    var spotifyModule = document.getElementById("module_A2D_Spotify")
+    var dom = document.getElementById("A2D_SPOTIFY")
+    this.timer = null
+    clearTimeout(this.timer)
+    dom.classList.remove("bottomIn")
+    dom.classList.add("bottomOut")
+    this.timer = setTimeout(() => {
+      dom.classList.add("inactive")
+      spotifyModule.style.display = "none"
+    }, 500)
+  }
+
+  showSpotify() {
+    var spotifyModule = document.getElementById("module_A2D_Spotify")
+    var dom = document.getElementById("A2D_SPOTIFY")
+    spotifyModule.style.display = "block"
+    dom.classList.remove("bottomOut")
+    dom.classList.add("bottomIn")
+    dom.classList.remove("inactive")
+  }
+
+  A2DLock() {
+    if (this.A2D.locked) return
+    A2D("Lock Screen")
+    MM.getModules().exceptWithClass("MMM-GoogleAssistant").enumerate((module)=> {
+      module.hide(15, {lockString: "A2D_LOCKED"})
+    })
+    if (this.A2D.spotify.connected && this.config.spotify.useBottomBar) this.hideSpotify()
+    if (this.config.screen.useScreen) this.sendSocketNotification("SCREEN_LOCK", true)
+    this.A2D.locked = true
+  }
+
+  A2DUnlock () {
+    if (!this.A2D.locked || this.working()) return
+    A2D("Unlock Screen")
+    MM.getModules().exceptWithClass("MMM-GoogleAssistant").enumerate((module)=> {
+      module.show(15, {lockString: "A2D_LOCKED"})
+    })
+    if (this.A2D.spotify.connected && this.config.spotify.useBottomBar) this.showSpotify()
+    if (this.config.screen.useScreen && !this.A2D.spotify.connected) this.sendSocketNotification("SCREEN_LOCK", false)
+    this.A2D.locked = false
+  }
+
+  objAssign (result) {
+    var stack = Array.prototype.slice.call(arguments, 1)
+    var item
+    var key
+    while (stack.length) {
+      item = stack.shift()
+      for (key in item) {
+        if (item.hasOwnProperty(key)) {
+          if (typeof result[key] === "object" && result[key] && Object.prototype.toString.call(result[key]) !== "[object Array]") {
+            if (typeof item[key] === "object" && item[key] !== null) {
+              result[key] = this.objAssign({}, result[key], item[key])
+            } else {
+              result[key] = item[key]
+            }
+          } else {
+            result[key] = item[key]
+          }
+        }
+      }
+    }
+    return result
+  }
+
+  working () {
+    return (this.A2D.youtube.displayed || this.A2D.photos.displayed || this.A2D.links.displayed)
+  }
+}
