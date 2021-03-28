@@ -114,7 +114,6 @@ Module.register("MMM-Assistant2Display",{
   },
 
   start: function () {
-    this.config = this.configAssignment({}, this.defaults, this.config)
     if (this.config.youtube.useYoutube && this.config.youtube.useVLC) this.initializeVolumeVLC()
 
     this.volumeScript= {
@@ -739,29 +738,6 @@ Module.register("MMM-Assistant2Display",{
       console.log("[A2D] displayStyle Error ! ["+ this.config.screen.displayStyle + "]")
       this.config.screen= Object.assign({}, this.config.screen, {displayStyle : "Text"} )
     }
-  },
-
-  configAssignment : function (result) {
-    var stack = Array.prototype.slice.call(arguments, 1)
-    var item
-    var key
-    while (stack.length) {
-      item = stack.shift()
-      for (key in item) {
-        if (item.hasOwnProperty(key)) {
-          if (typeof result[key] === "object" && result[key] && Object.prototype.toString.call(result[key]) !== "[object Array]") {
-            if (typeof item[key] === "object" && item[key] !== null) {
-              result[key] = this.configAssignment({}, result[key], item[key])
-            } else {
-              result[key] = item[key]
-            }
-          } else {
-            result[key] = item[key]
-          }
-        }
-      }
-    }
-    return result
   },
 
   /** briefToday **/
