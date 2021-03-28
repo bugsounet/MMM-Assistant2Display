@@ -16,8 +16,8 @@ Module.register("MMM-Assistant2Display",{
     youtube: {
       useYoutube: false,
       useVLC: false,
-      minVolume: 70,
-      maxVolume: 200
+      minVolume: 30,
+      maxVolume: 100
     },
     links: {
       useLinks: false,
@@ -115,6 +115,8 @@ Module.register("MMM-Assistant2Display",{
 
   start: function () {
     this.config = this.configAssignment({}, this.defaults, this.config)
+    if (this.config.youtube.useYoutube && this.config.youtube.useVLC) this.initializeVolumeVLC()
+
     this.volumeScript= {
       "OSX": "osascript -e 'set volume output volume #VOLUME#'",
       "ALSA": "amixer sset -M 'PCM' #VOLUME#%",
@@ -336,7 +338,6 @@ Module.register("MMM-Assistant2Display",{
             this.sendSocketNotification("SPOTIFY_VOLUME", this.A2D.spotify.targetVolume)
           }
           this.A2D.spotify.forceVolume= false
-          //this.spotifyNewVolume = false
           if (this.A2D.radio) this.radio.volume = 0.6
           if (this.displayResponse.working()) this.displayResponse.showDisplay()
           else this.displayResponse.hideDisplay()
@@ -1127,5 +1128,36 @@ Module.register("MMM-Assistant2Display",{
   *to*: Transfert music to another device (case sensitive)\
   ',{parse_mode:'Markdown'})
     }
+  },
+
+  /** initialise volume control for VLC **/
+  initializeVolumeVLC: function() {
+    if (!this.config.youtube.useVLC) return
+    /** convert volume **/
+    try {
+      let valueStart = null
+      valueStart = parseInt(this.config.youtube.minVolume)
+      if (typeof valueStart === "number" && valueStart >= 0 && valueStart <= 100) this.config.youtube.minVolume = ((valueStart * 255) / 100).toFixed(0)
+      else {
+        console.error("[A2D] config.youtube.minVolume error! Corrected with 100")
+        this.config.youtube.minVolume = 255
+      }
+    } catch (e) {
+      console.error("[A2D] config.youtube.minVolume error!", e)
+      this.config.youtube.minVolume = 255
+    }
+    try {
+      let valueMin = null
+      valueMin = parseInt(this.config.youtube.maxVolume)
+      if (typeof valueMin === "number" && valueMin >= 0 && valueMin <= 100) this.config.youtube.maxVolume = ((valueMin * 255) / 100).toFixed(0)
+      else {
+        console.error("[A2D] config.youtube.maxVolume error! Corrected with 30")
+        this.config.youtube.maxVolume = 70
+      }
+    } catch (e) {
+      console.error("[A2D] config.youtube.maxVolume error!", e)
+      this.config.youtube.maxVolume = 70
+    }
+    console.log("[A2D] VLC Volume Control initialized!")
   }
 });
