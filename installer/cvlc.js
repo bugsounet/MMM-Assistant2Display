@@ -5,9 +5,9 @@ var Cvlc = require('@bugsounet/cvlc')
 var link ="https://www.youtube.com/watch?v=25N1pdzvp4c"
 
 console.log("Try to start VLC...")
-var args = ["--no-video-title-show", "--no-video-deco", "--no-embedded-video", "--video-title=library @bugsounet/cvlc Testing Windows"]
+var args = ["--no-http-forward-cookies", "--no-video-title-show", "--no-video-deco", "--no-embedded-video", "--video-title=library @bugsounet/cvlc Testing Windows"]
 var test = 0
-var VolMin,VolMed,VolMax,full,win,pause,play,restart,help,end
+var VolMin,VolMed,VolMax,full,win,pause,play,restart,end
 this.stream = new Cvlc(args)
 self=this
 
@@ -27,7 +27,6 @@ this.stream.play(
     clearTimeout(pause)
     clearTimeout(play)
     clearTimeout(restart)
-    clearTimeout(help)
     clearTimeout(end)
     if (!test) {
       console.log("Error Detected")
@@ -75,12 +74,6 @@ function testVLC() {
   restart=setTimeout(() => {
     console.log("Test Restart")
     self.stream.cmd("prev")
-  }, 24000)
-  help=setTimeout(() => {
-    console.log("Display command help:")
-    self.stream.cmd('longhelp', (err, response) => {
-      console.log(response)
-    })
   }, 27000)
   end=setTimeout(() => {
     console.log("All Test Done!")
