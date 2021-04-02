@@ -1111,28 +1111,28 @@ Module.register("MMM-Assistant2Display",{
     if (!this.config.youtube.useVLC) return
     /** convert volume **/
     try {
-      let valueStart = null
-      valueStart = parseInt(this.config.youtube.minVolume)
-      if (typeof valueStart === "number" && valueStart >= 0 && valueStart <= 100) this.config.youtube.minVolume = ((valueStart * 255) / 100).toFixed(0)
+      let valueMin = null
+      valueMin = parseInt(this.config.youtube.minVolume)
+      if (typeof valueMin === "number" && valueMin >= 0 && valueMin <= 100) this.config.youtube.minVolume = ((valueMin * 255) / 100).toFixed(0)
       else {
-        console.error("[A2D] config.youtube.minVolume error! Corrected with 100")
-        this.config.youtube.minVolume = 255
+        console.error("[A2D] config.youtube.minVolume error! Corrected with 30")
+        this.config.youtube.minVolume = 70
       }
     } catch (e) {
       console.error("[A2D] config.youtube.minVolume error!", e)
-      this.config.youtube.minVolume = 255
+      this.config.youtube.minVolume = 70
     }
     try {
-      let valueMin = null
-      valueMin = parseInt(this.config.youtube.maxVolume)
-      if (typeof valueMin === "number" && valueMin >= 0 && valueMin <= 100) this.config.youtube.maxVolume = ((valueMin * 255) / 100).toFixed(0)
+      let valueMax = null
+      valueMax = parseInt(this.config.youtube.maxVolume)
+      if (typeof valueMax === "number" && valueMax >= 0 && valueMax <= 100) this.config.youtube.maxVolume = ((valueMax * 255) / 100).toFixed(0)
       else {
-        console.error("[A2D] config.youtube.maxVolume error! Corrected with 30")
-        this.config.youtube.maxVolume = 70
+        console.error("[A2D] config.youtube.maxVolume error! Corrected with 100")
+        this.config.youtube.maxVolume = 255
       }
     } catch (e) {
       console.error("[A2D] config.youtube.maxVolume error!", e)
-      this.config.youtube.maxVolume = 70
+      this.config.youtube.maxVolume = 255
     }
     console.log("[A2D] VLC Volume Control initialized!")
   }
