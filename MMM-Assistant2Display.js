@@ -291,7 +291,8 @@ Module.register("MMM-Assistant2Display",{
       en: "translations/en.json",
       fr: "translations/fr.json",
       it: "translations/it.json",
-      de: "translations/de.json"
+      de: "translations/de.json",
+      es: "translations/es.json"
     }
   },
 
