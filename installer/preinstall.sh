@@ -64,4 +64,5 @@ git pull 2>/dev/null
 
 echo
 Installer_info "Installing all library..."
+npm run dependencies
 echo
