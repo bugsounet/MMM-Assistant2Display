@@ -265,10 +265,8 @@ Module.register("MMM-Assistant2Display",{
 
   getScripts: function() {
     this.scanConfig()
-    var ui = this.ui + "/" + this.ui + '.js'
     return [
        "/modules/MMM-Assistant2Display/components/display.js",
-       "/modules/MMM-Assistant2Display/ui/" + ui,
        "/modules/MMM-Assistant2Display/components/youtube.js",
        "/modules/MMM-Assistant2Display/components/progressbar.js",
        "/modules/MMM-Assistant2Display/components/spotify.js",
@@ -280,8 +278,7 @@ Module.register("MMM-Assistant2Display",{
 
   getStyles: function() {
     return [
-      "/modules/MMM-Assistant2Display/ui/" + this.ui + "/" + this.ui + ".css",
-      "screen.css",
+      "MMM-Assistant2Display.css",
       "font-awesome.css"
     ]
   },
@@ -599,11 +596,15 @@ Module.register("MMM-Assistant2Display",{
         var ping = document.getElementById("A2D_INTERNET_PING")
         ping.textContent = payload
         break
-      case "SNOWBOY_STOP":
-        this.sendNotification("ASSISTANT_STOP")
+      case "SNOWBOY_STOP": // to replace soon by DETECTOR
+        this.sendNotification("ASSISTANT_STOP") // to delete soon
+        this.sendNotification("SNOWBOY_STOP") // to delete soon
+        this.sendNotification("DETECTOR_STOP")
         break
-      case "SNOWBOY_START":
-        this.sendNotification("ASSISTANT_START")
+      case "SNOWBOY_START": // to replace soon by DETECTOR
+        this.sendNotification("ASSISTANT_START") // to delete soon
+        this.sendNotification("SNOWBOY_START") // to delete soon
+        this.sendNotification("DETECTOR_START")
         break
       case "CAST_START":
         this.sendSocketNotification("SCREEN_WAKEUP")
@@ -663,7 +664,6 @@ Module.register("MMM-Assistant2Display",{
 
   scanConfig: function() {
     this.useA2D = false
-    this.ui = "Windows"
     console.log("[A2D] Scan config.js file")
     var GAFound = false
     var GAActivated= false
@@ -672,10 +672,6 @@ Module.register("MMM-Assistant2Display",{
     for (let [item, value] of Object.entries(config.modules)) {
       if (value.module == "MMM-GoogleAssistant") {
         GAFound = true
-        if (value.position == "fullscreen_above") {
-          if (value.config.responseConfig && value.config.responseConfig.screenRotate) this.ui = "FullscreenRotate"
-          else this.ui = "Fullscreen"
-        }
         GAActivated = value.config.A2DServer && value.config.A2DServer.useA2D && !value.disabled
       }
       if (value.module == "MMM-Alexa") {
@@ -694,7 +690,6 @@ Module.register("MMM-Assistant2Display",{
     } else console.log("[A2D][WARN] Alexa not found!")
 
     this.useA2D = GAActivated || AlexaActivated
-    console.log("[A2D] Auto choice UI:", this.ui)
     if (!this.useA2D) {
       console.log("[A2D][ERROR] A2D is desactived!")
     }
