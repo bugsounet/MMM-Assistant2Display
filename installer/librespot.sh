@@ -29,7 +29,8 @@ git clone https://github.com/librespot-org/librespot.git
 Installer_success "Done."
 echo
 Installer_info "Installing Rust..."
-curl https://sh.rustup.rs -sSf | sh -s -- --profile default -y
+#Issue : change RUSTUP_UNPACK_RAM to 100M
+curl https://sh.rustup.rs -sSf | RUSTUP_UNPACK_RAM=100000000 sh -s -- --profile default -y
 source $HOME/.cargo/env
 Installer_success "Done."
 echo
