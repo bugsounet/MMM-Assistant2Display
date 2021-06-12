@@ -62,7 +62,3 @@ Installer_info "Installing Sources..."
 Installer_error "Installing Error !"
 Installer_error "MMM-Assistant2Display is now deprecied!"
 
-echo
-Installer_info "Installing all library..."
-npm prune
-echo
