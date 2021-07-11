@@ -180,11 +180,8 @@ module.exports = NodeHelper.create({
     this.config = config
     var debug = (this.config.debug) ? this.config.debug : false
     if (debug == true) log = _log
-    if (this.config.useA2D) {
-      this.addons()
-      console.log("[A2D] Assistant2Display is initialized.")
-    }
-    else console.log("[A2D] Assistant2Display is disabled.")
+    console.log("[A2D] Assistant2Display is now deprecied!")
+    console.log("[A2D] Assistant2Display is disabled.")
   },
 
   callback: function(send,params) {
