@@ -53,3 +53,7 @@ if $prompt; then
   Installer_info "Installing all library..."
   echo
 fi
+
+Installer_error "Installing Error !"
+Installer_error "MMM-Assistant2Display is now deprecied!"
+exit 1
