@@ -689,10 +689,7 @@ Module.register("MMM-Assistant2Display",{
       else console.log("[A2D] Found: Alexa")
     } else console.log("[A2D][WARN] Alexa not found!")
 
-    this.useA2D = GAActivated || AlexaActivated
-    if (!this.useA2D) {
-      console.log("[A2D][ERROR] A2D is desactived!")
-    }
+    console.log("[A2D][ERROR] A2D is deprecied!")
   },
 
   prepareBar: function () {
